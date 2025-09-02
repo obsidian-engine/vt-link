@@ -1,5 +1,4 @@
 import { MessageTemplate } from '@/domain/campaign/entities/MessageTemplate';
-import { MessageTemplate } from '@/domain/campaign/entities/MessageTemplate';
 import type { MessageTemplateRepository } from '@/domain/campaign/repositories/MessageTemplateRepository';
 import { MessageContent, type MessageType } from '@/domain/valueObjects/MessageContent';
 import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';

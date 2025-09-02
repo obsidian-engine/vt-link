@@ -11,6 +11,10 @@ export enum LineActionType {
   Postback = 'postback',
   Message = 'message',
   Uri = 'uri',
+  DatetimePicker = 'datetimepicker',
+  Camera = 'camera',
+  CameraRoll = 'cameraRoll',
+  Location = 'location',
 }
 
 export interface RichMenuAction {

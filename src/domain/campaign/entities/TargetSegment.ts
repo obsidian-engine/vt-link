@@ -247,10 +247,15 @@ export class TargetSegment {
    * ユーザーがこのセグメントの対象になるかをチェックします
    */
   matches(user: LineUser): boolean {
+    // null値を適切にハンドリング
+    if (!user.age || !user.gender || !user.region) {
+      return false;
+    }
+
     return this.#criteria.matches({
-      gender: user.gender,
+      gender: user.gender as any, // 型変換（一時的対応）
       age: user.age,
-      region: user.region,
+      region: user.region as any, // 型変換（一時的対応）
     });
   }
 

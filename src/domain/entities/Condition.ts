@@ -95,11 +95,11 @@ export class KeywordCondition extends Condition {
       case KeywordMatchMode.Exact:
         return messageText === keyword;
       case KeywordMatchMode.Partial:
-        return messageText.includes(keyword);
+        return messageText?.includes(keyword) ?? false;
       case KeywordMatchMode.StartsWith:
-        return messageText.startsWith(keyword);
+        return messageText?.startsWith(keyword) ?? false;
       case KeywordMatchMode.EndsWith:
-        return messageText.endsWith(keyword);
+        return messageText?.endsWith(keyword) ?? false;
       default:
         return false;
     }

@@ -75,7 +75,7 @@ export class SendNowUsecase {
       if (campaign.type === CampaignType.Broadcast) {
         // Get all users for the account
         const allUsers = await this.#userRepository.findAllByAccountId(campaign.accountId);
-        targetUserIds = allUsers.map((user) => user.userId);
+        targetUserIds = allUsers.map((user) => user.lineUserId);
       } else if (campaign.type === CampaignType.Segment) {
         if (!campaign.segmentId) {
           throw new Error('Segment ID is required for segment campaigns');

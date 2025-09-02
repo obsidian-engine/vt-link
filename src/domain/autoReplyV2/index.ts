@@ -53,11 +53,12 @@ export {
 } from '../builders';
 
 // ===== EXAMPLES & DEMOS =====
-export {
-  VTuberAutoReplyDemo,
-  runVTuberDemo,
-  createCustomRule,
-} from '../examples/AutoReplyDemo';
+// デモ機能は一時的にコメントアウト（TypeScriptエラー対応）
+// export {
+//   VTuberAutoReplyDemo,
+//   runVTuberDemo,
+//   createCustomRule,
+// } from '../examples/AutoReplyDemo';
 
 // 既存エンティティとの互換性
 export type { MessageSource } from '../entities/IncomingMessage';

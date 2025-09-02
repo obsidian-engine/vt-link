@@ -16,6 +16,7 @@
 - [技術スタック](#技術スタック)
 - [Quick Start](#quick-start)
 - [開発環境のセットアップ](#開発環境のセットアップ)
+- [データベース管理コマンド](#データベース管理コマンド)
 - [利用可能なスクリプト](#利用可能なスクリプト)
 - [デプロイ](#デプロイ)
 - [必要なGitHub Secrets](#必要なgithub-secrets)
@@ -112,6 +113,98 @@ npm run dev
 ```
 
 開発サーバーが [http://localhost:3000](http://localhost:3000) で起動します。
+
+## データベース管理コマンド
+
+### Supabaseローカル環境
+
+```bash
+# Supabaseローカル環境を開始
+npx supabase start
+
+# Supabaseローカル環境を停止
+npx supabase stop
+
+# データベース状態を確認
+npx supabase status
+
+# ダッシュボードを開く (通常は http://localhost:54323)
+npx supabase dashboard
+```
+
+### マイグレーション管理
+
+```bash
+# 新しいマイグレーションを作成
+npx supabase migration new <migration_name>
+
+# ローカルデータベースにマイグレーションを適用
+npx supabase db push
+
+# リモートデータベースからスキーマを取得
+npx supabase db pull
+
+# マイグレーション履歴を確認
+npx supabase migration list
+```
+
+### 型定義生成
+
+```bash
+# TypeScript型定義を生成
+npm run types:generate
+
+# 型定義生成のエイリアス
+npm run db:types
+
+# 型定義生成を監視 (ファイル変更時に自動実行)
+npm run types:watch
+
+# 手動で型定義を生成 (直接実行)
+node scripts/generate-types.js
+```
+
+### データベーススキーマ管理
+
+```bash
+# スキーマをリセット (注意: 全データ削除)
+npx supabase db reset
+
+# 現在のスキーマを表示
+npx supabase db diff
+
+# Seed データを投入
+npx supabase seed
+```
+
+### トラブルシューティング
+
+```bash
+# Supabaseコンテナのログを確認
+npx supabase logs
+
+# 特定のサービスのログを確認
+npx supabase logs -f database
+npx supabase logs -f api
+
+# Supabase環境をクリーンアップ
+npx supabase stop --no-backup
+npx supabase start
+```
+
+### 便利なコマンド
+
+```bash
+# SQL ファイルを実行
+npx supabase db query --file path/to/query.sql
+
+# 本番データベースと同期
+npx supabase link --project-ref <your-project-ref>
+npx supabase db pull
+
+# 型生成と開発サーバーを同時起動
+npm run types:watch & npm run dev
+```
 
 ## 利用可能なスクリプト
 

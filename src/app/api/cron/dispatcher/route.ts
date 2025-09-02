@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     // 認証チェック（CRON_SECRET環境変数を使用）
     const authHeader = request.headers.get('Authorization');
-    const cronSecret = process.env.CRON_SECRET;
+    const cronSecret = process.env['CRON_SECRET'];
 
     if (!cronSecret) {
       return NextResponse.json({ error: 'CRON_SECRET is not configured' }, { status: 500 });

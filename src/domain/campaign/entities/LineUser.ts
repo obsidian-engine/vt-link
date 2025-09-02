@@ -1,31 +1,25 @@
-import type { Gender } from '@/domain/valueObjects/Gender';
-import type { RegionCode } from '@/domain/valueObjects/Region';
+import type { Gender, RegionCode } from '@/types/database.types';
 
 export class LineUser {
-  constructor(
-    public readonly id: string,
-    public readonly accountId: string,
-    public readonly lineUserId: string,
-    public readonly displayName: string,
-    public readonly pictureUrl: string | null,
-    public readonly statusMessage: string | null,
-    public readonly language: string | null,
-    public readonly gender: Gender | null,
-    public readonly age: number | null,
-    public readonly region: RegionCode | null,
-    public readonly isFriend: boolean,
-    public readonly blockedAt: Date | undefined,
-    public readonly createdAt: Date
-  ) {}
+  readonly id: string;
+  readonly accountId: string;
+  readonly lineUserId: string;
+  readonly displayName: string | null;
+  readonly pictureUrl: string | null;
+  readonly statusMessage: string | null;
+  readonly language: string | null;
+  readonly gender: Gender | null;
+  readonly age: number | null;
+  readonly region: RegionCode | null;
+  readonly isFriend: boolean;
+  readonly blockedAt: Date | null;
+  readonly createdAt: Date;
 
-  /**
-   * 既存のデータからLineUserエンティティを再構築
-   */
-  static reconstruct(
+  constructor(
     id: string,
     accountId: string,
     lineUserId: string,
-    displayName: string,
+    displayName: string | null,
     pictureUrl: string | null,
     statusMessage: string | null,
     language: string | null,
@@ -33,7 +27,62 @@ export class LineUser {
     age: number | null,
     region: RegionCode | null,
     isFriend: boolean,
-    blockedAt: Date | undefined,
+    blockedAt: Date | null,
+    createdAt: Date
+  ) {
+    this.id = id;
+    this.accountId = accountId;
+    this.lineUserId = lineUserId;
+    this.displayName = displayName;
+    this.pictureUrl = pictureUrl;
+    this.statusMessage = statusMessage;
+    this.language = language;
+    this.gender = gender;
+    this.age = age;
+    this.region = region;
+    this.isFriend = isFriend;
+    this.blockedAt = blockedAt;
+    this.createdAt = createdAt;
+  }
+
+  static create(
+    accountId: string,
+    lineUserId: string,
+    displayName?: string,
+    pictureUrl?: string,
+    statusMessage?: string,
+    language?: string
+  ): LineUser {
+    return new LineUser(
+      crypto.randomUUID(),
+      accountId,
+      lineUserId,
+      displayName || null,
+      pictureUrl || null,
+      statusMessage || null,
+      language || null,
+      null,
+      null,
+      null,
+      true,
+      null,
+      new Date()
+    );
+  }
+
+  static reconstruct(
+    id: string,
+    accountId: string,
+    lineUserId: string,
+    displayName: string | null,
+    pictureUrl: string | null,
+    statusMessage: string | null,
+    language: string | null,
+    gender: Gender | null,
+    age: number | null,
+    region: RegionCode | null,
+    isFriend: boolean,
+    blockedAt: Date | null,
     createdAt: Date
   ): LineUser {
     return new LineUser(
@@ -53,48 +102,52 @@ export class LineUser {
     );
   }
 
-  /**
-   * 新しいLINEユーザーを作成
-   */
-  static create(
-    accountId: string,
-    lineUserId: string,
-    displayName: string,
-    pictureUrl?: string | null,
-    statusMessage?: string | null,
-    language?: string | null,
-    gender?: Gender | null,
-    age?: number | null,
-    region?: RegionCode | null
+  updateProfile(
+    displayName?: string,
+    pictureUrl?: string,
+    statusMessage?: string,
+    language?: string
   ): LineUser {
     return new LineUser(
-      crypto.randomUUID(),
-      accountId,
-      lineUserId,
-      displayName,
-      pictureUrl ?? null,
-      statusMessage ?? null,
-      language ?? null,
-      gender ?? null,
-      age ?? null,
-      region ?? null,
-      true, // 新規ユーザーは友達状態でスタート
-      undefined, // ブロックされていない
-      new Date()
+      this.id,
+      this.accountId,
+      this.lineUserId,
+      displayName !== undefined ? displayName : this.displayName,
+      pictureUrl !== undefined ? pictureUrl : this.pictureUrl,
+      statusMessage !== undefined ? statusMessage : this.statusMessage,
+      language !== undefined ? language : this.language,
+      this.gender,
+      this.age,
+      this.region,
+      this.isFriend,
+      this.blockedAt,
+      this.createdAt
     );
   }
 
-  /**
-   * ユーザーがアクティブ（友達で、ブロックされていない）かどうか
-   */
-  get isActive(): boolean {
-    return this.isFriend && this.blockedAt === undefined;
+  updateDemographics(
+    gender: Gender | null,
+    age: number | null,
+    region: RegionCode | null
+  ): LineUser {
+    return new LineUser(
+      this.id,
+      this.accountId,
+      this.lineUserId,
+      this.displayName,
+      this.pictureUrl,
+      this.statusMessage,
+      this.language,
+      gender,
+      age,
+      region,
+      this.isFriend,
+      this.blockedAt,
+      this.createdAt
+    );
   }
 
-  /**
-   * 友達状態を更新
-   */
-  updateFriendStatus(isFriend: boolean): LineUser {
+  block(): LineUser {
     return new LineUser(
       this.id,
       this.accountId,
@@ -106,65 +159,31 @@ export class LineUser {
       this.gender,
       this.age,
       this.region,
-      isFriend,
-      isFriend ? undefined : new Date(), // 友達解除時は現在時刻でブロック
+      false,
+      new Date(),
       this.createdAt
     );
   }
 
-  /**
-   * プロフィール情報を更新
-   */
-  updateProfile(
-    displayName?: string,
-    pictureUrl?: string | null,
-    statusMessage?: string | null,
-    language?: string | null,
-    gender?: Gender | null,
-    age?: number | null,
-    region?: RegionCode | null
-  ): LineUser {
+  unblock(): LineUser {
     return new LineUser(
       this.id,
       this.accountId,
       this.lineUserId,
-      displayName ?? this.displayName,
-      pictureUrl !== undefined ? pictureUrl : this.pictureUrl,
-      statusMessage !== undefined ? statusMessage : this.statusMessage,
-      language !== undefined ? language : this.language,
-      gender !== undefined ? gender : this.gender,
-      age !== undefined ? age : this.age,
-      region !== undefined ? region : this.region,
-      this.isFriend,
-      this.blockedAt,
+      this.displayName,
+      this.pictureUrl,
+      this.statusMessage,
+      this.language,
+      this.gender,
+      this.age,
+      this.region,
+      true,
+      null,
       this.createdAt
     );
   }
 
-  /**
-   * 年代を取得（統計用）
-   */
-  get ageGroup(): string {
-    if (!this.age) return 'unknown';
-    if (this.age < 20) return '10代';
-    if (this.age < 30) return '20代';
-    if (this.age < 40) return '30代';
-    if (this.age < 50) return '40代';
-    if (this.age < 60) return '50代';
-    return '60代以上';
-  }
-
-  /**
-   * エンティティの等価性チェック
-   */
-  equals(other: LineUser): boolean {
-    return this.id === other.id;
-  }
-
-  /**
-   * デバッグ用の文字列表現
-   */
-  toString(): string {
-    return `LineUser(${this.id}, ${this.displayName}, ${this.lineUserId})`;
+  isActive(): boolean {
+    return this.isFriend && !this.blockedAt;
   }
 }

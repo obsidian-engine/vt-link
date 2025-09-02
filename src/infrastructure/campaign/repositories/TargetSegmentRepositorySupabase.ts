@@ -1,4 +1,5 @@
-import { type LineUser, TargetSegment } from '@/domain/campaign/entities/TargetSegment';
+import type { LineUser } from '@/domain/campaign/entities/LineUser';
+import { TargetSegment } from '@/domain/campaign/entities/TargetSegment';
 import type { TargetSegmentRepository } from '@/domain/campaign/repositories/TargetSegmentRepository';
 import { SegmentCriteria } from '@/domain/valueObjects/SegmentCriteria';
 import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';

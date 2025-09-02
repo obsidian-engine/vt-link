@@ -24,7 +24,7 @@ export default function NewRichMenuPage() {
       const result = await createRichMenu(formData);
 
       if (!result.success) {
-        setError(result.error);
+        setError(result.error || 'エラーが発生しました');
         return;
       }
 

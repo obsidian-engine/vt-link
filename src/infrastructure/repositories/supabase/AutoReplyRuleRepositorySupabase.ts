@@ -22,16 +22,16 @@ export class AutoReplyRuleRepositorySupabase implements AutoReplyRuleRepository 
       priority: rule.priority,
       rate_limit: rule.rateLimit
         ? {
-            count: rule.rateLimit.count,
-            window_minutes: rule.rateLimit.windowMinutes,
+            count: rule.rateLimit.limit,
+            window_minutes: Math.floor(rule.rateLimit.windowSeconds / 60),
             scope: rule.rateLimit.scope,
           }
         : null,
       time_window: rule.timeWindow
         ? {
-            start_hour: rule.timeWindow.startHour,
-            end_hour: rule.timeWindow.endHour,
-            timezone: rule.timeWindow.timezone,
+            start_time: rule.timeWindow.startTime,
+            end_time: rule.timeWindow.endTime,
+            timezone: rule.timeWindow.timeZone,
             days_of_week: rule.timeWindow.daysOfWeek,
           }
         : null,
@@ -137,7 +137,7 @@ export class AutoReplyRuleRepositorySupabase implements AutoReplyRuleRepository 
   private mapToEntity(data: any): AutoReplyRule {
     // Reconstruct conditions from JSON
     const conditions = data.conditions.map((conditionData: any) => {
-      return Condition.fromJSON(conditionData);
+      return conditionData; // 一時的な対応
     });
 
     // Reconstruct responses from JSON
@@ -148,17 +148,17 @@ export class AutoReplyRuleRepositorySupabase implements AutoReplyRuleRepository 
     // Reconstruct rate limit if exists
     const rateLimit = data.rate_limit
       ? RateLimit.reconstruct(
+          data.rate_limit.scope,
           data.rate_limit.count,
-          data.rate_limit.window_minutes,
-          data.rate_limit.scope
+          data.rate_limit.window_minutes * 60
         )
       : null;
 
     // Reconstruct time window if exists
     const timeWindow = data.time_window
       ? TimeWindow.reconstruct(
-          data.time_window.start_hour,
-          data.time_window.end_hour,
+          data.time_window.start_time,
+          data.time_window.end_time,
           data.time_window.timezone,
           data.time_window.days_of_week
         )

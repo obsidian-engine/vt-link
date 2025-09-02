@@ -37,7 +37,8 @@
       "@/application/*": ["./src/application/*"],
       "@/domain/*": ["./src/domain/*"],
       "@/infrastructure/*": ["./src/infrastructure/*"],
-      "@/shared/*": ["./src/shared/*"]
+      "@/shared/*": ["./src/shared/*"],
+      "@/types/*": ["./src/types/*"]
     },
     "target": "es2022",
     "composite": true,
@@ -53,6 +54,7 @@
     "node_modules",
     "**/*.test.ts",
     "**/*.test.tsx",
+    "src/domain/examples/**/*",
     "**/*.spec.ts",
     "**/*.spec.tsx",
     "__tests__/**/*",

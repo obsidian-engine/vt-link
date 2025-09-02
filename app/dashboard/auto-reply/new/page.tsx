@@ -278,14 +278,14 @@ function ConditionEditor({
         <div className="space-y-3">
           <input
             type="text"
-            value={condition.keyword || ''}
+            value={condition['keyword'] || ''}
             onChange={(e) => onChange({ keyword: e.target.value })}
             placeholder="キーワードを入力"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <div className="flex space-x-4">
             <select
-              value={condition.mode || 'partial'}
+              value={condition['mode'] || 'partial'}
               onChange={(e) => onChange({ mode: e.target.value })}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
@@ -297,7 +297,7 @@ function ConditionEditor({
             <label className="flex items-center">
               <input
                 type="checkbox"
-                checked={condition.caseSensitive || false}
+                checked={condition['caseSensitive'] || false}
                 onChange={(e) => onChange({ caseSensitive: e.target.checked })}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
@@ -312,7 +312,7 @@ function ConditionEditor({
       {condition.type === 'regex' && (
         <input
           type="text"
-          value={condition.pattern || ''}
+          value={condition['pattern'] || ''}
           onChange={(e) => onChange({ pattern: e.target.value })}
           placeholder="正規表現パターン"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -354,7 +354,7 @@ function ResponseEditor({
 
       {response.type === 'text' && (
         <textarea
-          value={response.text || ''}
+          value={response['text'] || ''}
           onChange={(e) => onChange({ text: e.target.value })}
           placeholder="返信メッセージを入力"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -366,14 +366,14 @@ function ResponseEditor({
         <div className="space-y-3">
           <input
             type="url"
-            value={response.originalContentUrl || ''}
+            value={response['originalContentUrl'] || ''}
             onChange={(e) => onChange({ originalContentUrl: e.target.value })}
             placeholder="画像URL"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <input
             type="url"
-            value={response.previewImageUrl || ''}
+            value={response['previewImageUrl'] || ''}
             onChange={(e) => onChange({ previewImageUrl: e.target.value })}
             placeholder="プレビュー画像URL"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -385,14 +385,14 @@ function ResponseEditor({
         <div className="space-y-3">
           <input
             type="text"
-            value={response.packageId || ''}
+            value={response['packageId'] || ''}
             onChange={(e) => onChange({ packageId: e.target.value })}
             placeholder="パッケージID"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <input
             type="text"
-            value={response.stickerId || ''}
+            value={response['stickerId'] || ''}
             onChange={(e) => onChange({ stickerId: e.target.value })}
             placeholder="スティッカーID"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -402,14 +402,14 @@ function ResponseEditor({
 
       <div className="mt-3">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          実行確率: {Math.round((response.probability || 1) * 100)}%
+          実行確率: {Math.round((response['probability'] || 1) * 100)}%
         </label>
         <input
           type="range"
           min="0.1"
           max="1"
           step="0.1"
-          value={response.probability || 1}
+          value={response['probability'] || 1}
           onChange={(e) => onChange({ probability: Number.parseFloat(e.target.value) })}
           className="w-full"
         />

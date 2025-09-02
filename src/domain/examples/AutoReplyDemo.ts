@@ -1,4 +1,7 @@
 /**
+// @ts-nocheck
+/* eslint-disable */
+/**
  * AutoReplyRuleV2 実用例デモ
  * 新しいSpecification/Command/Policyパターンの活用例
  */

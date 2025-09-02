@@ -1,16 +1,29 @@
 import type { AutoReplyRule } from '@/domain/entities/AutoReplyRule';
 import { IncomingMessage } from '@/domain/entities/IncomingMessage';
 import { ReplyLog, ReplyStatus } from '@/domain/entities/ReplyLog';
+import { type Response, ResponseType } from '@/domain/entities/Response';
+import type {
+  ImageResponsePayload,
+  StickerResponsePayload,
+  TextResponsePayload,
+} from '@/domain/entities/Response';
 import type { AutoReplyRuleRepository } from '@/domain/repositories/AutoReplyRuleRepository';
 import type { ReplyLogRepository } from '@/domain/repositories/ReplyLogRepository';
 import type { RateLimiter } from '@/domain/services/RateLimiter';
+import type {
+  LineImageMessage,
+  LineMessageUnion,
+  LineStickerMessage,
+  LineTextMessage,
+  LineWebhookEvent,
+} from '@/types/line.types';
 
 export interface LineReplyService {
-  reply(replyToken: string, messages: any[]): Promise<void>;
+  reply(replyToken: string, messages: LineMessageUnion[]): Promise<void>;
 }
 
 export interface HandleWebhookInput {
-  readonly events: ReadonlyArray<any>; // LINE webhook events
+  readonly events: ReadonlyArray<LineWebhookEvent>;
   readonly accountId: string;
 }
 
@@ -128,8 +141,8 @@ export class HandleWebhookUsecase {
             rule.id,
             accountId,
             message,
-            response.type,
-            this.getResponseContent(response),
+            response.type.toString(),
+            this.getResponseContent(this.convertResponseToLineMessage(response)),
             ReplyStatus.Success,
             null,
             Date.now() - startTime
@@ -144,8 +157,8 @@ export class HandleWebhookUsecase {
             rule.id,
             accountId,
             message,
-            response.type,
-            this.getResponseContent(response),
+            response.type.toString(),
+            this.getResponseContent(this.convertResponseToLineMessage(response)),
             ReplyStatus.Failed,
             errorMessage,
             Date.now() - startTime
@@ -196,7 +209,7 @@ export class HandleWebhookUsecase {
     }
   }
 
-  private getResponseContent(response: any): string {
+  private getResponseContent(response: LineMessageUnion): string {
     switch (response.type) {
       case 'text':
         return response.text || '';
@@ -206,6 +219,33 @@ export class HandleWebhookUsecase {
         return `${response.packageId}:${response.stickerId}`;
       default:
         return response.type;
+    }
+  }
+
+  private convertResponseToLineMessage(response: Response): LineMessageUnion {
+    switch (response.type) {
+      case ResponseType.Text:
+        const textPayload = response.payload as TextResponsePayload;
+        return {
+          type: 'text',
+          text: textPayload.text,
+        } as LineTextMessage;
+      case ResponseType.Image:
+        const imagePayload = response.payload as ImageResponsePayload;
+        return {
+          type: 'image',
+          originalContentUrl: imagePayload.originalContentUrl,
+          previewImageUrl: imagePayload.previewImageUrl,
+        } as LineImageMessage;
+      case ResponseType.Sticker:
+        const stickerPayload = response.payload as StickerResponsePayload;
+        return {
+          type: 'sticker',
+          packageId: stickerPayload.packageId,
+          stickerId: stickerPayload.stickerId,
+        } as LineStickerMessage;
+      default:
+        throw new Error(`Unsupported response type: ${response.type}`);
     }
   }
 }

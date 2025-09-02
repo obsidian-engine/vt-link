@@ -14,13 +14,14 @@ export interface CreateCampaignInput {
   readonly segmentId?: string;
   readonly content?: {
     readonly type: 'text' | 'image' | 'sticker';
-    readonly text?: string;
-    readonly originalContentUrl?: string;
-    readonly previewImageUrl?: string;
-    readonly packageId?: string;
-    readonly stickerId?: string;
+    readonly text?: string | null;
+    readonly originalContentUrl?: string | null;
+    readonly previewImageUrl?: string | null;
+    readonly packageId?: string | null;
+    readonly stickerId?: string | null;
   };
   readonly placeholderData?: Record<string, string>;
+  readonly scheduledAt?: Date;
 }
 
 export interface CreateCampaignOutput {
@@ -170,7 +171,7 @@ export class CreateCampaignUsecase {
         }
         return MessageContent.createImage(
           contentInput.originalContentUrl,
-          contentInput.previewImageUrl
+          contentInput.previewImageUrl ?? undefined
         );
 
       case 'sticker':

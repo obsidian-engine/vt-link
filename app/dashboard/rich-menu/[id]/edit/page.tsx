@@ -3,17 +3,20 @@
 import { RichMenuEditor } from '@/ui/components/rich-menu/RichMenuEditor';
 import { RichMenuPreview } from '@/ui/components/rich-menu/RichMenuPreview';
 import type { RichMenuArea } from '@/ui/components/rich-menu/types';
+import { LineActionType } from '@/ui/components/rich-menu/types';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface EditRichMenuPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
+  const resolvedParams = React.use(params);
+  const { id } = resolvedParams;
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,13 +28,13 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
 
   useEffect(() => {
     loadRichMenu();
-  }, [params.id]);
+  }, [id]);
 
   const loadRichMenu = async () => {
     try {
       setIsLoading(true);
       // TODO: リッチメニュー取得APIを実装
-      // const result = await getRichMenuById(params.id);
+      // const result = await getRichMenuById(id);
       // if (!result.success) {
       //   return notFound();
       // }
@@ -45,7 +48,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
 
       // デモデータ
       const demoMenu = {
-        id: params.id,
+        id: id,
         name: 'サンプルリッチメニュー',
         size: 'full' as const,
         chatBarText: 'メニュー',
@@ -57,7 +60,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
             width: 400,
             height: 200,
             action: {
-              type: 'postback' as const,
+              type: LineActionType.Postback,
               data: 'menu_action_1',
               displayText: 'メニュー1',
             },
@@ -84,7 +87,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
     try {
       // エリア情報をFormDataに追加
       formData.set('areas', JSON.stringify(areas));
-      formData.set('id', params.id);
+      formData.set('id', id);
 
       // TODO: 更新APIを実装
       // const result = await updateRichMenu(formData);

@@ -1,5 +1,6 @@
-import { MessageCampaign, type MessageContent } from '@/domain/entities/MessageCampaign';
+import { CampaignType, MessageCampaign } from '@/domain/campaign/entities/MessageCampaign';
 import type { MessageCampaignRepository } from '@/domain/repositories/MessageCampaignRepository';
+import type { MessageContent } from '@/domain/valueObjects/MessageContent';
 
 export interface BroadcastPort {
   sendBroadcast(content: readonly MessageContent[]): Promise<{ sentCount: number }>;
@@ -31,8 +32,9 @@ export class SendBroadcastMessageUsecase {
       id,
       input.accountId,
       input.name,
-      'broadcast',
-      input.content
+      '', // description
+      CampaignType.Broadcast,
+      input.content[0] // 最初のメッセージコンテンツを使用
     );
 
     if (input.scheduledAt) {
@@ -53,7 +55,7 @@ export class SendBroadcastMessageUsecase {
     await this.messageCampaignRepository.save(campaign);
 
     try {
-      const result = await this.broadcastPort.sendBroadcast(campaign.content);
+      const result = await this.broadcastPort.sendBroadcast([campaign.content]);
 
       campaign = campaign.markAsSent(result.sentCount);
       await this.messageCampaignRepository.save(campaign);

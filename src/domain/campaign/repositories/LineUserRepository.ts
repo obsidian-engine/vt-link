@@ -1,4 +1,4 @@
-import type { LineUser } from '../entities/TargetSegment';
+import type { LineUser } from '../entities/LineUser';
 
 export interface LineUserRepository {
   /**

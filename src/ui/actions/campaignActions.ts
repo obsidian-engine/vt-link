@@ -3,6 +3,7 @@
 import { CreateCampaignUsecase } from '@/application/campaign/CreateCampaignUsecase';
 import { ListHistoryUsecase } from '@/application/campaign/ListHistoryUsecase';
 import { SendNowUsecase } from '@/application/campaign/SendNowUsecase';
+import type { CampaignType } from '@/domain/campaign/entities/MessageCampaign';
 import { LineUserRepositorySupabase } from '@/infrastructure/campaign/repositories/LineUserRepositorySupabase';
 import { MessageCampaignRepositorySupabase } from '@/infrastructure/campaign/repositories/MessageCampaignRepositorySupabase';
 import { MessageTemplateRepositorySupabase } from '@/infrastructure/campaign/repositories/MessageTemplateRepositorySupabase';
@@ -15,7 +16,7 @@ export async function createCampaign(formData: FormData) {
     const accountId = formData.get('accountId') as string;
     const name = formData.get('name') as string;
     const type = formData.get('type') as string;
-    const campaignType = type === 'broadcast' || type === 'narrowcast' ? type : 'broadcast';
+    const campaignType = type === 'broadcast' || type === 'segment' ? type : 'broadcast';
     const templateId = (formData.get('templateId') as string) || undefined;
     const segmentId = (formData.get('segmentId') as string) || undefined;
     const contentJson = formData.get('content') as string;
@@ -77,7 +78,7 @@ export async function createCampaign(formData: FormData) {
     const result = await usecase.execute({
       accountId,
       name,
-      type: campaignType,
+      type: campaignType as CampaignType,
       templateId,
       segmentId,
       content,
@@ -116,12 +117,32 @@ export async function sendNowCampaign(campaignId: string) {
     }
     const lineGateway = new LineMessagingGateway(channelAccessToken);
 
+    // スタブ実装（一時的）
+    const stubBatchRepository = {
+      findByCampaignId: async () => [],
+      findByStatus: async () => [],
+      findByCampaignIdAndStatus: async () => [],
+      findPendingBatches: async () => [],
+      save: async () => {},
+      updateStatus: async () => {},
+      updateResults: async () => {},
+      deleteById: async () => {},
+      deleteByCampaignId: async () => {},
+    };
+
+    const stubSegmentRepository = {
+      findById: async () => null,
+      findByAccountId: async () => [],
+      save: async () => {},
+      delete: async () => {},
+    };
+
     const usecase = new SendNowUsecase(
       campaignRepository,
+      stubBatchRepository as any, // DeliveryBatchRepository（スタブ実装）
+      stubSegmentRepository as any, // TargetSegmentRepository（スタブ実装）
       userRepository,
-      lineGateway,
-      null, // デリバリーバッチリポジトリ（一時的にnull）
-      null // セグメントリポジトリ（一時的にnull）
+      lineGateway
     );
 
     const result = await usecase.execute({
@@ -228,10 +249,31 @@ export async function getCampaignHistory(accountId: string, page = 1, limit = 20
 
     const campaignRepository = new MessageCampaignRepositorySupabase();
 
+    // スタブ実装（一時的）
+    const stubBatchRepository = {
+      findByCampaignId: async () => [],
+      findByStatus: async () => [],
+      findByCampaignIdAndStatus: async () => [],
+      findPendingBatches: async () => [],
+      save: async () => {},
+      updateStatus: async () => {},
+      updateResults: async () => {},
+      deleteById: async () => {},
+      deleteByCampaignId: async () => {},
+    };
+
+    const stubLogRepository = {
+      findByCampaignId: async () => [],
+      findByBatchId: async () => [],
+      save: async () => {},
+      deleteById: async () => {},
+      deleteByCampaignId: async () => {},
+    };
+
     const usecase = new ListHistoryUsecase(
       campaignRepository,
-      null, // DeliveryBatchRepository（一時的にnull）
-      null // DeliveryLogRepository（一時的にnull）
+      stubBatchRepository as any, // DeliveryBatchRepository（スタブ実装）
+      stubLogRepository as any // DeliveryLogRepository（スタブ実装）
     );
 
     const result = await usecase.execute({
@@ -324,7 +366,7 @@ export async function duplicateCampaign(campaignId: string) {
       templateId: originalCampaign.templateId || undefined,
       segmentId: originalCampaign.segmentId || undefined,
       content: originalCampaign.content,
-      placeholderData: originalCampaign.placeholderData,
+      placeholderData: originalCampaign.placeholderData?.toRecord(),
       // スケジュールは複製しない
     });
 

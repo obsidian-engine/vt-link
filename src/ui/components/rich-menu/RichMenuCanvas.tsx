@@ -2,7 +2,7 @@
 
 import { useDraggable } from '@dnd-kit/core';
 import { memo } from 'react';
-import type { LineActionType, RichMenuArea, RichMenuSize } from './types';
+import { LineActionType, type RichMenuArea, type RichMenuSize } from './types';
 import { EDITOR_SCALE } from './types';
 
 interface RichMenuCanvasProps {

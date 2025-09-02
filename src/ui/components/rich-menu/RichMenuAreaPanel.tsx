@@ -1,6 +1,7 @@
 'use client';
 
 import type { RichMenuAction, RichMenuArea } from './types';
+import type { LineActionType } from './types';
 
 interface RichMenuAreaPanelProps {
   area: RichMenuArea | null;
@@ -118,7 +119,7 @@ export function RichMenuAreaPanel({ area, onAreaUpdate, onAreaDelete }: RichMenu
             value={area.action.type}
             onChange={(e) =>
               handleActionChange({
-                type: e.target.value as 'postback' | 'message' | 'uri',
+                type: e.target.value as LineActionType,
                 // タイプ変更時は他のフィールドをリセット
                 text: undefined,
                 data: undefined,

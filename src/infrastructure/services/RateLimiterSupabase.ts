@@ -1,5 +1,5 @@
+import type { RateLimit } from '@/domain/entities/RateLimit';
 import type { RateLimitCheck, RateLimiter } from '@/domain/services/RateLimiter';
-import type { RateLimit } from '@/domain/services/RateLimiter';
 import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';
 
 export class RateLimiterSupabase implements RateLimiter {
@@ -133,6 +133,7 @@ export class RateLimiterSupabase implements RateLimiter {
 
   private async cleanupOldEntries(key: string, windowStart: Date): Promise<void> {
     try {
+      if (!supabaseAdmin) return;
       await supabaseAdmin
         .from('rate_limit_entries')
         .delete()

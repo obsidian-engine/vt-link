@@ -1,6 +1,8 @@
 'use server';
 
 import { CreateSegmentUsecase } from '@/application/campaign/CreateSegmentUsecase';
+import { TargetSegment } from '@/domain/campaign/entities/TargetSegment';
+import { SegmentCriteria } from '@/domain/valueObjects/SegmentCriteria';
 import { LineUserRepositorySupabase } from '@/infrastructure/campaign/repositories/LineUserRepositorySupabase';
 import { TargetSegmentRepositorySupabase } from '@/infrastructure/campaign/repositories/TargetSegmentRepositorySupabase';
 import { revalidatePath } from 'next/cache';
@@ -33,13 +35,16 @@ export async function createSegment(formData: FormData) {
     const segmentRepository = new TargetSegmentRepositorySupabase();
     const userRepository = new LineUserRepositorySupabase();
 
-    const usecase = new CreateSegmentUsecase(segmentRepository);
+    // 直接セグメントを作成（UseCaseが未実装のため）
+    const segmentId = crypto.randomUUID();
+    const segment = TargetSegment.create(segmentId, accountId, name, description || '', criteria);
 
-    const result = await usecase.execute({
-      name,
-      description,
-      criteria,
-    });
+    await segmentRepository.save(segment);
+
+    const result = {
+      segmentId: segment.id,
+      estimatedCount: 0, // TODO: 実際の推定数を計算
+    };
 
     revalidatePath('/dashboard/segments');
 
@@ -157,13 +162,13 @@ export async function updateSegment(segmentId: string, formData: FormData) {
       throw new Error('Segment not found');
     }
 
-    // TODO: Claude Aがドメイン層修正後に適切なメソッドに変更
-    const updatedSegment = segment;
-    const segmentWithCriteria = updatedSegment.updateCriteria(criteria);
+    // updateメソッドを使用してセグメントを更新
+    const segmentCriteria = SegmentCriteria.create(criteria);
+    const updatedSegment = segment.update(name, description, segmentCriteria);
 
     // 対象者数を再計算
-    const estimatedCount = await userRepository.countByCriteria(segment.accountId, criteria);
-    const finalSegment = segmentWithCriteria.updateEstimatedCount(estimatedCount);
+    const estimatedCount = await userRepository.countByCriteria(segment.accountId, segmentCriteria);
+    const finalSegment = updatedSegment.updateEstimatedSize(estimatedCount);
 
     await segmentRepository.save(finalSegment);
 
@@ -176,7 +181,7 @@ export async function updateSegment(segmentId: string, formData: FormData) {
         id: finalSegment.id,
         name: finalSegment.name,
         description: finalSegment.description,
-        estimatedCount: finalSegment.estimatedCount,
+        estimatedCount: finalSegment.estimatedSize,
       },
     };
   } catch (error) {
@@ -231,14 +236,22 @@ export async function duplicateSegment(segmentId: string) {
       throw new Error('Segment not found');
     }
 
-    const usecase = new CreateSegmentUsecase(segmentRepository);
+    // 直接セグメントを複製（UseCaseが未実装のため）
+    const duplicateId = crypto.randomUUID();
+    const duplicateSegment = TargetSegment.create(
+      duplicateId,
+      originalSegment.accountId,
+      `${originalSegment.name} (コピー)`,
+      originalSegment.description,
+      originalSegment.criteria
+    );
 
-    const result = await usecase.execute({
-      accountId: originalSegment.accountId,
-      name: `${originalSegment.name} (コピー)`,
-      description: originalSegment.description,
-      criteria: originalSegment.criteria,
-    });
+    await segmentRepository.save(duplicateSegment);
+
+    const result = {
+      segmentId: duplicateSegment.id,
+      estimatedCount: originalSegment.estimatedSize,
+    };
 
     revalidatePath('/dashboard/segments');
 
@@ -273,11 +286,14 @@ export async function previewSegment(criteriaJson: string, accountId: string) {
 
     const userRepository = new LineUserRepositorySupabase();
 
+    // SegmentCriteriaオブジェクトを作成
+    const segmentCriteria = SegmentCriteria.create(criteria);
+
     // 条件に一致するユーザー数を取得
-    const estimatedCount = await userRepository.countByCriteria(accountId, criteria);
+    const estimatedCount = await userRepository.countByCriteria(accountId, segmentCriteria);
 
     // サンプルユーザーを取得（最大10件）
-    const sampleUsers = await userRepository.findByCriteria(accountId, criteria as any);
+    const sampleUsers = await userRepository.findByCriteria(accountId, segmentCriteria);
     const limitedSampleUsers = sampleUsers.slice(0, 10);
 
     return {

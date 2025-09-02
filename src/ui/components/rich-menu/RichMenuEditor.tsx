@@ -13,7 +13,7 @@ import { createSnapModifier } from '@dnd-kit/modifiers';
 import { useCallback, useEffect, useState } from 'react';
 import { RichMenuAreaPanel } from './RichMenuAreaPanel';
 import { RichMenuCanvas } from './RichMenuCanvas';
-import type { RichMenuArea } from './types';
+import { LineActionType, type RichMenuArea } from './types';
 import { EDITOR_SCALE, GRID_SIZE, RICH_MENU_SIZES } from './types';
 
 interface RichMenuEditorProps {
@@ -101,7 +101,7 @@ export function RichMenuEditor({ size, onAreasChange, initialAreas = [] }: RichM
       width: 400,
       height: 200,
       action: {
-        type: 'postback',
+        type: LineActionType.Postback,
         data: '',
         displayText: '',
       },
@@ -140,7 +140,9 @@ export function RichMenuEditor({ size, onAreasChange, initialAreas = [] }: RichM
     [onAreasChange, selectedAreaId]
   );
 
-  const selectedArea = selectedAreaId ? areas.find((area) => area.id === selectedAreaId) : null;
+  const selectedArea = selectedAreaId
+    ? (areas.find((area) => area.id === selectedAreaId) ?? null)
+    : null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

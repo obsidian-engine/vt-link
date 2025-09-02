@@ -77,7 +77,7 @@ export function CreateCampaignForm() {
       if (result.success) {
         router.push('/dashboard/campaigns');
       } else {
-        setError(result.error);
+        setError(result.error || 'エラーが発生しました');
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'エラーが発生しました');
