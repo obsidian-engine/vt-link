@@ -1,7 +1,7 @@
 import { getAutoReplyRules } from '@/ui/actions/autoReplyActions';
+import { getAutoReplyRules } from '@/ui/actions/autoReplyActions';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { getAutoReplyRules } from '@/ui/actions/autoReplyActions';
 
 // 自動返信ルールの型定義
 interface AutoReplyRule {

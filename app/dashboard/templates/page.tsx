@@ -1,7 +1,7 @@
+import type { MessageTemplate, TemplateContent } from '@/types/dashboard.types';
 import { getTemplates } from '@/ui/actions/templateActions';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import type { MessageTemplate, TemplateContent } from '@/types/dashboard.types';
 
 export default function TemplatesPage() {
   return (

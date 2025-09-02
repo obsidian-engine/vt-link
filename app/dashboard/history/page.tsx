@@ -1,7 +1,7 @@
+import type { DeliveryHistory } from '@/types/dashboard.types';
 import { getCampaignHistory } from '@/ui/actions/campaignActions';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import type { DeliveryHistory } from '@/types/dashboard.types';
 
 export default function HistoryPage() {
   return (
@@ -135,7 +135,10 @@ async function HistoryContent() {
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {campaigns.length > 0
                       ? Math.round(
-                          (campaigns.reduce((sum: number, c: DeliveryHistory) => sum + (c.sentCount || 0), 0) /
+                          (campaigns.reduce(
+                            (sum: number, c: DeliveryHistory) => sum + (c.sentCount || 0),
+                            0
+                          ) /
                             (campaigns.reduce(
                               (sum: number, c: DeliveryHistory) =>
                                 sum + (c.sentCount || 0) + (c.failedCount || 0),

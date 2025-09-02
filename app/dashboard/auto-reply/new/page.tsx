@@ -45,7 +45,12 @@ interface UserCondition extends BaseCondition {
 }
 
 // 統合条件型
-type Condition = KeywordCondition | RegexCondition | MessageTypeCondition | TimeCondition | UserCondition;
+type Condition =
+  | KeywordCondition
+  | RegexCondition
+  | MessageTypeCondition
+  | TimeCondition
+  | UserCondition;
 
 // 基本返信インターフェース
 interface BaseResponse {

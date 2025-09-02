@@ -76,7 +76,7 @@ export interface MessageTemplate {
   updatedAt: DateString;
 }
 
-export type TemplateContent = 
+export type TemplateContent =
   | TextContent
   | ImageContent
   | CarouselContent

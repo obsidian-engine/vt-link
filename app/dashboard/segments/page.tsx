@@ -1,7 +1,7 @@
+import type { SegmentCriteria, TargetSegment } from '@/types/dashboard.types';
 import { getSegments } from '@/ui/actions/segmentActions';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import type { TargetSegment, SegmentCriteria } from '@/types/dashboard.types';
 
 export default function SegmentsPage() {
   return (

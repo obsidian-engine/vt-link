@@ -1,12 +1,12 @@
 import { getCampaigns } from '@/ui/actions/campaignActions';
+import { getCampaigns } from '@/ui/actions/campaignActions';
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { getCampaigns } from '@/ui/actions/campaignActions';
 
 // キャンペーンのステータス型
 type CampaignStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed';
 
-// キャンペーンのタイプ型  
+// キャンペーンのタイプ型
 type CampaignType = 'broadcast' | 'narrowcast';
 
 // キャンペーンデータの型定義
