@@ -6,7 +6,8 @@
       "es6"
     ],
     "allowJs": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
+    "noEmitOnError": true,
     "strict": true,
     "exactOptionalPropertyTypes": false,
     "noUncheckedIndexedAccess": false,

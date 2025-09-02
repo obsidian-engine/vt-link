@@ -156,8 +156,8 @@ export class PresetBuilder {
    */
   static stickerReaction(
     accountId: string,
-    packageId: string = "446",
-    stickerId: string = "1988"
+    packageId: string = '446',
+    stickerId: string = '1988'
   ): any {
     return {
       accountId,

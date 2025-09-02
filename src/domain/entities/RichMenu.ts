@@ -18,6 +18,8 @@ export class RichMenu {
   static readonly MAX_NAME_LENGTH = 100;
   static readonly MAX_CHAT_BAR_TEXT_LENGTH = 14;
   static readonly MAX_AREAS_COUNT = 20;
+  
+  // RichMenu dimensions  
   static readonly FULL_WIDTH = 2500;
   static readonly FULL_HEIGHT = 1686;
   static readonly HALF_HEIGHT = 843;

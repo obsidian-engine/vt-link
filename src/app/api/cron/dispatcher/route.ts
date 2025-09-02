@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     // 認証チェック（CRON_SECRET環境変数を使用）
     const authHeader = request.headers.get('Authorization');
-    const cronSecret = process.env.CRON_SECRET;
+    const cronSecret = process.env['CRON_SECRET'];
     
     if (!cronSecret) {
       return NextResponse.json(
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const userRepository = new LineUserRepositorySupabase();
 
     // LINE公式アカウントのアクセストークンを取得
-    const channelAccessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+    const channelAccessToken = process.env['LINE_CHANNEL_ACCESS_TOKEN'];
     if (!channelAccessToken) {
       console.error('[CRON] LINE_CHANNEL_ACCESS_TOKEN is not configured');
       return NextResponse.json(
@@ -51,11 +51,7 @@ export async function POST(request: NextRequest) {
 
     // Usecaseを初期化
     const scheduleDeliveryUsecase = new ScheduleDeliveryUsecase(
-      campaignRepository,
-      batchRepository,
-      logRepository,
-      userRepository,
-      lineGateway
+      campaignRepository
     );
 
     // 送信準備ができたキャンペーンを取得

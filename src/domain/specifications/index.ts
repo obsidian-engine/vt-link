@@ -1,5 +1,5 @@
 // Base Specification
-export { MessageSpecification } from './MessageSpecification';
+export { type MessageSpecification } from './MessageSpecification';
 export { CompositeSpecification, AndSpecification, OrSpecification, NotSpecification } from './CompositeSpecification';
 
 // Concrete Specifications

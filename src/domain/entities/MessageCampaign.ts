@@ -12,7 +12,7 @@ export interface MessageContent {
 
 export class MessageCampaign {
   static readonly MAX_NAME_LENGTH = 100;
-  static readonly MAX_TARGET_USERS = 500;
+  static readonly MAX_TARGET_USERS = 10000;
   static readonly MAX_CONTENT_ITEMS = 5;
 
   readonly #id: string;

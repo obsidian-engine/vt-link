@@ -87,7 +87,7 @@ export class RuleBuilder {
   /**
    * 有効/無効を設定
    */
-  enabled(enabled: boolean = true): RuleBuilder {
+  setEnabled(enabled: boolean = true): RuleBuilder {
     this.enabled = enabled;
     return this;
   }

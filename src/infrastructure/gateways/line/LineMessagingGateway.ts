@@ -2,7 +2,6 @@ import { BroadcastPort } from '@/application/message/SendBroadcastMessageUsecase
 import { MessageContent } from '@/domain/entities/MessageCampaign';
 import { NarrowcastPort } from '@/application/campaign/SendNowUsecase';
 import { MessageContent as CampaignMessageContent } from '@/domain/valueObjects/MessageContent';
-
 export interface LineRichMenuCreateRequest {
   size: {
     width: number;
@@ -72,9 +71,9 @@ export class LineMessagingGateway implements BroadcastPort, NarrowcastPort {
 
   async sendNarrowcast(content: ReadonlyArray<CampaignMessageContent>, userIds: ReadonlyArray<string>): Promise<{ sentCount: number }> {
     const messages = this.convertCampaignToLineMessages(content);
-    
+
     // LINE APIは最大500件のユーザーIDまで一度に送信可能
-    const BATCH_SIZE = 500;
+    const BATCH_SIZE = LINE_API_LIMITS.MAX_BATCH_SIZE;
     let totalSent = 0;
     
     for (let i = 0; i < userIds.length; i += BATCH_SIZE) {

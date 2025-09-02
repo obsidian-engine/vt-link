@@ -58,7 +58,7 @@ async function RichMenuList() {
 
   const richMenus = result.data;
 
-  if (richMenus.length === 0) {
+  if (!richMenus || richMenus.length === 0) {
     return (
       <div className="text-center py-12">
         <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -81,7 +81,7 @@ async function RichMenuList() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {richMenus.map((menu) => (
+      {richMenus?.map((menu) => (
         <RichMenuCard key={menu.id} menu={menu} />
       ))}
     </div>

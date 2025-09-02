@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     // 認証チェック
     const authHeader = request.headers.get('Authorization');
-    const cronSecret = process.env.CRON_SECRET;
+    const cronSecret = process.env['CRON_SECRET'];
     
     if (!cronSecret) {
       return NextResponse.json(
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const logRepository = new DeliveryLogRepositorySupabase();
     const campaignRepository = new MessageCampaignRepositorySupabase();
 
-    const channelAccessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+    const channelAccessToken = process.env['LINE_CHANNEL_ACCESS_TOKEN'];
     if (!channelAccessToken) {
       console.error('[BATCH_EXECUTOR] LINE_CHANNEL_ACCESS_TOKEN is not configured');
       return NextResponse.json(

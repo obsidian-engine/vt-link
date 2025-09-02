@@ -12,7 +12,7 @@ export { AutoReplyRuleV2 } from '../entities/AutoReplyRuleV2';
 
 // ===== SPECIFICATIONS (いつ発火するか) =====
 export {
-  MessageSpecification,
+  type MessageSpecification,
   CompositeSpecification,
   AndSpecification, 
   OrSpecification,
@@ -21,14 +21,14 @@ export {
   RegexSpecification,
   TimeWindowSpecification,
   MessageTypeSpecification,
-  KeywordMatchMode,
-  MessageType
+  type KeywordMatchMode,
+  type MessageType
 } from '../specifications';
 
 // ===== COMMANDS (何をするか) =====
 export {
-  ReplyCommand,
-  MessageContext,
+  type ReplyCommand,
+  type MessageContext,
   TextReplyCommand,
   StickerReplyCommand,
   ImageReplyCommand,
@@ -38,10 +38,10 @@ export {
 // ===== POLICIES (いくつまで・制限) =====
 export {
   RateLimitPolicy,
-  RateLimitScope,
+  type RateLimitScope,
   SlidingWindowPolicy,
   NoRateLimitPolicy,
-  RateLimitStorage
+  type RateLimitStorage
 } from '../policies';
 
 // ===== BUILDERS (組み立て支援) =====

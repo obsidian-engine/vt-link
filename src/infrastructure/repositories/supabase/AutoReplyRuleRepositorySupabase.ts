@@ -59,7 +59,7 @@ export class AutoReplyRuleRepositorySupabase implements AutoReplyRuleRepository 
     return this.mapToEntity(data);
   }
 
-  async findByAccountId(accountId: string): Promise<AutoReplyRule[]> {
+  async findAllByAccountId(accountId: string): Promise<AutoReplyRule[]> {
     if (!supabaseAdmin) {
       throw new Error('Supabase service role key is required');
     }
@@ -110,6 +110,25 @@ export class AutoReplyRuleRepositorySupabase implements AutoReplyRuleRepository 
 
     if (error) {
       throw new Error(`Failed to delete auto reply rule: ${error.message}`);
+    }
+  }
+
+  async updatePriorities(accountId: string, rulePriorities: Array<{ id: string; priority: number }>): Promise<void> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase service role key is required');
+    }
+
+    // Update priorities in a transaction
+    for (const rp of rulePriorities) {
+      const { error } = await supabaseAdmin
+        .from('auto_reply_rules')
+        .update({ priority: rp.priority })
+        .eq('id', rp.id)
+        .eq('account_id', accountId);
+
+      if (error) {
+        throw new Error(`Failed to update priority for rule ${rp.id}: ${error.message}`);
+      }
     }
   }
 
