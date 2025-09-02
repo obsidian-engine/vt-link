@@ -17,7 +17,17 @@
     "types:generate": "node scripts/generate-types.js",
     "types:watch": "chokidar 'supabase/**/*.sql' -c 'npm run types:generate'",
     "db:types": "npm run types:generate",
-    "prebuild": "npm run types:generate"
+    "prebuild": "npm run types:generate",
+    "test:schemas": "vitest run **/*.schema.test.ts",
+    "test:brand-types": "vitest run __tests__/type-safety/brand-types.test.ts",
+    "test:id-factory": "vitest run __tests__/type-safety/id-factory.test.ts",
+    "test:server-actions": "vitest run __tests__/type-safety/server-actions.test.ts",
+    "test:api-contracts": "vitest run __tests__/type-safety/api-contracts.test.ts",
+    "test:type-safety": "node scripts/test-type-safety.js",
+    "check:schema-drift": "npm run types:generate && git diff --exit-code src/generated/",
+    "check:type-coverage": "typescript-coverage-report",
+    "analyze:bundle": "next build --analyze",
+    "security:type-check": "npm audit && npm run lint -- --quiet"
   },
   "dependencies": {
     "next": "15.1.8",

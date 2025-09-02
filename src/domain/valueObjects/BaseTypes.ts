@@ -1,7 +1,9 @@
 /**
- * Brand型パターンによる型安全なID実装
+ * unique symbolを使用したBrand型パターン
+ * モジュールを跨いでも型安全性を保証
  */
-type Brand<T, B extends string> = T & { readonly __brand: B };
+declare const __brand: unique symbol;
+type Brand<T, B extends string> = T & { readonly [__brand]: B };
 
 // 基本的なID型定義
 export type UserID = Brand<string, 'UserID'>;
