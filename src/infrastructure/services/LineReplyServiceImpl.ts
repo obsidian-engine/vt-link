@@ -1,5 +1,5 @@
-import { LineReplyService } from '@/domain/services/LineReplyService';
-import { Response } from '@/domain/entities/Response';
+import type { LineReplyService } from '@/domain/services/LineReplyService';
+import type { LineMessageUnion } from '@/types/line.types';
 
 export class LineReplyServiceImpl implements LineReplyService {
   readonly #baseUrl = 'https://api.line.me/v2/bot';
@@ -12,13 +12,11 @@ export class LineReplyServiceImpl implements LineReplyService {
     this.#channelAccessToken = channelAccessToken;
   }
 
-  async sendReply(replyToken: string, responses: Response[]): Promise<void> {
-    const messages = responses.map(response => response.toLineMessageObject());
-    
+  async reply(replyToken: string, messages: LineMessageUnion[]): Promise<void> {
     const response = await fetch(`${this.#baseUrl}/message/reply`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.#channelAccessToken}`,
+        Authorization: `Bearer ${this.#channelAccessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -33,13 +31,11 @@ export class LineReplyServiceImpl implements LineReplyService {
     }
   }
 
-  async pushMessage(to: string, responses: Response[]): Promise<void> {
-    const messages = responses.map(response => response.toLineMessageObject());
-    
+  async pushMessage(to: string, messages: LineMessageUnion[]): Promise<void> {
     const response = await fetch(`${this.#baseUrl}/message/push`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.#channelAccessToken}`,
+        Authorization: `Bearer ${this.#channelAccessToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

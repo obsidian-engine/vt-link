@@ -1,5 +1,6 @@
-import { TargetSegment, LineUser } from '@/domain/campaign/entities/TargetSegment';
-import { TargetSegmentRepository } from '@/domain/campaign/repositories/TargetSegmentRepository';
+import type { LineUser } from '@/domain/campaign/entities/LineUser';
+import { TargetSegment } from '@/domain/campaign/entities/TargetSegment';
+import type { TargetSegmentRepository } from '@/domain/campaign/repositories/TargetSegmentRepository';
 import { SegmentCriteria } from '@/domain/valueObjects/SegmentCriteria';
 import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';
 
@@ -9,19 +10,17 @@ export class TargetSegmentRepositorySupabase implements TargetSegmentRepository 
       throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from('target_segments')
-      .upsert({
-        id: segment.id,
-        account_id: segment.accountId,
-        name: segment.name,
-        description: segment.description,
-        criteria: segment.criteria.toJSON(),
-        is_active: segment.isActive,
-        estimated_size: segment.estimatedSize,
-        created_at: segment.createdAt.toISOString(),
-        updated_at: segment.updatedAt.toISOString(),
-      });
+    const { error } = await supabaseAdmin.from('target_segments').upsert({
+      id: segment.id,
+      account_id: segment.accountId,
+      name: segment.name,
+      description: segment.description,
+      criteria: segment.criteria.toJSON(),
+      is_active: segment.isActive,
+      estimated_size: segment.estimatedSize,
+      created_at: segment.createdAt.toISOString(),
+      updated_at: segment.updatedAt.toISOString(),
+    });
 
     if (error) {
       throw new Error(`Failed to save target segment: ${error.message}`);
@@ -62,7 +61,7 @@ export class TargetSegmentRepositorySupabase implements TargetSegmentRepository 
       throw new Error(`Failed to find target segments: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findActiveByAccountId(accountId: string): Promise<TargetSegment[]> {
@@ -81,7 +80,7 @@ export class TargetSegmentRepositorySupabase implements TargetSegmentRepository 
       throw new Error(`Failed to find active target segments: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findByNamePattern(accountId: string, namePattern: string): Promise<TargetSegment[]> {
@@ -100,7 +99,7 @@ export class TargetSegmentRepositorySupabase implements TargetSegmentRepository 
       throw new Error(`Failed to search target segments: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async delete(id: string): Promise<void> {
@@ -108,10 +107,7 @@ export class TargetSegmentRepositorySupabase implements TargetSegmentRepository 
       throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from('target_segments')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabaseAdmin.from('target_segments').delete().eq('id', id);
 
     if (error) {
       throw new Error(`Failed to delete target segment: ${error.message}`);
@@ -161,7 +157,7 @@ export class TargetSegmentRepositorySupabase implements TargetSegmentRepository 
 
     const matchingUsers = segment.filterUsers(users);
     const updatedSegment = segment.updateEstimatedSize(matchingUsers.length);
-    
+
     await this.save(updatedSegment);
   }
 

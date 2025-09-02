@@ -1,4 +1,4 @@
-import { MessageTemplate } from '../entities/MessageTemplate';
+import type { MessageTemplate } from '../entities/MessageTemplate';
 
 export interface MessageTemplateRepository {
   /**

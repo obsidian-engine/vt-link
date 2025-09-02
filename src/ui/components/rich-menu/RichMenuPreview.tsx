@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { RichMenuArea, RichMenuSize, RICH_MENU_SIZES } from './types';
+import type { RichMenuArea, RichMenuSize } from './types';
+import { RICH_MENU_SIZES } from './types';
 
 interface RichMenuPreviewProps {
   size: 'full' | 'half';
@@ -25,7 +26,7 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
     if (!canvasRef.current) return;
 
     setIsGenerating(true);
-    
+
     try {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
@@ -150,21 +151,31 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
 
   const getActionIcon = (type: string): string => {
     switch (type) {
-      case 'postback': return '📋';
-      case 'message': return '💬';
-      case 'uri': return '🔗';
-      default: return '❓';
+      case 'postback':
+        return '📋';
+      case 'message':
+        return '💬';
+      case 'uri':
+        return '🔗';
+      default:
+        return '❓';
     }
   };
 
   const getActionText = (action: RichMenuArea['action']): string => {
     switch (action.type) {
       case 'message':
-        return action.text?.substring(0, 10) + (action.text && action.text.length > 10 ? '...' : '') || '';
+        return (
+          action.text?.substring(0, 10) + (action.text && action.text.length > 10 ? '...' : '') ||
+          ''
+        );
       case 'uri':
         return action.uri ? new URL(action.uri).hostname : '';
       case 'postback':
-        return action.displayText?.substring(0, 10) + (action.displayText && action.displayText.length > 10 ? '...' : '') || '';
+        return (
+          action.displayText?.substring(0, 10) +
+            (action.displayText && action.displayText.length > 10 ? '...' : '') || ''
+        );
       default:
         return '';
     }
@@ -182,22 +193,13 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg border p-4 ${className}`}>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-          プレビュー
-        </h3>
-        {isGenerating && (
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            生成中...
-          </div>
-        )}
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white">プレビュー</h3>
+        {isGenerating && <div className="text-sm text-gray-500 dark:text-gray-400">生成中...</div>}
       </div>
 
       <div className="flex flex-col items-center">
-        <canvas
-          ref={canvasRef}
-          className="hidden"
-        />
-        
+        <canvas ref={canvasRef} className="hidden" />
+
         {previewUrl ? (
           <img
             src={previewUrl}
@@ -209,7 +211,7 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
             }}
           />
         ) : (
-          <div 
+          <div
             className="flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700"
             style={{
               width: `${menuSize.width * previewScale}px`,
@@ -225,8 +227,7 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
 
         <div className="mt-4 text-center">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {size === 'full' ? 'フルサイズ' : 'ハーフサイズ'} 
-            ({menuSize.width}×{menuSize.height}px)
+            {size === 'full' ? 'フルサイズ' : 'ハーフサイズ'}({menuSize.width}×{menuSize.height}px)
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
             エリア数: {areas.length}

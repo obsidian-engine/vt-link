@@ -18,6 +18,8 @@ export class RichMenu {
   static readonly MAX_NAME_LENGTH = 100;
   static readonly MAX_CHAT_BAR_TEXT_LENGTH = 14;
   static readonly MAX_AREAS_COUNT = 20;
+
+  // RichMenu dimensions
   static readonly FULL_WIDTH = 2500;
   static readonly FULL_HEIGHT = 1686;
   static readonly HALF_HEIGHT = 843;
@@ -28,7 +30,7 @@ export class RichMenu {
   readonly #name: string;
   readonly #size: RichMenuSize;
   readonly #chatBarText: string | null;
-  readonly #areas: ReadonlyArray<RichMenuArea>;
+  readonly #areas: readonly RichMenuArea[];
   readonly #imageUrl: string | null;
   readonly #isDefault: boolean;
   readonly #isPublished: boolean;
@@ -40,7 +42,7 @@ export class RichMenu {
     name: string,
     size: RichMenuSize,
     chatBarText: string | null,
-    areas: ReadonlyArray<RichMenuArea>,
+    areas: readonly RichMenuArea[],
     imageUrl: string | null,
     isDefault: boolean,
     isPublished: boolean
@@ -48,11 +50,11 @@ export class RichMenu {
     if (name.length === 0 || name.length > RichMenu.MAX_NAME_LENGTH) {
       throw new Error('Name must be between 1 and 100 characters');
     }
-    
+
     if (chatBarText && chatBarText.length > RichMenu.MAX_CHAT_BAR_TEXT_LENGTH) {
       throw new Error('Chat bar text must be 14 characters or less');
     }
-    
+
     if (areas.length > RichMenu.MAX_AREAS_COUNT) {
       throw new Error('Areas count must be 20 or less');
     }
@@ -67,7 +69,7 @@ export class RichMenu {
     this.#imageUrl = imageUrl;
     this.#isDefault = isDefault;
     this.#isPublished = isPublished;
-    
+
     Object.freeze(this);
   }
 
@@ -77,7 +79,7 @@ export class RichMenu {
     name: string,
     size: RichMenuSize = 'full',
     chatBarText: string | null = null,
-    areas: ReadonlyArray<RichMenuArea> = [],
+    areas: readonly RichMenuArea[] = [],
     imageUrl: string | null = null
   ): RichMenu {
     return new RichMenu(
@@ -101,7 +103,7 @@ export class RichMenu {
     name: string,
     size: RichMenuSize,
     chatBarText: string | null,
-    areas: ReadonlyArray<RichMenuArea>,
+    areas: readonly RichMenuArea[],
     imageUrl: string | null,
     isDefault: boolean,
     isPublished: boolean
@@ -120,16 +122,36 @@ export class RichMenu {
     );
   }
 
-  get id(): string { return this.#id; }
-  get accountId(): string { return this.#accountId; }
-  get lineRichMenuId(): string | null { return this.#lineRichMenuId; }
-  get name(): string { return this.#name; }
-  get size(): RichMenuSize { return this.#size; }
-  get chatBarText(): string | null { return this.#chatBarText; }
-  get areas(): ReadonlyArray<RichMenuArea> { return this.#areas; }
-  get imageUrl(): string | null { return this.#imageUrl; }
-  get isDefault(): boolean { return this.#isDefault; }
-  get isPublished(): boolean { return this.#isPublished; }
+  get id(): string {
+    return this.#id;
+  }
+  get accountId(): string {
+    return this.#accountId;
+  }
+  get lineRichMenuId(): string | null {
+    return this.#lineRichMenuId;
+  }
+  get name(): string {
+    return this.#name;
+  }
+  get size(): RichMenuSize {
+    return this.#size;
+  }
+  get chatBarText(): string | null {
+    return this.#chatBarText;
+  }
+  get areas(): readonly RichMenuArea[] {
+    return this.#areas;
+  }
+  get imageUrl(): string | null {
+    return this.#imageUrl;
+  }
+  get isDefault(): boolean {
+    return this.#isDefault;
+  }
+  get isPublished(): boolean {
+    return this.#isPublished;
+  }
 
   getExpectedWidth(): number {
     return RichMenu.FULL_WIDTH;
@@ -142,7 +164,7 @@ export class RichMenu {
   isValidAreaBounds(area: RichMenuArea): boolean {
     const maxWidth = this.getExpectedWidth();
     const maxHeight = this.getExpectedHeight();
-    
+
     return (
       area.x >= 0 &&
       area.y >= 0 &&
@@ -168,9 +190,9 @@ export class RichMenu {
     );
   }
 
-  updateAreas(areas: ReadonlyArray<RichMenuArea>): RichMenu {
-    const validAreas = areas.filter(area => this.isValidAreaBounds(area));
-    
+  updateAreas(areas: readonly RichMenuArea[]): RichMenu {
+    const validAreas = areas.filter((area) => this.isValidAreaBounds(area));
+
     return RichMenu.reconstruct(
       this.#id,
       this.#accountId,

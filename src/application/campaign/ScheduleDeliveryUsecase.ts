@@ -1,4 +1,4 @@
-import { MessageCampaignRepository } from '@/domain/campaign/repositories/MessageCampaignRepository';
+import type { MessageCampaignRepository } from '@/domain/campaign/repositories/MessageCampaignRepository';
 
 export interface ScheduleDeliveryInput {
   readonly campaignId: string;
@@ -11,6 +11,8 @@ export interface ScheduleDeliveryOutput {
   readonly scheduledAt: Date;
   readonly status: string;
   readonly updatedAt: Date;
+  readonly batchesCreated: number;
+  readonly totalRecipients: number;
 }
 
 export class ScheduleDeliveryUsecase {
@@ -55,6 +57,8 @@ export class ScheduleDeliveryUsecase {
       scheduledAt: scheduledCampaign.scheduledAt!,
       status: scheduledCampaign.status,
       updatedAt: scheduledCampaign.updatedAt,
+      batchesCreated: 0, // TODO: 実装時に正しい値を設定
+      totalRecipients: 0, // TODO: 実装時に正しい値を設定
     };
   }
 }

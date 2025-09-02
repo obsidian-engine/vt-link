@@ -18,10 +18,7 @@ export interface StickerResponsePayload {
   readonly stickerId: string;
 }
 
-export type ResponsePayload = 
-  | TextResponsePayload
-  | ImageResponsePayload
-  | StickerResponsePayload;
+export type ResponsePayload = TextResponsePayload | ImageResponsePayload | StickerResponsePayload;
 
 export class Response {
   readonly #id: string;
@@ -53,12 +50,7 @@ export class Response {
       throw new Error('Probability must be between 0 and 1');
     }
 
-    return new Response(
-      id,
-      ResponseType.Text,
-      { text: text.trim() },
-      probability
-    );
+    return new Response(id, ResponseType.Text, { text: text.trim() }, probability);
   }
 
   static createImage(
@@ -95,12 +87,7 @@ export class Response {
       throw new Error('Probability must be between 0 and 1');
     }
 
-    return new Response(
-      id,
-      ResponseType.Sticker,
-      { packageId, stickerId },
-      probability
-    );
+    return new Response(id, ResponseType.Sticker, { packageId, stickerId }, probability);
   }
 
   static reconstruct(
@@ -129,32 +116,30 @@ export class Response {
   }
 
   get text(): string | null {
-    return this.#type === ResponseType.Text 
-      ? (this.#payload as TextResponsePayload).text 
-      : null;
+    return this.#type === ResponseType.Text ? (this.#payload as TextResponsePayload).text : null;
   }
 
   get originalContentUrl(): string | null {
-    return this.#type === ResponseType.Image 
-      ? (this.#payload as ImageResponsePayload).originalContentUrl 
+    return this.#type === ResponseType.Image
+      ? (this.#payload as ImageResponsePayload).originalContentUrl
       : null;
   }
 
   get previewImageUrl(): string | null {
-    return this.#type === ResponseType.Image 
-      ? (this.#payload as ImageResponsePayload).previewImageUrl 
+    return this.#type === ResponseType.Image
+      ? (this.#payload as ImageResponsePayload).previewImageUrl
       : null;
   }
 
   get packageId(): string | null {
-    return this.#type === ResponseType.Sticker 
-      ? (this.#payload as StickerResponsePayload).packageId 
+    return this.#type === ResponseType.Sticker
+      ? (this.#payload as StickerResponsePayload).packageId
       : null;
   }
 
   get stickerId(): string | null {
-    return this.#type === ResponseType.Sticker 
-      ? (this.#payload as StickerResponsePayload).stickerId 
+    return this.#type === ResponseType.Sticker
+      ? (this.#payload as StickerResponsePayload).stickerId
       : null;
   }
 
@@ -169,20 +154,22 @@ export class Response {
           type: 'text',
           text: (this.#payload as TextResponsePayload).text,
         };
-      case ResponseType.Image:
+      case ResponseType.Image: {
         const imagePayload = this.#payload as ImageResponsePayload;
         return {
           type: 'image',
           originalContentUrl: imagePayload.originalContentUrl,
           previewImageUrl: imagePayload.previewImageUrl,
         };
-      case ResponseType.Sticker:
+      }
+      case ResponseType.Sticker: {
         const stickerPayload = this.#payload as StickerResponsePayload;
         return {
           type: 'sticker',
           packageId: stickerPayload.packageId,
           stickerId: stickerPayload.stickerId,
         };
+      }
       default:
         throw new Error(`Unsupported response type: ${this.#type}`);
     }
@@ -198,11 +185,11 @@ export class Response {
 
   static fromJSON(data: any): Response {
     const id = crypto.randomUUID();
-    
+
     switch (data.type) {
       case ResponseType.Text:
         return Response.createText(id, data.payload.text, data.probability);
-      
+
       case ResponseType.Image:
         return Response.createImage(
           id,
@@ -210,7 +197,7 @@ export class Response {
           data.payload.previewImageUrl,
           data.probability
         );
-      
+
       case ResponseType.Sticker:
         return Response.createSticker(
           id,
@@ -218,7 +205,7 @@ export class Response {
           data.payload.stickerId,
           data.probability
         );
-      
+
       default:
         throw new Error(`Unsupported response type: ${data.type}`);
     }

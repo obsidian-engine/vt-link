@@ -45,27 +45,32 @@ export class GenderSet {
     if (this.#genders.size !== other.#genders.size) {
       return false;
     }
-    
+
     for (const gender of this.#genders) {
       if (!other.#genders.has(gender)) {
         return false;
       }
     }
-    
+
     return true;
   }
 
   toString(): string {
-    const genderNames = this.genders.map(gender => {
+    const genderNames = this.genders.map((gender) => {
       switch (gender) {
-        case Gender.Male: return '男性';
-        case Gender.Female: return '女性';
-        case Gender.Other: return 'その他';
-        case Gender.Unknown: return '不明';
-        default: return gender;
+        case Gender.Male:
+          return '男性';
+        case Gender.Female:
+          return '女性';
+        case Gender.Other:
+          return 'その他';
+        case Gender.Unknown:
+          return '不明';
+        default:
+          return gender;
       }
     });
-    
+
     return genderNames.join('、');
   }
 

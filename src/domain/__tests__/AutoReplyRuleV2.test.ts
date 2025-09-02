@@ -3,27 +3,23 @@
  * Specification/Command/Policyパターンの動作確認
  */
 
+import { CommandBuilder, RuleBuilder, SpecificationBuilder } from '../builders';
+import { CompositeReplyCommand, StickerReplyCommand, TextReplyCommand } from '../commands';
 import { AutoReplyRuleV2 } from '../entities/AutoReplyRuleV2';
-import { IncomingMessage, MessageType, MessageSource } from '../entities/IncomingMessage';
-import { 
-  KeywordSpecification, 
-  RegexSpecification, 
-  MessageTypeSpecification,
-  KeywordMatchMode 
-} from '../specifications';
-import { 
-  TextReplyCommand, 
-  StickerReplyCommand, 
-  CompositeReplyCommand 
-} from '../commands';
-import { 
-  RateLimitPolicy, 
-  RateLimitScope,
-  SlidingWindowPolicy,
+import { IncomingMessage, type MessageSource, MessageType } from '../entities/IncomingMessage';
+import {
   NoRateLimitPolicy,
-  RateLimitStorage 
+  RateLimitPolicy,
+  RateLimitScope,
+  type RateLimitStorage,
+  SlidingWindowPolicy,
 } from '../policies';
-import { RuleBuilder, SpecificationBuilder, CommandBuilder } from '../builders';
+import {
+  KeywordMatchMode,
+  KeywordSpecification,
+  MessageTypeSpecification,
+  RegexSpecification,
+} from '../specifications';
 
 // Mock RateLimitStorage for testing
 class MockRateLimitStorage implements RateLimitStorage {
@@ -33,8 +29,8 @@ class MockRateLimitStorage implements RateLimitStorage {
     const now = new Date();
     const cutoff = new Date(now.getTime() - windowSeconds * 1000);
     const keyExecutions = this.executions.get(key) || [];
-    
-    return keyExecutions.filter(date => date > cutoff).length;
+
+    return keyExecutions.filter((date) => date > cutoff).length;
   }
 
   async recordExecution(key: string): Promise<void> {
@@ -53,9 +49,9 @@ describe('AutoReplyRuleV2 Integration Tests', () => {
     mockStorage = new MockRateLimitStorage();
     testSource = {
       type: 'user',
-      userId: 'test-user-123'
+      userId: 'test-user-123',
     };
-    
+
     testMessage = IncomingMessage.create(
       'msg-001',
       MessageType.Text,
@@ -71,10 +67,10 @@ describe('AutoReplyRuleV2 Integration Tests', () => {
       // Arrange
       const trigger = new KeywordSpecification('こんにちは', KeywordMatchMode.Partial);
       const response = new TextReplyCommand('お疲れ様です！');
-      
+
       const rule = AutoReplyRuleV2.create(
         'rule-001',
-        'account-001', 
+        'account-001',
         'テストルール',
         1,
         trigger,
@@ -96,11 +92,11 @@ describe('AutoReplyRuleV2 Integration Tests', () => {
       // Arrange
       const trigger = new KeywordSpecification('さようなら', KeywordMatchMode.Exact);
       const response = new TextReplyCommand('またね！');
-      
+
       const rule = AutoReplyRuleV2.create(
         'rule-002',
         'account-001',
-        'さよならルール', 
+        'さよならルール',
         1,
         trigger,
         response
@@ -114,15 +110,15 @@ describe('AutoReplyRuleV2 Integration Tests', () => {
     });
 
     test('無効なルールは実行されない', async () => {
-      // Arrange  
+      // Arrange
       const trigger = new KeywordSpecification('こんにちは');
       const response = new TextReplyCommand('お疲れ様です！');
-      
+
       const rule = AutoReplyRuleV2.create(
         'rule-003',
         'account-001',
         '無効ルール',
-        1, 
+        1,
         trigger,
         response,
         null,
@@ -143,7 +139,7 @@ describe('AutoReplyRuleV2 Integration Tests', () => {
       const rateLimit = new SlidingWindowPolicy(1, 60, RateLimitScope.User, mockStorage);
       const trigger = new KeywordSpecification('こんにちは');
       const response = new TextReplyCommand('こんにちは！');
-      
+
       const rule = AutoReplyRuleV2.create(
         'rule-004',
         'account-001',
@@ -169,7 +165,7 @@ describe('AutoReplyRuleV2 Integration Tests', () => {
       const noRateLimit = new NoRateLimitPolicy();
       const trigger = new KeywordSpecification('こんにちは');
       const response = new TextReplyCommand('こんにちは！');
-      
+
       const rule = AutoReplyRuleV2.create(
         'rule-005',
         'account-001',
@@ -221,9 +217,10 @@ describe('AutoReplyRuleV2 Integration Tests', () => {
 
     test('複合条件とコマンドの組み合わせ', async () => {
       // Arrange - 「hello」キーワード AND テキストメッセージのみ
-      const complexTrigger = SpecificationBuilder.keyword('hello')
-        .and(SpecificationBuilder.textOnly());
-      
+      const complexTrigger = SpecificationBuilder.keyword('hello').and(
+        SpecificationBuilder.textOnly()
+      );
+
       const comboResponse = CommandBuilder.all(
         CommandBuilder.text('Hello!'),
         CommandBuilder.text('How are you?')
@@ -286,7 +283,7 @@ describe('AutoReplyRuleV2 Integration Tests', () => {
         new TextReplyCommand('test')
       );
 
-      // Act  
+      // Act
       const updatedRule = rule.updatePriority(10);
 
       // Assert
@@ -298,7 +295,7 @@ describe('AutoReplyRuleV2 Integration Tests', () => {
       // Arrange
       const rule = AutoReplyRuleV2.create(
         'rule-008',
-        'account-001', 
+        'account-001',
         'テスト',
         1,
         new KeywordSpecification('test'),
@@ -322,19 +319,22 @@ describe('AutoReplyRuleV2 Integration Tests', () => {
 // 実行例のデモ用関数
 export function demoUsage() {
   console.log('=== AutoReplyRuleV2 Demo ===');
-  
+
   // DSLを使った直感的なルール作成例
-  const rule = RuleBuilder
-    .when(SpecificationBuilder.keyword('こんにちは').and(SpecificationBuilder.textOnly()))
-    .then(CommandBuilder.oneOf(
-      CommandBuilder.text('こんにちは！'),
-      CommandBuilder.text('お疲れ様です！'),
-      CommandBuilder.sticker('446', '1988')
-    ))
+  const rule = RuleBuilder.when(
+    SpecificationBuilder.keyword('こんにちは').and(SpecificationBuilder.textOnly())
+  )
+    .then(
+      CommandBuilder.oneOf(
+        CommandBuilder.text('こんにちは！'),
+        CommandBuilder.text('お疲れ様です！'),
+        CommandBuilder.sticker('446', '1988')
+      )
+    )
     .forAccount('vtuber-account-001')
     .named('挨拶ルール')
     .withPriority(10)
-    // .limitTo(5, 60, RateLimitScope.User, storage)  // 1分間に5回まで  
+    // .limitTo(5, 60, RateLimitScope.User, storage)  // 1分間に5回まで
     .noRateLimit()
     .build();
 

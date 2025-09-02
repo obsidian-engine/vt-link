@@ -1,26 +1,26 @@
+import type {
+  LineChannelID,
+  LineRichMenuID,
+  LineUserID,
+  URL,
+} from '@/domain/valueObjects/BaseTypes';
+import { IDFactory } from '@/domain/valueObjects/IDFactory';
 /**
  * 型安全なLINE Bot API クライアント
  * 公式APIの型定義を厳密に実装し、ランタイム検証も行う
  */
 import { z } from 'zod';
 import type {
-  LineMessage,
+  LineApiResponse,
   LineBroadcastRequest,
+  LineErrorResponse,
+  LineMessage,
   LineNarrowcastRequest,
-  LineReplyRequest,
   LinePushRequest,
+  LineReplyRequest,
   LineRichMenuRequest,
   LineRichMenuResponse,
-  LineApiResponse,
-  LineErrorResponse
 } from './types';
-import type {
-  LineChannelID,
-  LineUserID,
-  LineRichMenuID,
-  URL
-} from '@/domain/valueObjects/BaseTypes';
-import { IDFactory } from '@/domain/valueObjects/IDFactory';
 
 // ============================================================================
 // エラークラス定義
@@ -37,7 +37,10 @@ export class LineApiError extends Error {
 }
 
 export class LineApiValidationError extends Error {
-  constructor(message: string, public readonly validationErrors: z.ZodError) {
+  constructor(
+    message: string,
+    public readonly validationErrors: z.ZodError
+  ) {
     super(message);
     this.name = 'LineApiValidationError';
   }
@@ -46,7 +49,7 @@ export class LineApiValidationError extends Error {
 // ============================================================================
 // Zodスキーマ定義
 // ============================================================================
-const LineMessageSchema: z.ZodType<LineMessage> = z.discriminatedUnion('type', [
+const LineMessageSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('text'),
     text: z.string().min(1).max(5000),
@@ -57,17 +60,31 @@ const LineMessageSchema: z.ZodType<LineMessage> = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('image'),
-    originalContentUrl: z.string().url(),
-    previewImageUrl: z.string().url(),
+    originalContentUrl: z
+      .string()
+      .url()
+      .transform((url) => url as URL),
+    previewImageUrl: z
+      .string()
+      .url()
+      .transform((url) => url as URL),
   }),
   z.object({
     type: z.literal('sticker'),
     packageId: z.string(),
     stickerId: z.string(),
-    stickerResourceType: z.enum([
-      'STATIC', 'ANIMATION', 'SOUND', 'ANIMATION_SOUND', 
-      'POPUP', 'POPUP_SOUND', 'CUSTOM', 'MESSAGE'
-    ]).optional(),
+    stickerResourceType: z
+      .enum([
+        'STATIC',
+        'ANIMATION',
+        'SOUND',
+        'ANIMATION_SOUND',
+        'POPUP',
+        'POPUP_SOUND',
+        'CUSTOM',
+        'MESSAGE',
+      ])
+      .optional(),
     keywords: z.array(z.string()).optional(),
     text: z.string().optional(),
   }),
@@ -86,10 +103,12 @@ const LineNarrowcastRequestSchema = z.object({
     audienceGroupId: z.number().optional(),
   }),
   filter: z.any().optional(),
-  limit: z.object({
-    max: z.number().optional(),
-    upToRemainingQuota: z.boolean().optional(),
-  }).optional(),
+  limit: z
+    .object({
+      max: z.number().optional(),
+      upToRemainingQuota: z.boolean().optional(),
+    })
+    .optional(),
   notificationDisabled: z.boolean().optional(),
 });
 
@@ -113,15 +132,21 @@ const LineRichMenuRequestSchema = z.object({
   selected: z.boolean(),
   name: z.string().min(1).max(300),
   chatBarText: z.string().min(1).max(14),
-  areas: z.array(z.object({
-    bounds: z.object({
-      x: z.number().int().min(0),
-      y: z.number().int().min(0),
-      width: z.number().int().min(1),
-      height: z.number().int().min(1),
-    }),
-    action: z.any(), // アクションの詳細なスキーマは省略
-  })).max(20),
+  areas: z
+    .array(
+      z.object({
+        bounds: z.object({
+          x: z.number().int().min(0),
+          y: z.number().int().min(0),
+          width: z.number().int().min(1),
+          height: z.number().int().min(1),
+        }),
+        action: z.any().refine((val) => val !== undefined, {
+          message: 'Action is required',
+        }), // アクションの詳細なスキーマは省略
+      })
+    )
+    .max(20),
 });
 
 // ============================================================================
@@ -136,7 +161,7 @@ export class LineApiClient {
     if (!channelAccessToken) {
       throw new Error('LINE channel access token is required');
     }
-    
+
     this.#channelAccessToken = channelAccessToken;
     this.#channelId = IDFactory.createLineChannelID(channelId);
   }
@@ -151,7 +176,7 @@ export class LineApiClient {
   async sendBroadcast(request: LineBroadcastRequest): Promise<LineApiResponse> {
     try {
       const validatedRequest = LineBroadcastRequestSchema.parse(request);
-      
+
       const response = await this.#makeRequest('/message/broadcast', {
         method: 'POST',
         body: validatedRequest,
@@ -172,7 +197,7 @@ export class LineApiClient {
   async sendNarrowcast(request: LineNarrowcastRequest): Promise<LineApiResponse> {
     try {
       const validatedRequest = LineNarrowcastRequestSchema.parse(request);
-      
+
       const response = await this.#makeRequest('/message/narrowcast', {
         method: 'POST',
         body: validatedRequest,
@@ -193,7 +218,7 @@ export class LineApiClient {
   async sendReply(request: LineReplyRequest): Promise<LineApiResponse> {
     try {
       const validatedRequest = LineReplyRequestSchema.parse(request);
-      
+
       const response = await this.#makeRequest('/message/reply', {
         method: 'POST',
         body: validatedRequest,
@@ -214,7 +239,7 @@ export class LineApiClient {
   async sendPush(request: LinePushRequest): Promise<LineApiResponse> {
     try {
       const validatedRequest = LinePushRequestSchema.parse(request);
-      
+
       const response = await this.#makeRequest('/message/push', {
         method: 'POST',
         body: validatedRequest,
@@ -239,7 +264,7 @@ export class LineApiClient {
   async createRichMenu(request: LineRichMenuRequest): Promise<LineRichMenuResponse> {
     try {
       const validatedRequest = LineRichMenuRequestSchema.parse(request);
-      
+
       const response = await this.#makeRequest('/richmenu', {
         method: 'POST',
         body: validatedRequest,
@@ -249,6 +274,10 @@ export class LineApiClient {
       return {
         ...validatedRequest,
         richMenuId,
+        areas: validatedRequest.areas.map((area) => ({
+          ...area,
+          action: area.action!, // 必須プロパティとしてアサーション
+        })),
       };
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -262,14 +291,14 @@ export class LineApiClient {
    * リッチメニュー画像アップロード
    */
   async uploadRichMenuImage(
-    richMenuId: LineRichMenuID, 
+    richMenuId: LineRichMenuID,
     imageBuffer: Buffer,
     contentType: 'image/jpeg' | 'image/png' = 'image/png'
   ): Promise<void> {
     const response = await fetch(`${this.#baseUrl}/richmenu/${richMenuId}/content`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${this.#channelAccessToken}`,
+        Authorization: `Bearer ${this.#channelAccessToken}`,
         'Content-Type': contentType,
       },
       body: imageBuffer,
@@ -278,7 +307,7 @@ export class LineApiClient {
     if (!response.ok) {
       const errorText = await response.text();
       let errorResponse: LineErrorResponse | undefined;
-      
+
       try {
         errorResponse = JSON.parse(errorText);
       } catch {
@@ -312,7 +341,7 @@ export class LineApiClient {
   }
 
   // ============================================================================
-  // ユーザー情報メソッド  
+  // ユーザー情報メソッド
   // ============================================================================
 
   /**
@@ -338,7 +367,7 @@ export class LineApiClient {
   // プライベートメソッド
   // ============================================================================
 
-  private async #makeRequest(
+  async #makeRequest(
     endpoint: string,
     options: {
       method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -347,9 +376,9 @@ export class LineApiClient {
     }
   ): Promise<any> {
     const url = `${this.#baseUrl}${endpoint}`;
-    
+
     const headers: Record<string, string> = {
-      'Authorization': `Bearer ${this.#channelAccessToken}`,
+      Authorization: `Bearer ${this.#channelAccessToken}`,
       ...options.headers,
     };
 
@@ -366,7 +395,7 @@ export class LineApiClient {
     if (!response.ok) {
       const errorText = await response.text();
       let errorResponse: LineErrorResponse | undefined;
-      
+
       try {
         errorResponse = JSON.parse(errorText);
       } catch {

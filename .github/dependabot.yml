@@ -1,9 +1,9 @@
 version: 2
 
 updates:
-  # Go dependencies
-  - package-ecosystem: "gomod"
-    directory: "/go-backend"
+  # npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5

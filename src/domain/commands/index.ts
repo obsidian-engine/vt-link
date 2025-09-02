@@ -1,5 +1,5 @@
 // Base Command
-export { ReplyCommand, MessageContext } from './ReplyCommand';
+export type { ReplyCommand, MessageContext } from './ReplyCommand';
 
 // Concrete Commands
 export { TextReplyCommand } from './TextReplyCommand';

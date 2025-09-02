@@ -2,7 +2,7 @@
  * Server Actions用の型定義
  * 型安全なServer Actionsのための共通型
  */
-import type { z } from 'zod';
+import { z } from 'zod';
 
 // ============================================================================
 // Server Action 結果型
@@ -42,7 +42,7 @@ export class FormDataParser {
     return value;
   }
 
-  getBoolean(key: string, defaultValue: boolean = false): boolean {
+  getBoolean(key: string, defaultValue = false): boolean {
     const value = this.getString(key);
     if (value === undefined) return defaultValue;
     return value === 'true' || value === '1' || value === 'on';
@@ -64,15 +64,15 @@ export class FormDataParser {
   }
 
   getArray(key: string): ReadonlyArray<string> {
-    return this.#formData.getAll(key).map(value => 
-      typeof value === 'string' ? value : String(value)
-    );
+    return this.#formData
+      .getAll(key)
+      .map((value) => (typeof value === 'string' ? value : String(value)));
   }
 
   getJSON<T>(key: string, defaultValue?: T): T | undefined {
     const value = this.getString(key);
     if (value === undefined) return defaultValue;
-    
+
     try {
       return JSON.parse(value) as T;
     } catch {
@@ -109,20 +109,20 @@ export class ActionExecutor {
       };
     } catch (error) {
       console.error('Server Action Error:', error);
-      
+
       // Zodエラーの場合は詳細なバリデーションエラーを返す
       if (error instanceof z.ZodError) {
         return {
           success: false,
           error: 'Validation failed',
-          validationErrors: error.errors.map(err => ({
+          validationErrors: error.errors.map((err) => ({
             field: err.path.join('.'),
             message: err.message,
           })),
           timestamp: new Date().toISOString(),
         };
       }
-      
+
       // カスタムエラーメッセージがある場合はそれを使用
       if (onError) {
         return {
@@ -131,7 +131,7 @@ export class ActionExecutor {
           timestamp: new Date().toISOString(),
         };
       }
-      
+
       // デフォルトエラーメッセージ
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       return {
@@ -154,7 +154,7 @@ export class ActionExecutor {
       // FormDataを適切な形式に変換
       const rawData: Record<string, unknown> = {};
       const parser = new FormDataParser(formData);
-      
+
       // FormDataの全てのキーを処理
       for (const [key, value] of formData.entries()) {
         if (key.endsWith('[]')) {
@@ -180,10 +180,10 @@ export class ActionExecutor {
           rawData[key] = value;
         }
       }
-      
+
       // スキーマでバリデーション
       const validatedData = schema.parse(rawData);
-      
+
       // アクションを実行
       return await action(validatedData);
     });
@@ -200,7 +200,7 @@ export class ActionExecutor {
     return this.execute(async () => {
       // スキーマでバリデーション
       const validatedData = schema.parse(jsonData);
-      
+
       // アクションを実行
       return await action(validatedData);
     });
@@ -220,17 +220,17 @@ export function withActionLogging<T extends any[], R>(
   return async (...args: T): Promise<ActionState<R>> => {
     const startTime = Date.now();
     console.log(`[Server Action] ${actionName} started`);
-    
+
     try {
       const result = await originalFunction(...args);
       const duration = Date.now() - startTime;
-      
+
       if (result.success) {
         console.log(`[Server Action] ${actionName} completed successfully in ${duration}ms`);
       } else {
         console.warn(`[Server Action] ${actionName} failed in ${duration}ms:`, result.error);
       }
-      
+
       return result;
     } catch (error) {
       const duration = Date.now() - startTime;
@@ -250,15 +250,15 @@ export function withRateLimit<T extends any[], R>(
   originalFunction: (...args: T) => Promise<ActionState<R>>
 ) {
   const requests = new Map<string, number[]>();
-  
+
   return async (...args: T): Promise<ActionState<R>> => {
     const now = Date.now();
     const requestKey = `${key}`;
-    
+
     // 現在の時刻から計算したウィンドウ内のリクエスト回数を取得
     const requestTimes = requests.get(requestKey) || [];
-    const validRequests = requestTimes.filter(time => now - time < windowMs);
-    
+    const validRequests = requestTimes.filter((time) => now - time < windowMs);
+
     if (validRequests.length >= maxRequests) {
       return {
         success: false,
@@ -266,11 +266,11 @@ export function withRateLimit<T extends any[], R>(
         timestamp: new Date().toISOString(),
       };
     }
-    
+
     // 新しいリクエスト時刻を記録
     validRequests.push(now);
     requests.set(requestKey, validRequests);
-    
+
     return await originalFunction(...args);
   };
 }
@@ -318,7 +318,7 @@ export const createValidationResult = <T>(
  * ZodエラーからFieldErrorの配列に変換
  */
 export const zodErrorToFieldErrors = (error: z.ZodError): ReadonlyArray<FieldError> => {
-  return error.errors.map(err => ({
+  return error.errors.map((err) => ({
     field: err.path.join('.'),
     message: err.message,
   }));

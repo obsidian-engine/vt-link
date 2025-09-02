@@ -1,4 +1,4 @@
-import { DeliveryBatch, DeliveryBatchStatus } from '../entities/DeliveryBatch';
+import type { DeliveryBatch, DeliveryBatchStatus } from '../entities/DeliveryBatch';
 
 export interface DeliveryBatchRepository {
   /**
@@ -24,7 +24,10 @@ export interface DeliveryBatchRepository {
   /**
    * キャンペーンIDと指定されたステータスでバッチを検索します
    */
-  findByCampaignIdAndStatus(campaignId: string, status: DeliveryBatchStatus): Promise<DeliveryBatch[]>;
+  findByCampaignIdAndStatus(
+    campaignId: string,
+    status: DeliveryBatchStatus
+  ): Promise<DeliveryBatch[]>;
 
   /**
    * 送信可能なバッチを検索します
@@ -67,7 +70,10 @@ export interface DeliveryBatchRepository {
   /**
    * 全体の配信統計を取得します（指定期間内）
    */
-  getOverallDeliveryStats(startDate: Date, endDate: Date): Promise<{
+  getOverallDeliveryStats(
+    startDate: Date,
+    endDate: Date
+  ): Promise<{
     totalBatches: number;
     completedBatches: number;
     failedBatches: number;

@@ -1,15 +1,15 @@
 export enum DeliveryBatchStatus {
-  Pending = 'pending',     // 送信待ち
-  Sending = 'sending',     // 送信中
+  Pending = 'pending', // 送信待ち
+  Sending = 'sending', // 送信中
   Completed = 'completed', // 送信完了
-  Failed = 'failed',       // 送信失敗
+  Failed = 'failed', // 送信失敗
 }
 
 export class DeliveryBatch {
   readonly #id: string;
   readonly #campaignId: string;
   readonly #lineBroadcastId: string | null;
-  readonly #targetUserIds: ReadonlyArray<string>;
+  readonly #targetUserIds: readonly string[];
   readonly #status: DeliveryBatchStatus;
   readonly #sentCount: number;
   readonly #failCount: number;
@@ -23,7 +23,7 @@ export class DeliveryBatch {
     id: string,
     campaignId: string,
     lineBroadcastId: string | null,
-    targetUserIds: ReadonlyArray<string>,
+    targetUserIds: readonly string[],
     status: DeliveryBatchStatus,
     sentCount: number,
     failCount: number,
@@ -48,11 +48,7 @@ export class DeliveryBatch {
     Object.freeze(this);
   }
 
-  static create(
-    id: string,
-    campaignId: string,
-    targetUserIds: string[]
-  ): DeliveryBatch {
+  static create(id: string, campaignId: string, targetUserIds: string[]): DeliveryBatch {
     if (!id || id.trim().length === 0) {
       throw new Error('Delivery batch ID is required');
     }
@@ -64,8 +60,8 @@ export class DeliveryBatch {
     }
 
     // Remove duplicates and filter out empty IDs
-    const uniqueUserIds = [...new Set(targetUserIds.filter(id => id && id.trim().length > 0))];
-    
+    const uniqueUserIds = [...new Set(targetUserIds.filter((id) => id && id.trim().length > 0))];
+
     if (uniqueUserIds.length === 0) {
       throw new Error('At least one valid target user ID is required');
     }
@@ -91,7 +87,7 @@ export class DeliveryBatch {
     id: string,
     campaignId: string,
     lineBroadcastId: string | null,
-    targetUserIds: ReadonlyArray<string>,
+    targetUserIds: readonly string[],
     status: DeliveryBatchStatus,
     sentCount: number,
     failCount: number,
@@ -117,18 +113,42 @@ export class DeliveryBatch {
     );
   }
 
-  get id(): string { return this.#id; }
-  get campaignId(): string { return this.#campaignId; }
-  get lineBroadcastId(): string | null { return this.#lineBroadcastId; }
-  get targetUserIds(): ReadonlyArray<string> { return this.#targetUserIds; }
-  get status(): DeliveryBatchStatus { return this.#status; }
-  get sentCount(): number { return this.#sentCount; }
-  get failCount(): number { return this.#failCount; }
-  get errorCode(): string | null { return this.#errorCode; }
-  get errorMessage(): string | null { return this.#errorMessage; }
-  get sentAt(): Date | null { return this.#sentAt; }
-  get createdAt(): Date { return this.#createdAt; }
-  get updatedAt(): Date { return this.#updatedAt; }
+  get id(): string {
+    return this.#id;
+  }
+  get campaignId(): string {
+    return this.#campaignId;
+  }
+  get lineBroadcastId(): string | null {
+    return this.#lineBroadcastId;
+  }
+  get targetUserIds(): readonly string[] {
+    return this.#targetUserIds;
+  }
+  get status(): DeliveryBatchStatus {
+    return this.#status;
+  }
+  get sentCount(): number {
+    return this.#sentCount;
+  }
+  get failCount(): number {
+    return this.#failCount;
+  }
+  get errorCode(): string | null {
+    return this.#errorCode;
+  }
+  get errorMessage(): string | null {
+    return this.#errorMessage;
+  }
+  get sentAt(): Date | null {
+    return this.#sentAt;
+  }
+  get createdAt(): Date {
+    return this.#createdAt;
+  }
+  get updatedAt(): Date {
+    return this.#updatedAt;
+  }
 
   /**
    * バッチの総対象ユーザー数を取得します
@@ -152,8 +172,9 @@ export class DeliveryBatch {
    * バッチが完了しているかチェックします
    */
   get isCompleted(): boolean {
-    return this.#status === DeliveryBatchStatus.Completed || 
-           this.#status === DeliveryBatchStatus.Failed;
+    return (
+      this.#status === DeliveryBatchStatus.Completed || this.#status === DeliveryBatchStatus.Failed
+    );
   }
 
   /**
@@ -240,7 +261,10 @@ export class DeliveryBatch {
    * バッチを失敗状態にマークします
    */
   markAsFailed(errorCode: string, errorMessage: string): DeliveryBatch {
-    if (this.#status !== DeliveryBatchStatus.Pending && this.#status !== DeliveryBatchStatus.Sending) {
+    if (
+      this.#status !== DeliveryBatchStatus.Pending &&
+      this.#status !== DeliveryBatchStatus.Sending
+    ) {
       throw new Error('Only pending or sending batches can be marked as failed');
     }
 

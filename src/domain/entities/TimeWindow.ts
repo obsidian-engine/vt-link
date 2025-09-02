@@ -1,15 +1,10 @@
 export class TimeWindow {
   readonly #startTime: string; // HH:mm format
-  readonly #endTime: string;   // HH:mm format
+  readonly #endTime: string; // HH:mm format
   readonly #timeZone: string;
   readonly #daysOfWeek: Set<number>; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
 
-  private constructor(
-    startTime: string,
-    endTime: string,
-    timeZone: string,
-    daysOfWeek: number[]
-  ) {
+  private constructor(startTime: string, endTime: string, timeZone: string, daysOfWeek: number[]) {
     this.#startTime = startTime;
     this.#endTime = endTime;
     this.#timeZone = timeZone;
@@ -23,7 +18,7 @@ export class TimeWindow {
     timeZone = 'Asia/Tokyo',
     daysOfWeek: number[] = [0, 1, 2, 3, 4, 5, 6] // All days by default
   ): TimeWindow {
-    if (!this.isValidTimeFormat(startTime) || !this.isValidTimeFormat(endTime)) {
+    if (!TimeWindow.isValidTimeFormat(startTime) || !TimeWindow.isValidTimeFormat(endTime)) {
       throw new Error('Time must be in HH:mm format');
     }
 
@@ -31,7 +26,7 @@ export class TimeWindow {
       throw new Error('At least one day of week must be specified');
     }
 
-    const invalidDays = daysOfWeek.filter(day => day < 0 || day > 6);
+    const invalidDays = daysOfWeek.filter((day) => day < 0 || day > 6);
     if (invalidDays.length > 0) {
       throw new Error('Days of week must be between 0 (Sunday) and 6 (Saturday)');
     }
@@ -94,10 +89,9 @@ export class TimeWindow {
     if (startMinutes <= endMinutes) {
       // Same day range (e.g., 09:00-17:00)
       return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
-    } else {
-      // Overnight range (e.g., 22:00-06:00)
-      return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
     }
+    // Overnight range (e.g., 22:00-06:00)
+    return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
   }
 
   private timeToMinutes(time: string): number {
@@ -117,13 +111,13 @@ export class TimeWindow {
     for (let dayOffset = 0; dayOffset < 14; dayOffset++) {
       const checkDate = new Date(startOfDay);
       checkDate.setDate(checkDate.getDate() + dayOffset);
-      
+
       const dayOfWeek = checkDate.getUTCDay();
       if (this.#daysOfWeek.has(dayOfWeek)) {
         const [startHour, startMinute] = this.#startTime.split(':').map(Number);
         const activeTime = new Date(checkDate);
         activeTime.setHours(startHour, startMinute, 0, 0);
-        
+
         if (activeTime > from) {
           return activeTime;
         }

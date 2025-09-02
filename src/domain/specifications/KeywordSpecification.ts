@@ -1,6 +1,6 @@
-import { MessageSpecification } from './MessageSpecification';
-import { IncomingMessage } from '../entities/IncomingMessage';
 import { KeywordMatchMode } from '../entities/Condition';
+import type { IncomingMessage } from '../entities/IncomingMessage';
+import type { MessageSpecification } from './MessageSpecification';
 
 /**
  * キーワードマッチング条件のSpecification
@@ -13,12 +13,12 @@ export class KeywordSpecification implements MessageSpecification {
   constructor(
     keyword: string,
     mode: KeywordMatchMode = KeywordMatchMode.Partial,
-    caseSensitive: boolean = false
+    caseSensitive = false
   ) {
     if (!keyword || keyword.trim().length === 0) {
       throw new Error('Keyword cannot be empty');
     }
-    
+
     this.#keyword = keyword;
     this.#mode = mode;
     this.#caseSensitive = caseSensitive;
@@ -29,24 +29,23 @@ export class KeywordSpecification implements MessageSpecification {
       return false;
     }
 
-    const messageText = this.#caseSensitive 
-      ? message.text 
-      : message.text.toLowerCase();
-      
-    const keyword = this.#caseSensitive 
-      ? this.#keyword 
-      : this.#keyword.toLowerCase();
+    if (!message.text) {
+      return false; // null or empty text cannot match keywords
+    }
+
+    const messageText = this.#caseSensitive ? message.text : message.text.toLowerCase();
+
+    const keyword = this.#caseSensitive ? this.#keyword : this.#keyword.toLowerCase();
 
     switch (this.#mode) {
       case KeywordMatchMode.Exact:
         return messageText === keyword;
       case KeywordMatchMode.StartsWith:
-        return messageText.startsWith(keyword);
+        return messageText?.startsWith(keyword) ?? false;
       case KeywordMatchMode.EndsWith:
-        return messageText.endsWith(keyword);
-      case KeywordMatchMode.Partial:
+        return messageText?.endsWith(keyword) ?? false;
       default:
-        return messageText.includes(keyword);
+        return messageText?.includes(keyword) ?? false;
     }
   }
 

@@ -1,6 +1,6 @@
 import { LineUser } from '@/domain/campaign/entities/LineUser';
-import { LineUserRepository } from '@/domain/campaign/repositories/LineUserRepository';
-import { SegmentCriteria } from '@/domain/valueObjects/SegmentCriteria';
+import type { LineUserRepository } from '@/domain/campaign/repositories/LineUserRepository';
+import type { SegmentCriteria } from '@/domain/valueObjects/SegmentCriteria';
 import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';
 
 export class LineUserRepositorySupabase implements LineUserRepository {
@@ -9,24 +9,22 @@ export class LineUserRepositorySupabase implements LineUserRepository {
       throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from('line_users')
-      .upsert({
-        id: lineUser.id,
-        account_id: lineUser.accountId,
-        line_user_id: lineUser.lineUserId,
-        display_name: lineUser.displayName,
-        picture_url: lineUser.pictureUrl,
-        status_message: lineUser.statusMessage,
-        language: lineUser.language,
-        gender: lineUser.gender,
-        age: lineUser.age,
-        region: lineUser.region,
-        is_friend: lineUser.isFriend,
-        blocked_at: lineUser.blockedAt?.toISOString(),
-        created_at: lineUser.createdAt.toISOString(),
-        updated_at: new Date().toISOString(),
-      });
+    const { error } = await supabaseAdmin.from('line_users').upsert({
+      id: lineUser.id,
+      account_id: lineUser.accountId,
+      line_user_id: lineUser.lineUserId,
+      display_name: lineUser.displayName,
+      picture_url: lineUser.pictureUrl,
+      status_message: lineUser.statusMessage,
+      language: lineUser.language,
+      gender: lineUser.gender,
+      age: lineUser.age,
+      region: lineUser.region,
+      is_friend: lineUser.isFriend,
+      blocked_at: lineUser.blockedAt?.toISOString(),
+      created_at: lineUser.createdAt.toISOString(),
+      updated_at: new Date().toISOString(),
+    });
 
     if (error) {
       throw new Error(`Failed to save LINE user: ${error.message}`);
@@ -89,7 +87,7 @@ export class LineUserRepositorySupabase implements LineUserRepository {
       throw new Error(`Failed to find LINE users: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findByCriteria(accountId: string, criteria: SegmentCriteria): Promise<LineUser[]> {
@@ -105,29 +103,29 @@ export class LineUserRepositorySupabase implements LineUserRepository {
       .is('blocked_at', null);
 
     // Gender filtering
-    if (criteria.genders && criteria.genders.length > 0) {
-      query = query.in('gender', criteria.genders);
+    if (criteria.genders && criteria.genders.size > 0) {
+      query = query.in('gender', criteria.genders.genders);
     }
 
     // Age filtering
     if (criteria.ageRange) {
-      query = query
-        .gte('age', criteria.ageRange.min)
-        .lte('age', criteria.ageRange.max);
+      query = query.gte('age', criteria.ageRange.min).lte('age', criteria.ageRange.max);
     }
 
     // Region filtering
-    if (criteria.regions && criteria.regions.length > 0) {
-      query = query.in('region', criteria.regions);
+    if (criteria.regions && criteria.regions.size > 0) {
+      query = query.in('region', criteria.regions.regions);
     }
 
-    const { data, error } = await query.order('created_at', { ascending: false });
+    const { data, error } = await query.order('created_at', {
+      ascending: false,
+    });
 
     if (error) {
       throw new Error(`Failed to find LINE users by criteria: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async countByCriteria(accountId: string, criteria: SegmentCriteria): Promise<number> {
@@ -143,20 +141,18 @@ export class LineUserRepositorySupabase implements LineUserRepository {
       .is('blocked_at', null);
 
     // Gender filtering
-    if (criteria.genders && criteria.genders.length > 0) {
-      query = query.in('gender', criteria.genders);
+    if (criteria.genders && criteria.genders.size > 0) {
+      query = query.in('gender', criteria.genders.genders);
     }
 
     // Age filtering
     if (criteria.ageRange) {
-      query = query
-        .gte('age', criteria.ageRange.min)
-        .lte('age', criteria.ageRange.max);
+      query = query.gte('age', criteria.ageRange.min).lte('age', criteria.ageRange.max);
     }
 
     // Region filtering
-    if (criteria.regions && criteria.regions.length > 0) {
-      query = query.in('region', criteria.regions);
+    if (criteria.regions && criteria.regions.size > 0) {
+      query = query.in('region', criteria.regions.regions);
     }
 
     const { count, error } = await query;
@@ -186,10 +182,14 @@ export class LineUserRepositorySupabase implements LineUserRepository {
       throw new Error(`Failed to find active LINE users: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
-  async updateFriendStatus(accountId: string, lineUserId: string, isFriend: boolean): Promise<void> {
+  async updateFriendStatus(
+    accountId: string,
+    lineUserId: string,
+    isFriend: boolean
+  ): Promise<void> {
     if (!supabaseAdmin) {
       throw new Error('Supabase service role key is required');
     }
@@ -218,74 +218,73 @@ export class LineUserRepositorySupabase implements LineUserRepository {
 
   async getStatistics(accountId: string): Promise<{
     totalUsers: number;
-    activeUsers: number;
-    blockedUsers: number;
-    genderBreakdown: Record<string, number>;
-    ageBreakdown: Record<string, number>;
-    regionBreakdown: Record<string, number>;
+    genderDistribution: Record<string, number>;
+    ageDistribution: Record<string, number>;
+    regionDistribution: Record<string, number>;
   }> {
     if (!supabaseAdmin) {
       throw new Error('Supabase service role key is required');
     }
 
     // 並列でクエリを実行してパフォーマンスを向上
-    const [
+    const [totalResult, activeResult, blockedResult, genderResult, ageResult, regionResult] =
+      await Promise.all([
+        // Total users
+        supabaseAdmin
+          .from('line_users')
+          .select('id', { count: 'exact', head: true })
+          .eq('account_id', accountId),
+
+        // Active users (friends, not blocked)
+        supabaseAdmin
+          .from('line_users')
+          .select('id', { count: 'exact', head: true })
+          .eq('account_id', accountId)
+          .eq('is_friend', true)
+          .is('blocked_at', null),
+
+        // Blocked users
+        supabaseAdmin
+          .from('line_users')
+          .select('id', { count: 'exact', head: true })
+          .eq('account_id', accountId)
+          .not('blocked_at', 'is', null),
+
+        // Gender breakdown (active users only)
+        supabaseAdmin
+          .from('line_users')
+          .select('gender')
+          .eq('account_id', accountId)
+          .eq('is_friend', true)
+          .is('blocked_at', null),
+
+        // Age breakdown (active users only)
+        supabaseAdmin
+          .from('line_users')
+          .select('age')
+          .eq('account_id', accountId)
+          .eq('is_friend', true)
+          .is('blocked_at', null)
+          .not('age', 'is', null),
+
+        // Region breakdown (active users only)
+        supabaseAdmin
+          .from('line_users')
+          .select('region')
+          .eq('account_id', accountId)
+          .eq('is_friend', true)
+          .is('blocked_at', null),
+      ]);
+
+    // エラーハンドリング
+    const results = [
       totalResult,
       activeResult,
       blockedResult,
       genderResult,
       ageResult,
-      regionResult
-    ] = await Promise.all([
-      // Total users
-      supabaseAdmin
-        .from('line_users')
-        .select('id', { count: 'exact', head: true })
-        .eq('account_id', accountId),
-
-      // Active users (friends, not blocked)
-      supabaseAdmin
-        .from('line_users')
-        .select('id', { count: 'exact', head: true })
-        .eq('account_id', accountId)
-        .eq('is_friend', true)
-        .is('blocked_at', null),
-
-      // Blocked users
-      supabaseAdmin
-        .from('line_users')
-        .select('id', { count: 'exact', head: true })
-        .eq('account_id', accountId)
-        .not('blocked_at', 'is', null),
-
-      // Gender breakdown (active users only)
-      supabaseAdmin
-        .from('line_users')
-        .select('gender')
-        .eq('account_id', accountId)
-        .eq('is_friend', true)
-        .is('blocked_at', null),
-
-      // Age breakdown (active users only)
-      supabaseAdmin
-        .from('line_users')
-        .select('age')
-        .eq('account_id', accountId)
-        .eq('is_friend', true)
-        .is('blocked_at', null)
-        .not('age', 'is', null),
-
-      // Region breakdown (active users only)
-      supabaseAdmin
-        .from('line_users')
-        .select('region')
-        .eq('account_id', accountId)
-        .eq('is_friend', true)
-        .is('blocked_at', null),
-    ]);
-
-    // エラーハンドリング
-    const results = [totalResult, activeResult, blockedResult, genderResult, ageResult, regionResult];
+      regionResult,
+    ];
     for (const result of results) {
       if (result.error) {
         throw new Error(`Failed to get user statistics: ${result.error.message}`);
@@ -327,12 +326,213 @@ export class LineUserRepositorySupabase implements LineUserRepository {
 
     return {
       totalUsers: totalResult.count ?? 0,
-      activeUsers: activeResult.count ?? 0,
-      blockedUsers: blockedResult.count ?? 0,
-      genderBreakdown,
-      ageBreakdown,
-      regionBreakdown,
+      genderDistribution: genderBreakdown,
+      ageDistribution: ageBreakdown,
+      regionDistribution: regionBreakdown,
     };
+  }
+
+  // Additional required methods from LineUserRepository interface
+
+  async saveBatch(users: LineUser[]): Promise<void> {
+    for (const user of users) {
+      await this.save(user);
+    }
+  }
+
+  async findByUserId(userId: string): Promise<LineUser | null> {
+    return await this.findById(userId);
+  }
+
+  async findAllByAccountId(accountId: string): Promise<LineUser[]> {
+    return await this.findByAccountId(accountId);
+  }
+
+  async findByAccountIdWithFilters(
+    accountId: string,
+    filters: {
+      genders?: string[];
+      minAge?: number;
+      maxAge?: number;
+      regions?: string[];
+    },
+    limit?: number,
+    offset?: number
+  ): Promise<LineUser[]> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase service role key is required');
+    }
+
+    let query = supabaseAdmin
+      .from('line_users')
+      .select('*')
+      .eq('account_id', accountId)
+      .eq('is_friend', true)
+      .is('blocked_at', null);
+
+    if (filters.genders?.length) {
+      query = query.in('gender', filters.genders);
+    }
+
+    if (filters.minAge !== undefined) {
+      query = query.gte('age', filters.minAge);
+    }
+
+    if (filters.maxAge !== undefined) {
+      query = query.lte('age', filters.maxAge);
+    }
+
+    if (filters.regions?.length) {
+      query = query.in('region', filters.regions);
+    }
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    if (offset) {
+      query = query.range(offset, offset + (limit || 1000) - 1);
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false });
+
+    if (error) {
+      throw new Error(`Failed to find LINE users with filters: ${error.message}`);
+    }
+
+    return (data ?? []).map((item) => this.mapToEntity(item));
+  }
+
+  async countByAccountId(accountId: string): Promise<number> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase service role key is required');
+    }
+
+    const { count, error } = await supabaseAdmin
+      .from('line_users')
+      .select('*', { count: 'exact', head: true })
+      .eq('account_id', accountId)
+      .eq('is_friend', true)
+      .is('blocked_at', null);
+
+    if (error) {
+      throw new Error(`Failed to count LINE users: ${error.message}`);
+    }
+
+    return count ?? 0;
+  }
+
+  async countByAccountIdWithFilters(
+    accountId: string,
+    filters: {
+      genders?: string[];
+      minAge?: number;
+      maxAge?: number;
+      regions?: string[];
+    }
+  ): Promise<number> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase service role key is required');
+    }
+
+    let query = supabaseAdmin
+      .from('line_users')
+      .select('*', { count: 'exact', head: true })
+      .eq('account_id', accountId)
+      .eq('is_friend', true)
+      .is('blocked_at', null);
+
+    if (filters.genders?.length) {
+      query = query.in('gender', filters.genders);
+    }
+
+    if (filters.minAge !== undefined) {
+      query = query.gte('age', filters.minAge);
+    }
+
+    if (filters.maxAge !== undefined) {
+      query = query.lte('age', filters.maxAge);
+    }
+
+    if (filters.regions?.length) {
+      query = query.in('region', filters.regions);
+    }
+
+    const { count, error } = await query;
+
+    if (error) {
+      throw new Error(`Failed to count LINE users with filters: ${error.message}`);
+    }
+
+    return count ?? 0;
+  }
+
+  async delete(userId: string): Promise<void> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase service role key is required');
+    }
+
+    const { error } = await supabaseAdmin.from('line_users').delete().eq('id', userId);
+
+    if (error) {
+      throw new Error(`Failed to delete LINE user: ${error.message}`);
+    }
+  }
+
+  async deleteByAccountId(accountId: string): Promise<number> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase service role key is required');
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('line_users')
+      .delete()
+      .eq('account_id', accountId)
+      .select('id');
+
+    if (error) {
+      throw new Error(`Failed to delete LINE users by account: ${error.message}`);
+    }
+
+    return data?.length ?? 0;
+  }
+
+  async getAccountUserStats(accountId: string): Promise<{
+    totalUsers: number;
+    genderDistribution: { [gender: string]: number };
+    ageDistribution: { [ageGroup: string]: number };
+    regionDistribution: { [region: string]: number };
+  }> {
+    return await this.getStatistics(accountId);
+  }
+
+  async getLastUpdatedAt(accountId: string): Promise<Date | null> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase service role key is required');
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('line_users')
+      .select('updated_at')
+      .eq('account_id', accountId)
+      .order('updated_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') return null;
+      throw new Error(`Failed to get last updated time: ${error.message}`);
+    }
+
+    return data ? new Date(data.updated_at) : null;
+  }
+
+  async updateUser(user: LineUser): Promise<void> {
+    await this.save(user);
+  }
+
+  async updateBatch(users: LineUser[]): Promise<void> {
+    await this.saveBatch(users);
   }
 
   private mapToEntity(data: any): LineUser {
@@ -348,7 +548,7 @@ export class LineUserRepositorySupabase implements LineUserRepository {
       data.age,
       data.region,
       data.is_friend,
-      data.blocked_at ? new Date(data.blocked_at) : undefined,
+      data.blocked_at ? new Date(data.blocked_at) : null,
       new Date(data.created_at)
     );
   }

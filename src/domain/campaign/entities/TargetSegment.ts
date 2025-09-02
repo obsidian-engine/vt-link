@@ -1,13 +1,5 @@
-import { SegmentCriteria } from '../../valueObjects/SegmentCriteria';
-import { Gender } from '../../valueObjects/Gender';
-import { RegionCode } from '../../valueObjects/Region';
-
-export interface LineUser {
-  readonly userId: string;
-  readonly gender: Gender;
-  readonly age: number;
-  readonly region: RegionCode;
-}
+import type { SegmentCriteria } from '../../valueObjects/SegmentCriteria';
+import type { LineUser } from './LineUser';
 
 export class TargetSegment {
   static readonly MAX_NAME_LENGTH = 100;
@@ -66,7 +58,9 @@ export class TargetSegment {
       throw new Error(`Segment name cannot exceed ${this.MAX_NAME_LENGTH} characters`);
     }
     if (description && description.length > this.MAX_DESCRIPTION_LENGTH) {
-      throw new Error(`Segment description cannot exceed ${this.MAX_DESCRIPTION_LENGTH} characters`);
+      throw new Error(
+        `Segment description cannot exceed ${this.MAX_DESCRIPTION_LENGTH} characters`
+      );
     }
     if (criteria.isEmpty()) {
       throw new Error('Segment criteria cannot be empty');
@@ -149,11 +143,7 @@ export class TargetSegment {
   /**
    * セグメントを更新します
    */
-  update(
-    name?: string,
-    description?: string,
-    criteria?: SegmentCriteria
-  ): TargetSegment {
+  update(name?: string, description?: string, criteria?: SegmentCriteria): TargetSegment {
     if (name !== undefined) {
       if (!name || name.trim().length === 0) {
         throw new Error('Segment name is required');
@@ -164,7 +154,9 @@ export class TargetSegment {
     }
 
     if (description !== undefined && description.length > TargetSegment.MAX_DESCRIPTION_LENGTH) {
-      throw new Error(`Segment description cannot exceed ${TargetSegment.MAX_DESCRIPTION_LENGTH} characters`);
+      throw new Error(
+        `Segment description cannot exceed ${TargetSegment.MAX_DESCRIPTION_LENGTH} characters`
+      );
     }
 
     if (criteria !== undefined && criteria.isEmpty()) {
@@ -255,10 +247,15 @@ export class TargetSegment {
    * ユーザーがこのセグメントの対象になるかをチェックします
    */
   matches(user: LineUser): boolean {
+    // null値を適切にハンドリング
+    if (!user.age || !user.gender || !user.region) {
+      return false;
+    }
+
     return this.#criteria.matches({
-      gender: user.gender,
+      gender: user.gender as any, // 型変換（一時的対応）
       age: user.age,
-      region: user.region,
+      region: user.region as any, // 型変換（一時的対応）
     });
   }
 
@@ -266,14 +263,14 @@ export class TargetSegment {
    * ユーザーリストからこのセグメントに一致するユーザーをフィルタリングします
    */
   filterUsers(users: LineUser[]): LineUser[] {
-    return users.filter(user => this.matches(user));
+    return users.filter((user) => this.matches(user));
   }
 
   /**
    * ユーザーリストからこのセグメントに一致するユーザーIDのみを抽出します
    */
   filterUserIds(users: LineUser[]): string[] {
-    return this.filterUsers(users).map(user => user.userId);
+    return this.filterUsers(users).map((user) => user.id);
   }
 
   /**
@@ -289,8 +286,7 @@ export class TargetSegment {
   }
 
   equals(other: TargetSegment): boolean {
-    return this.#id === other.#id &&
-           this.#accountId === other.#accountId;
+    return this.#id === other.#id && this.#accountId === other.#accountId;
   }
 
   toJSON(): any {

@@ -1,7 +1,8 @@
+import type { ReplyCommand } from '../commands';
 import { AutoReplyRuleV2 } from '../entities/AutoReplyRuleV2';
-import { MessageSpecification } from '../specifications';
-import { ReplyCommand } from '../commands';
-import { RateLimitPolicy, RateLimitScope, SlidingWindowPolicy, NoRateLimitPolicy, RateLimitStorage } from '../policies';
+import type { RateLimitPolicy, RateLimitStorage } from '../policies';
+import { NoRateLimitPolicy, RateLimitScope, SlidingWindowPolicy } from '../policies';
+import type { MessageSpecification } from '../specifications';
 
 /**
  * AutoReplyRuleを直感的に組み立てるBuilderクラス
@@ -14,7 +15,7 @@ export class RuleBuilder {
   private trigger?: MessageSpecification;
   private response?: ReplyCommand;
   private rateLimit?: RateLimitPolicy;
-  private enabled: boolean = true;
+  private enabled = true;
 
   /**
    * ルールIDを設定
@@ -67,11 +68,16 @@ export class RuleBuilder {
   /**
    * レート制限を設定（Policy）
    */
-  limitTo(maxCount: number, windowSeconds: number, scope: RateLimitScope = RateLimitScope.User, storage?: RateLimitStorage): RuleBuilder {
+  limitTo(
+    maxCount: number,
+    windowSeconds: number,
+    scope: RateLimitScope = RateLimitScope.User,
+    storage?: RateLimitStorage
+  ): RuleBuilder {
     if (!storage) {
       throw new Error('RateLimitStorage is required for rate limiting');
     }
-    
+
     this.rateLimit = new SlidingWindowPolicy(maxCount, windowSeconds, scope, storage);
     return this;
   }
@@ -87,7 +93,7 @@ export class RuleBuilder {
   /**
    * 有効/無効を設定
    */
-  enabled(enabled: boolean = true): RuleBuilder {
+  setEnabled(enabled = true): RuleBuilder {
     this.enabled = enabled;
     return this;
   }

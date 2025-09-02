@@ -1,4 +1,4 @@
-import { ReplyCommand, MessageContext } from './ReplyCommand';
+import type { MessageContext, ReplyCommand } from './ReplyCommand';
 
 /**
  * 複数の返信コマンドを組み合わせるCompositeコマンド
@@ -7,11 +7,11 @@ export class CompositeReplyCommand implements ReplyCommand {
   readonly #commands: ReplyCommand[];
   readonly #executeAll: boolean;
 
-  constructor(commands: ReplyCommand[], executeAll: boolean = true) {
+  constructor(commands: ReplyCommand[], executeAll = true) {
     if (!commands || commands.length === 0) {
       throw new Error('At least one command must be provided');
     }
-    
+
     this.#commands = [...commands]; // 防御的コピー
     this.#executeAll = executeAll;
   }

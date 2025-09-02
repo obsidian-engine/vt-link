@@ -5,10 +5,10 @@
  * Supabase CLIを使用してTypeScript型定義を自動生成
  */
 
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import path from 'path';
-import fs from 'fs/promises';
+import { exec } from 'node:child_process';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { promisify } from 'node:util';
 
 const execAsync = promisify(exec);
 
@@ -39,9 +39,9 @@ async function generateTypes() {
     }
 
     console.log(`実行コマンド: ${command}`);
-    
+
     const { stdout, stderr } = await execAsync(command);
-    
+
     if (stderr && !stderr.includes('warning')) {
       console.warn('⚠️  警告:', stderr);
     }
@@ -54,15 +54,14 @@ async function generateTypes() {
 
     // 型定義のカスタマイズファイルも生成
     await generateCustomTypes();
-
   } catch (error) {
     console.error('❌ 型生成に失敗しました:', error.message);
-    
+
     if (error.message.includes('supabase')) {
       console.log('💡 ヒント: Supabase CLIがインストールされていない可能性があります');
       console.log('   インストール: npm install -g supabase');
     }
-    
+
     process.exit(1);
   }
 }
@@ -207,7 +206,7 @@ export type CampaignUpdate = Database['public']['Tables']['campaigns']['Update']
 
   const customTypesPath = 'src/generated/database.types.ts';
   await fs.writeFile(customTypesPath, customTypesContent, 'utf8');
-  
+
   console.log(`📁 カスタム型定義: ${customTypesPath}`);
 }
 

@@ -64,7 +64,7 @@ export class IncomingMessage {
   static fromLineWebhookEvent(event: any): IncomingMessage {
     return IncomingMessage.create(
       event.message?.id || crypto.randomUUID(),
-      event.message?.type as MessageType || MessageType.Text,
+      (event.message?.type as MessageType) || MessageType.Text,
       event.message?.text || null,
       {
         type: event.source.type,

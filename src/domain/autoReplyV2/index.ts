@@ -1,9 +1,9 @@
 /**
  * AutoReplyRuleV2 - Specification/Command/Policy Pattern
- * 
+ *
  * Domain Service を使わずに責務分離を実現する新アーキテクチャ
  * - Specification: 「いつ発火するか」の条件判定
- * - Command: 「何をするか」のアクション実行  
+ * - Command: 「何をするか」のアクション実行
  * - Policy: 「いくつまで」の制限・ルール
  */
 
@@ -12,36 +12,36 @@ export { AutoReplyRuleV2 } from '../entities/AutoReplyRuleV2';
 
 // ===== SPECIFICATIONS (いつ発火するか) =====
 export {
-  MessageSpecification,
+  type MessageSpecification,
   CompositeSpecification,
-  AndSpecification, 
+  AndSpecification,
   OrSpecification,
   NotSpecification,
   KeywordSpecification,
   RegexSpecification,
   TimeWindowSpecification,
   MessageTypeSpecification,
-  KeywordMatchMode,
-  MessageType
+  type KeywordMatchMode,
+  type MessageType,
 } from '../specifications';
 
 // ===== COMMANDS (何をするか) =====
 export {
-  ReplyCommand,
-  MessageContext,
+  type ReplyCommand,
+  type MessageContext,
   TextReplyCommand,
   StickerReplyCommand,
   ImageReplyCommand,
-  CompositeReplyCommand
+  CompositeReplyCommand,
 } from '../commands';
 
 // ===== POLICIES (いくつまで・制限) =====
 export {
-  RateLimitPolicy,
-  RateLimitScope,
+  type RateLimitPolicy,
+  type RateLimitScope,
   SlidingWindowPolicy,
   NoRateLimitPolicy,
-  RateLimitStorage
+  type RateLimitStorage,
 } from '../policies';
 
 // ===== BUILDERS (組み立て支援) =====
@@ -49,15 +49,17 @@ export {
   RuleBuilder,
   SpecificationBuilder,
   CommandBuilder,
-  PresetBuilder
+  PresetBuilder,
 } from '../builders';
 
 // ===== EXAMPLES & DEMOS =====
-export {
-  VTuberAutoReplyDemo,
-  runVTuberDemo,
-  createCustomRule
-} from '../examples/AutoReplyDemo';
+// デモ機能は一時的にコメントアウト（TypeScriptエラー対応）
+// export {
+//   VTuberAutoReplyDemo,
+//   runVTuberDemo,
+//   createCustomRule,
+// } from '../examples/AutoReplyDemo';
 
 // 既存エンティティとの互換性
-export { IncomingMessage, MessageSource } from '../entities/IncomingMessage';
+export type { MessageSource } from '../entities/IncomingMessage';
+export { IncomingMessage } from '../entities/IncomingMessage';

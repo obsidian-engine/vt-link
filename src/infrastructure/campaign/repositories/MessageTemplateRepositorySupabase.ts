@@ -1,6 +1,6 @@
 import { MessageTemplate } from '@/domain/campaign/entities/MessageTemplate';
-import { MessageTemplateRepository } from '@/domain/campaign/repositories/MessageTemplateRepository';
-import { MessageContent, MessageType } from '@/domain/valueObjects/MessageContent';
+import type { MessageTemplateRepository } from '@/domain/campaign/repositories/MessageTemplateRepository';
+import { MessageContent, type MessageType } from '@/domain/valueObjects/MessageContent';
 import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';
 
 export class MessageTemplateRepositorySupabase implements MessageTemplateRepository {
@@ -9,19 +9,17 @@ export class MessageTemplateRepositorySupabase implements MessageTemplateReposit
       throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from('message_templates')
-      .upsert({
-        id: template.id,
-        account_id: template.accountId,
-        title: template.title,
-        description: template.description,
-        content: template.content.toJSON(),
-        placeholder_keys: template.placeholderKeys,
-        is_active: template.isActive,
-        created_at: template.createdAt.toISOString(),
-        updated_at: template.updatedAt.toISOString(),
-      });
+    const { error } = await supabaseAdmin.from('message_templates').upsert({
+      id: template.id,
+      account_id: template.accountId,
+      title: template.title,
+      description: template.description,
+      content: template.content.toJSON(),
+      placeholder_keys: template.placeholderKeys,
+      is_active: template.isActive,
+      created_at: template.createdAt.toISOString(),
+      updated_at: template.updatedAt.toISOString(),
+    });
 
     if (error) {
       throw new Error(`Failed to save message template: ${error.message}`);
@@ -62,7 +60,7 @@ export class MessageTemplateRepositorySupabase implements MessageTemplateReposit
       throw new Error(`Failed to find message templates: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findActiveByAccountId(accountId: string): Promise<MessageTemplate[]> {
@@ -81,7 +79,7 @@ export class MessageTemplateRepositorySupabase implements MessageTemplateReposit
       throw new Error(`Failed to find active message templates: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findByNamePattern(accountId: string, namePattern: string): Promise<MessageTemplate[]> {
@@ -100,10 +98,13 @@ export class MessageTemplateRepositorySupabase implements MessageTemplateReposit
       throw new Error(`Failed to search message templates: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
-  async findByPlaceholderKey(accountId: string, placeholderKey: string): Promise<MessageTemplate[]> {
+  async findByPlaceholderKey(
+    accountId: string,
+    placeholderKey: string
+  ): Promise<MessageTemplate[]> {
     if (!supabaseAdmin) {
       throw new Error('Supabase service role key is required');
     }
@@ -119,7 +120,7 @@ export class MessageTemplateRepositorySupabase implements MessageTemplateReposit
       throw new Error(`Failed to find message templates by placeholder: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async delete(id: string): Promise<void> {
@@ -127,10 +128,7 @@ export class MessageTemplateRepositorySupabase implements MessageTemplateReposit
       throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from('message_templates')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabaseAdmin.from('message_templates').delete().eq('id', id);
 
     if (error) {
       throw new Error(`Failed to delete message template: ${error.message}`);

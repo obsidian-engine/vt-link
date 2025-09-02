@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import { createCampaign } from '@/ui/actions/campaignActions';
+import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
 
 export function CreateCampaignForm() {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   // フォームの状態管理
   const [campaignType, setCampaignType] = useState<'broadcast' | 'narrowcast'>('broadcast');
   const [useTemplate, setUseTemplate] = useState(false);
@@ -18,15 +18,15 @@ export function CreateCampaignForm() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    
+
     if (isSubmitting) return;
-    
+
     setIsSubmitting(true);
     setError(null);
 
     try {
       const formData = new FormData(event.currentTarget);
-      
+
       // 実際のアプリケーションでは認証からaccountIdを取得
       formData.append('accountId', 'demo-account-id');
 
@@ -37,7 +37,7 @@ export function CreateCampaignForm() {
         if (textContent) {
           content.push({
             type: 'text',
-            payload: { text: textContent }
+            payload: { text: textContent },
           });
         }
       } else if (messageType === 'image') {
@@ -45,7 +45,7 @@ export function CreateCampaignForm() {
         if (imageUrl) {
           content.push({
             type: 'image',
-            payload: { imageUrl }
+            payload: { imageUrl },
           });
         }
       } else if (messageType === 'sticker') {
@@ -54,7 +54,7 @@ export function CreateCampaignForm() {
         if (packageId && stickerId) {
           content.push({
             type: 'sticker',
-            payload: { packageId, stickerId }
+            payload: { packageId, stickerId },
           });
         }
       }
@@ -77,7 +77,7 @@ export function CreateCampaignForm() {
       if (result.success) {
         router.push('/dashboard/campaigns');
       } else {
-        setError(result.error);
+        setError(result.error || 'エラーが発生しました');
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'エラーが発生しました');
@@ -101,7 +101,10 @@ export function CreateCampaignForm() {
         </h2>
         <div className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               キャンペーン名 <span className="text-red-500">*</span>
             </label>
             <input
@@ -118,9 +121,7 @@ export function CreateCampaignForm() {
 
       {/* 配信設定 */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
-          配信設定
-        </h2>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">配信設定</h2>
         <div className="space-y-6">
           {/* 配信タイプ */}
           <div>
@@ -160,7 +161,10 @@ export function CreateCampaignForm() {
           {/* セグメント選択（ナローキャストの場合のみ） */}
           {campaignType === 'narrowcast' && (
             <div>
-              <label htmlFor="segmentId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="segmentId"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 配信先セグメント <span className="text-red-500">*</span>
               </label>
               <select
@@ -196,9 +200,7 @@ export function CreateCampaignForm() {
                   onChange={(e) => setScheduleType(e.target.value as 'now')}
                   className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                  即座に配信
-                </span>
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">即座に配信</span>
               </label>
               <label className="flex items-center">
                 <input
@@ -209,16 +211,17 @@ export function CreateCampaignForm() {
                   onChange={(e) => setScheduleType(e.target.value as 'scheduled')}
                   className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                  日時指定配信
-                </span>
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">日時指定配信</span>
               </label>
             </div>
 
             {scheduleType === 'scheduled' && (
               <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="scheduledDate" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="scheduledDate"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     配信日
                   </label>
                   <input
@@ -231,7 +234,10 @@ export function CreateCampaignForm() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="scheduledTime" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="scheduledTime"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     配信時刻
                   </label>
                   <input
@@ -250,9 +256,7 @@ export function CreateCampaignForm() {
 
       {/* メッセージ内容 */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
-          メッセージ内容
-        </h2>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">メッセージ内容</h2>
         <div className="space-y-6">
           {/* テンプレート利用設定 */}
           <div>
@@ -271,7 +275,10 @@ export function CreateCampaignForm() {
 
           {useTemplate ? (
             <div>
-              <label htmlFor="templateId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="templateId"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 テンプレート選択 <span className="text-red-500">*</span>
               </label>
               <select
@@ -304,7 +311,9 @@ export function CreateCampaignForm() {
                       onChange={(e) => setMessageType(e.target.value as 'text')}
                       className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                     />
-                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">💬 テキスト</span>
+                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                      💬 テキスト
+                    </span>
                   </label>
                   <label className="flex items-center">
                     <input
@@ -326,7 +335,9 @@ export function CreateCampaignForm() {
                       onChange={(e) => setMessageType(e.target.value as 'sticker')}
                       className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                     />
-                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">😊 スタンプ</span>
+                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                      😊 スタンプ
+                    </span>
                   </label>
                 </div>
               </div>
@@ -334,7 +345,10 @@ export function CreateCampaignForm() {
               {/* メッセージ内容入力 */}
               {messageType === 'text' && (
                 <div>
-                  <label htmlFor="textContent" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="textContent"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     メッセージ内容 <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -353,7 +367,10 @@ export function CreateCampaignForm() {
 
               {messageType === 'image' && (
                 <div>
-                  <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="imageUrl"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     画像URL <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -373,7 +390,10 @@ export function CreateCampaignForm() {
               {messageType === 'sticker' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="packageId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label
+                      htmlFor="packageId"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
                       パッケージID <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -386,7 +406,10 @@ export function CreateCampaignForm() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="stickerId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label
+                      htmlFor="stickerId"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
                       スタンプID <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -420,9 +443,25 @@ export function CreateCampaignForm() {
         >
           {isSubmitting ? (
             <>
-              <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              <svg
+                className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                />
               </svg>
               作成中...
             </>

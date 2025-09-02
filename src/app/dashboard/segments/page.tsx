@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
 import { getSegments } from '@/ui/actions/segmentActions';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function SegmentsPage() {
   return (
@@ -48,16 +48,14 @@ async function SegmentList() {
   if (!result.success) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600 dark:text-red-400">
-          エラーが発生しました: {result.error}
-        </div>
+        <div className="text-red-600 dark:text-red-400">エラーが発生しました: {result.error}</div>
       </div>
     );
   }
 
   const segments = result.data;
 
-  if (segments.length === 0) {
+  if (!segments || segments.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="text-gray-500 dark:text-gray-400 mb-4">
@@ -89,14 +87,14 @@ async function SegmentList() {
                     総セグメント数
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {segments.length}
+                    {segments?.length || 0}
                   </dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
@@ -109,17 +107,20 @@ async function SegmentList() {
                     平均対象者数
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {segments.length > 0 
-                      ? Math.round(segments.reduce((sum, s) => sum + (s.estimatedCount || 0), 0) / segments.length).toLocaleString()
-                      : 0
-                    }名
+                    {(segments?.length || 0) > 0
+                      ? Math.round(
+                          segments.reduce((sum, s) => sum + (s.estimatedCount || 0), 0) /
+                            (segments?.length || 1)
+                        ).toLocaleString()
+                      : 0}
+                    名
                   </dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
@@ -168,7 +169,7 @@ async function SegmentList() {
 
       {/* セグメント一覧 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {segments.map((segment) => (
+        {segments?.map((segment) => (
           <SegmentCard key={segment.id} segment={segment} />
         ))}
       </div>
@@ -179,35 +180,42 @@ async function SegmentList() {
 function SegmentCard({ segment }: { segment: any }) {
   const getCriteriaText = (criteria: any) => {
     const parts = [];
-    
+
     if (criteria.ageRange) {
       parts.push(`${criteria.ageRange.min}-${criteria.ageRange.max}歳`);
     }
-    
+
     if (criteria.genders && criteria.genders.length > 0) {
       const genderLabels = criteria.genders.map((g: string) => {
-        switch(g) {
-          case 'male': return '男性';
-          case 'female': return '女性';
-          default: return g;
+        switch (g) {
+          case 'male':
+            return '男性';
+          case 'female':
+            return '女性';
+          default:
+            return g;
         }
       });
       parts.push(genderLabels.join('・'));
     }
-    
+
     if (criteria.regions && criteria.regions.length > 0) {
       const regionLabels = criteria.regions.map((r: string) => {
         // 地域コードから日本語名への変換（簡略版）
-        switch(r) {
-          case 'JP-13': return '東京都';
-          case 'JP-27': return '大阪府';
-          case 'JP-14': return '神奈川県';
-          default: return r;
+        switch (r) {
+          case 'JP-13':
+            return '東京都';
+          case 'JP-27':
+            return '大阪府';
+          case 'JP-14':
+            return '神奈川県';
+          default:
+            return r;
         }
       });
       parts.push(regionLabels.join('・'));
     }
-    
+
     return parts.length > 0 ? parts.join(' / ') : '条件なし';
   };
 
@@ -236,17 +244,13 @@ function SegmentCard({ segment }: { segment: any }) {
                   {segment.name}
                 </h3>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                {segment.description}
-              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{segment.description}</p>
             </div>
           </div>
-          
+
           {/* セグメント条件 */}
           <div className="mb-4">
-            <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              対象条件:
-            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">対象条件:</div>
             <div className="text-sm text-gray-900 dark:text-white">
               {getCriteriaText(segment.criteria)}
             </div>
@@ -319,7 +323,7 @@ function SegmentListSkeleton() {
                   <div className="h-4 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-3"></div>
                 </div>
               </div>
-              
+
               <div className="mb-4">
                 <div className="h-3 w-16 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-1"></div>
                 <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>

@@ -1,8 +1,8 @@
-import { Condition } from './Condition';
-import { Response } from './Response';
-import { RateLimit } from './RateLimit';
-import { TimeWindow } from './TimeWindow';
-import { IncomingMessage } from './IncomingMessage';
+import type { Condition } from './Condition';
+import type { IncomingMessage } from './IncomingMessage';
+import type { RateLimit } from './RateLimit';
+import type { Response } from './Response';
+import type { TimeWindow } from './TimeWindow';
 
 export class AutoReplyRule {
   static readonly MAX_NAME_LENGTH = 100;
@@ -13,8 +13,8 @@ export class AutoReplyRule {
   readonly #accountId: string;
   readonly #name: string;
   readonly #priority: number;
-  readonly #conditions: ReadonlyArray<Condition>;
-  readonly #responses: ReadonlyArray<Response>;
+  readonly #conditions: readonly Condition[];
+  readonly #responses: readonly Response[];
   readonly #rateLimit: RateLimit | null;
   readonly #timeWindow: TimeWindow | null;
   readonly #enabled: boolean;
@@ -26,8 +26,8 @@ export class AutoReplyRule {
     accountId: string,
     name: string,
     priority: number,
-    conditions: ReadonlyArray<Condition>,
-    responses: ReadonlyArray<Response>,
+    conditions: readonly Condition[],
+    responses: readonly Response[],
     rateLimit: RateLimit | null,
     timeWindow: TimeWindow | null,
     enabled: boolean,
@@ -53,8 +53,8 @@ export class AutoReplyRule {
     accountId: string,
     name: string,
     priority: number,
-    conditions: ReadonlyArray<Condition>,
-    responses: ReadonlyArray<Response>,
+    conditions: readonly Condition[],
+    responses: readonly Response[],
     rateLimit: RateLimit | null = null,
     timeWindow: TimeWindow | null = null,
     enabled = true
@@ -68,8 +68,8 @@ export class AutoReplyRule {
     if (!name || name.trim().length === 0) {
       throw new Error('Rule name is required');
     }
-    if (name.length > this.MAX_NAME_LENGTH) {
-      throw new Error(`Rule name cannot exceed ${this.MAX_NAME_LENGTH} characters`);
+    if (name.length > AutoReplyRule.MAX_NAME_LENGTH) {
+      throw new Error(`Rule name cannot exceed ${AutoReplyRule.MAX_NAME_LENGTH} characters`);
     }
     if (priority < 0) {
       throw new Error('Priority must be non-negative');
@@ -77,14 +77,14 @@ export class AutoReplyRule {
     if (!conditions || conditions.length === 0) {
       throw new Error('At least one condition is required');
     }
-    if (conditions.length > this.MAX_CONDITIONS) {
-      throw new Error(`Cannot exceed ${this.MAX_CONDITIONS} conditions`);
+    if (conditions.length > AutoReplyRule.MAX_CONDITIONS) {
+      throw new Error(`Cannot exceed ${AutoReplyRule.MAX_CONDITIONS} conditions`);
     }
     if (!responses || responses.length === 0) {
       throw new Error('At least one response is required');
     }
-    if (responses.length > this.MAX_RESPONSES) {
-      throw new Error(`Cannot exceed ${this.MAX_RESPONSES} responses`);
+    if (responses.length > AutoReplyRule.MAX_RESPONSES) {
+      throw new Error(`Cannot exceed ${AutoReplyRule.MAX_RESPONSES} responses`);
     }
 
     const now = new Date();
@@ -108,8 +108,8 @@ export class AutoReplyRule {
     accountId: string,
     name: string,
     priority: number,
-    conditions: ReadonlyArray<Condition>,
-    responses: ReadonlyArray<Response>,
+    conditions: readonly Condition[],
+    responses: readonly Response[],
     rateLimit: RateLimit | null,
     timeWindow: TimeWindow | null,
     enabled: boolean,
@@ -147,11 +147,11 @@ export class AutoReplyRule {
     return this.#priority;
   }
 
-  get conditions(): ReadonlyArray<Condition> {
+  get conditions(): readonly Condition[] {
     return this.#conditions;
   }
 
-  get responses(): ReadonlyArray<Response> {
+  get responses(): readonly Response[] {
     return this.#responses;
   }
 
@@ -186,7 +186,7 @@ export class AutoReplyRule {
     }
 
     // All conditions must match (AND logic)
-    return this.#conditions.every(condition => condition.matches(message));
+    return this.#conditions.every((condition) => condition.matches(message));
   }
 
   pickResponse(): Response | null {
@@ -195,8 +195,8 @@ export class AutoReplyRule {
     }
 
     // Filter responses by probability
-    const availableResponses = this.#responses.filter(response => response.shouldExecute());
-    
+    const availableResponses = this.#responses.filter((response) => response.shouldExecute());
+
     if (availableResponses.length === 0) {
       return null;
     }
@@ -261,7 +261,7 @@ export class AutoReplyRule {
     );
   }
 
-  updateConditions(conditions: ReadonlyArray<Condition>): AutoReplyRule {
+  updateConditions(conditions: readonly Condition[]): AutoReplyRule {
     if (!conditions || conditions.length === 0) {
       throw new Error('At least one condition is required');
     }
@@ -284,7 +284,7 @@ export class AutoReplyRule {
     );
   }
 
-  updateResponses(responses: ReadonlyArray<Response>): AutoReplyRule {
+  updateResponses(responses: readonly Response[]): AutoReplyRule {
     if (!responses || responses.length === 0) {
       throw new Error('At least one response is required');
     }
@@ -380,7 +380,6 @@ export class AutoReplyRule {
   }
 
   canBeExecuted(currentTime: Date = new Date()): boolean {
-    return this.#enabled && 
-           (this.#timeWindow === null || this.#timeWindow.contains(currentTime));
+    return this.#enabled && (this.#timeWindow === null || this.#timeWindow.contains(currentTime));
   }
 }

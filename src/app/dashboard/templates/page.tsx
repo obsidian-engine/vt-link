@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
 import { getTemplates } from '@/ui/actions/templateActions';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function TemplatesPage() {
   return (
@@ -48,16 +48,14 @@ async function TemplateList() {
   if (!result.success) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600 dark:text-red-400">
-          エラーが発生しました: {result.error}
-        </div>
+        <div className="text-red-600 dark:text-red-400">エラーが発生しました: {result.error}</div>
       </div>
     );
   }
 
   const templates = result.data;
 
-  if (templates.length === 0) {
+  if (!templates || templates.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="text-gray-500 dark:text-gray-400 mb-4">
@@ -103,7 +101,7 @@ async function TemplateList() {
 
       {/* テンプレート一覧 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {templates.map((template) => (
+        {templates?.map((template) => (
           <TemplateCard key={template.id} template={template} />
         ))}
       </div>
@@ -128,22 +126,41 @@ function TemplateCard({ template }: { template: any }) {
   const getCategoryBadge = (category: string) => {
     switch (category) {
       case 'notification':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">お知らせ</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+            お知らせ
+          </span>
+        );
       case 'promotion':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">プロモーション</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+            プロモーション
+          </span>
+        );
       case 'greeting':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">挨拶</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+            挨拶
+          </span>
+        );
       default:
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">その他</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+            その他
+          </span>
+        );
     }
   };
 
   const getPreviewText = (content: any[]) => {
     if (!content || content.length === 0) return 'コンテンツがありません';
-    
+
     const firstContent = content[0];
     if (firstContent.type === 'text') {
-      return firstContent.payload?.text?.slice(0, 100) + (firstContent.payload?.text?.length > 100 ? '...' : '');
+      return (
+        firstContent.payload?.text?.slice(0, 100) +
+        (firstContent.payload?.text?.length > 100 ? '...' : '')
+      );
     } else if (firstContent.type === 'image') {
       return '🖼️ 画像メッセージ';
     } else if (firstContent.type === 'sticker') {
@@ -172,7 +189,7 @@ function TemplateCard({ template }: { template: any }) {
               </div>
             </div>
           </div>
-          
+
           <div className="mb-4">
             <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
               {template.description || getPreviewText(template.content)}
@@ -240,7 +257,7 @@ function TemplateListSkeleton() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mb-4 space-y-2">
                 <div className="h-4 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
                 <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>

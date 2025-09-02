@@ -1,5 +1,5 @@
 import { DeliveryBatch, DeliveryBatchStatus } from '@/domain/campaign/entities/DeliveryBatch';
-import { DeliveryBatchRepository } from '@/domain/campaign/repositories/DeliveryBatchRepository';
+import type { DeliveryBatchRepository } from '@/domain/campaign/repositories/DeliveryBatchRepository';
 import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';
 
 export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository {
@@ -8,22 +8,20 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
       throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from('delivery_batches')
-      .upsert({
-        id: batch.id,
-        campaign_id: batch.campaignId,
-        line_broadcast_id: batch.lineBroadcastId,
-        target_user_ids: batch.targetUserIds,
-        status: batch.status,
-        sent_count: batch.sentCount,
-        fail_count: batch.failCount,
-        error_code: batch.errorCode,
-        error_message: batch.errorMessage,
-        sent_at: batch.sentAt?.toISOString() || null,
-        created_at: batch.createdAt.toISOString(),
-        updated_at: batch.updatedAt.toISOString(),
-      });
+    const { error } = await supabaseAdmin.from('delivery_batches').upsert({
+      id: batch.id,
+      campaign_id: batch.campaignId,
+      line_broadcast_id: batch.lineBroadcastId,
+      target_user_ids: batch.targetUserIds,
+      status: batch.status,
+      sent_count: batch.sentCount,
+      fail_count: batch.failCount,
+      error_code: batch.errorCode,
+      error_message: batch.errorMessage,
+      sent_at: batch.sentAt?.toISOString() || null,
+      created_at: batch.createdAt.toISOString(),
+      updated_at: batch.updatedAt.toISOString(),
+    });
 
     if (error) {
       throw new Error(`Failed to save delivery batch: ${error.message}`);
@@ -64,7 +62,7 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
       throw new Error(`Failed to find delivery batches: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findByStatus(status: DeliveryBatchStatus): Promise<DeliveryBatch[]> {
@@ -82,10 +80,13 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
       throw new Error(`Failed to find delivery batches by status: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
-  async findByCampaignIdAndStatus(campaignId: string, status: DeliveryBatchStatus): Promise<DeliveryBatch[]> {
+  async findByCampaignIdAndStatus(
+    campaignId: string,
+    status: DeliveryBatchStatus
+  ): Promise<DeliveryBatch[]> {
     if (!supabaseAdmin) {
       throw new Error('Supabase service role key is required');
     }
@@ -101,7 +102,7 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
       throw new Error(`Failed to find delivery batches by campaign and status: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findPendingBatches(limit = 50): Promise<DeliveryBatch[]> {
@@ -120,7 +121,26 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
       throw new Error(`Failed to find pending batches: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
+  }
+
+  async findReadyToSend(limit = 50): Promise<DeliveryBatch[]> {
+    if (!supabaseAdmin) {
+      throw new Error('Supabase service role key is required');
+    }
+
+    const { data, error } = await supabaseAdmin
+      .from('delivery_batches')
+      .select('*')
+      .eq('status', DeliveryBatchStatus.Pending)
+      .order('created_at', { ascending: true })
+      .limit(limit);
+
+    if (error) {
+      throw new Error(`Failed to find ready to send batches: ${error.message}`);
+    }
+
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findByLineBroadcastId(lineBroadcastId: string): Promise<DeliveryBatch | null> {
@@ -158,7 +178,7 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
       throw new Error(`Failed to find batches by created date range: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findBySentDateRange(startDate: Date, endDate: Date): Promise<DeliveryBatch[]> {
@@ -177,7 +197,7 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
       throw new Error(`Failed to find batches by sent date range: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async delete(id: string): Promise<void> {
@@ -185,10 +205,7 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
       throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from('delivery_batches')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabaseAdmin.from('delivery_batches').delete().eq('id', id);
 
     if (error) {
       throw new Error(`Failed to delete delivery batch: ${error.message}`);
@@ -219,12 +236,14 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
 
     const batches = data ?? [];
     const totalBatches = batches.length;
-    const completedBatches = batches.filter(b => b.status === DeliveryBatchStatus.Completed).length;
-    const failedBatches = batches.filter(b => b.status === DeliveryBatchStatus.Failed).length;
+    const completedBatches = batches.filter(
+      (b) => b.status === DeliveryBatchStatus.Completed
+    ).length;
+    const failedBatches = batches.filter((b) => b.status === DeliveryBatchStatus.Failed).length;
     const totalTargetUsers = batches.reduce((sum, b) => sum + (b.target_user_ids?.length || 0), 0);
     const totalSentMessages = batches.reduce((sum, b) => sum + (b.sent_count || 0), 0);
     const totalFailedMessages = batches.reduce((sum, b) => sum + (b.fail_count || 0), 0);
-    
+
     const totalProcessed = totalSentMessages + totalFailedMessages;
     const averageSuccessRate = totalProcessed > 0 ? totalSentMessages / totalProcessed : 0;
 
@@ -239,7 +258,10 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
     };
   }
 
-  async getOverallDeliveryStats(startDate: Date, endDate: Date): Promise<{
+  async getOverallDeliveryStats(
+    startDate: Date,
+    endDate: Date
+  ): Promise<{
     totalBatches: number;
     completedBatches: number;
     failedBatches: number;
@@ -265,28 +287,29 @@ export class DeliveryBatchRepositorySupabase implements DeliveryBatchRepository 
 
     const batches = data ?? [];
     const totalBatches = batches.length;
-    const completedBatches = batches.filter(b => b.status === DeliveryBatchStatus.Completed).length;
-    const failedBatches = batches.filter(b => b.status === DeliveryBatchStatus.Failed).length;
+    const completedBatches = batches.filter(
+      (b) => b.status === DeliveryBatchStatus.Completed
+    ).length;
+    const failedBatches = batches.filter((b) => b.status === DeliveryBatchStatus.Failed).length;
     const totalTargetUsers = batches.reduce((sum, b) => sum + (b.target_user_ids?.length || 0), 0);
     const totalSentMessages = batches.reduce((sum, b) => sum + (b.sent_count || 0), 0);
     const totalFailedMessages = batches.reduce((sum, b) => sum + (b.fail_count || 0), 0);
-    
+
     const totalProcessed = totalSentMessages + totalFailedMessages;
     const averageSuccessRate = totalProcessed > 0 ? totalSentMessages / totalProcessed : 0;
 
     // Calculate average latency for completed batches
-    const completedWithLatency = batches.filter(b => 
-      b.status === DeliveryBatchStatus.Completed && b.created_at && b.sent_at
+    const completedWithLatency = batches.filter(
+      (b) => b.status === DeliveryBatchStatus.Completed && b.created_at && b.sent_at
     );
-    
+
     const totalLatencyMs = completedWithLatency.reduce((sum, b) => {
       const latency = new Date(b.sent_at).getTime() - new Date(b.created_at).getTime();
       return sum + latency;
     }, 0);
-    
-    const averageLatencyMs = completedWithLatency.length > 0 
-      ? totalLatencyMs / completedWithLatency.length 
-      : 0;
+
+    const averageLatencyMs =
+      completedWithLatency.length > 0 ? totalLatencyMs / completedWithLatency.length : 0;
 
     return {
       totalBatches,

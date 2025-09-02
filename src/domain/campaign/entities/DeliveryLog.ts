@@ -1,6 +1,6 @@
 export enum DeliveryStatus {
-  Success = 'success',   // 配信成功
-  Failed = 'failed',     // 配信失敗
+  Success = 'success', // 配信成功
+  Failed = 'failed', // 配信失敗
 }
 
 export class DeliveryLog {
@@ -141,15 +141,33 @@ export class DeliveryLog {
     );
   }
 
-  get id(): string { return this.#id; }
-  get batchId(): string { return this.#batchId; }
-  get campaignId(): string { return this.#campaignId; }
-  get lineUserId(): string { return this.#lineUserId; }
-  get status(): DeliveryStatus { return this.#status; }
-  get errorCode(): string | null { return this.#errorCode; }
-  get errorMessage(): string | null { return this.#errorMessage; }
-  get deliveredAt(): Date { return this.#deliveredAt; }
-  get responseLatencyMs(): number | null { return this.#responseLatencyMs; }
+  get id(): string {
+    return this.#id;
+  }
+  get batchId(): string {
+    return this.#batchId;
+  }
+  get campaignId(): string {
+    return this.#campaignId;
+  }
+  get lineUserId(): string {
+    return this.#lineUserId;
+  }
+  get status(): DeliveryStatus {
+    return this.#status;
+  }
+  get errorCode(): string | null {
+    return this.#errorCode;
+  }
+  get errorMessage(): string | null {
+    return this.#errorMessage;
+  }
+  get deliveredAt(): Date {
+    return this.#deliveredAt;
+  }
+  get responseLatencyMs(): number | null {
+    return this.#responseLatencyMs;
+  }
 
   /**
    * 配信が成功したかチェックします

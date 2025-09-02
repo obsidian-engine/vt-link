@@ -138,14 +138,15 @@ CREATE TABLE IF NOT EXISTS delivery_logs (
   error_code VARCHAR(100),
   error_message TEXT,
   line_response JSONB,
-  delivered_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  
-  INDEX idx_delivery_logs_batch_id (batch_id),
-  INDEX idx_delivery_logs_campaign_id (campaign_id),
-  INDEX idx_delivery_logs_status (status),
-  INDEX idx_delivery_logs_delivered_at (delivered_at DESC),
-  INDEX idx_delivery_logs_user_status (line_user_id, status, delivered_at DESC)
+  delivered_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
+
+-- インデックス
+CREATE INDEX idx_delivery_logs_batch_id ON delivery_logs(batch_id);
+CREATE INDEX idx_delivery_logs_campaign_id ON delivery_logs(campaign_id);
+CREATE INDEX idx_delivery_logs_status ON delivery_logs(status);
+CREATE INDEX idx_delivery_logs_delivered_at ON delivery_logs(delivered_at DESC);
+CREATE INDEX idx_delivery_logs_user_status ON delivery_logs(line_user_id, status, delivered_at DESC);
 
 -- ============================================================================
 -- 7. トリガー関数：updated_at自動更新

@@ -5,10 +5,10 @@
  * Brand型、IDFactory、Server Actionsの型安全性を検証
  */
 
-import { execSync } from 'child_process';
-import { promises as fs } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { execSync } from 'node:child_process';
+import { promises as fs } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,25 +24,24 @@ async function runTypeSafetyTests() {
 
     // Brand型テスト
     await createBrandTypeTest();
-    
+
     // IDFactoryテスト
     await createIdFactoryTest();
-    
+
     // Server Actionsテスト
     await createServerActionsTest();
-    
+
     // API契約テスト
     await createApiContractTest();
 
     // 全テストを実行
     console.log('▶️  テストを実行中...');
-    execSync('npm run test __tests__/type-safety', { 
+    execSync('npm run test __tests__/type-safety', {
       stdio: 'inherit',
-      cwd: join(__dirname, '..')
+      cwd: join(__dirname, '..'),
     });
 
     console.log('✅ 全ての型安全性テストが完了しました');
-
   } catch (error) {
     console.error('❌ 型安全性テストに失敗しました:', error.message);
     process.exit(1);

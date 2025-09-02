@@ -10,7 +10,7 @@ export class MessageTemplate {
   readonly #title: string;
   readonly #description: string;
   readonly #content: MessageContent;
-  readonly #placeholderKeys: ReadonlyArray<string>;
+  readonly #placeholderKeys: readonly string[];
   readonly #isActive: boolean;
   readonly #createdAt: Date;
   readonly #updatedAt: Date;
@@ -21,7 +21,7 @@ export class MessageTemplate {
     title: string,
     description: string,
     content: MessageContent,
-    placeholderKeys: ReadonlyArray<string>,
+    placeholderKeys: readonly string[],
     isActive: boolean,
     createdAt: Date,
     updatedAt: Date
@@ -54,15 +54,19 @@ export class MessageTemplate {
     if (!title || title.trim().length === 0) {
       throw new Error('Template title is required');
     }
-    if (title.length > this.MAX_TITLE_LENGTH) {
-      throw new Error(`Template title cannot exceed ${this.MAX_TITLE_LENGTH} characters`);
+    if (title.length > MessageTemplate.MAX_TITLE_LENGTH) {
+      throw new Error(
+        `Template title cannot exceed ${MessageTemplate.MAX_TITLE_LENGTH} characters`
+      );
     }
-    if (description && description.length > this.MAX_DESCRIPTION_LENGTH) {
-      throw new Error(`Template description cannot exceed ${this.MAX_DESCRIPTION_LENGTH} characters`);
+    if (description && description.length > MessageTemplate.MAX_DESCRIPTION_LENGTH) {
+      throw new Error(
+        `Template description cannot exceed ${MessageTemplate.MAX_DESCRIPTION_LENGTH} characters`
+      );
     }
 
     // Extract placeholder keys from template content
-    const placeholderKeys = content.text 
+    const placeholderKeys = content.text
       ? PlaceholderData.extractPlaceholderKeys(content.text)
       : [];
 
@@ -86,7 +90,7 @@ export class MessageTemplate {
     title: string,
     description: string,
     content: MessageContent,
-    placeholderKeys: ReadonlyArray<string>,
+    placeholderKeys: readonly string[],
     isActive: boolean,
     createdAt: Date,
     updatedAt: Date
@@ -124,7 +128,7 @@ export class MessageTemplate {
     return this.#content;
   }
 
-  get placeholderKeys(): ReadonlyArray<string> {
+  get placeholderKeys(): readonly string[] {
     return this.#placeholderKeys;
   }
 
@@ -143,32 +147,33 @@ export class MessageTemplate {
   /**
    * テンプレートを更新します
    */
-  update(
-    title?: string,
-    description?: string,
-    content?: MessageContent
-  ): MessageTemplate {
+  update(title?: string, description?: string, content?: MessageContent): MessageTemplate {
     if (title !== undefined) {
       if (!title || title.trim().length === 0) {
         throw new Error('Template title is required');
       }
       if (title.length > MessageTemplate.MAX_TITLE_LENGTH) {
-        throw new Error(`Template title cannot exceed ${MessageTemplate.MAX_TITLE_LENGTH} characters`);
+        throw new Error(
+          `Template title cannot exceed ${MessageTemplate.MAX_TITLE_LENGTH} characters`
+        );
       }
     }
 
     if (description !== undefined && description.length > MessageTemplate.MAX_DESCRIPTION_LENGTH) {
-      throw new Error(`Template description cannot exceed ${MessageTemplate.MAX_DESCRIPTION_LENGTH} characters`);
+      throw new Error(
+        `Template description cannot exceed ${MessageTemplate.MAX_DESCRIPTION_LENGTH} characters`
+      );
     }
 
     const newTitle = title?.trim() || this.#title;
     const newDescription = description?.trim() || this.#description;
     const newContent = content || this.#content;
-    
+
     // Re-extract placeholder keys if content changed
-    const newPlaceholderKeys = content && newContent.text
-      ? PlaceholderData.extractPlaceholderKeys(newContent.text)
-      : this.#placeholderKeys;
+    const newPlaceholderKeys =
+      content && newContent.text
+        ? PlaceholderData.extractPlaceholderKeys(newContent.text)
+        : this.#placeholderKeys;
 
     return new MessageTemplate(
       this.#id,
@@ -254,8 +259,7 @@ export class MessageTemplate {
   }
 
   equals(other: MessageTemplate): boolean {
-    return this.#id === other.#id &&
-           this.#accountId === other.#accountId;
+    return this.#id === other.#id && this.#accountId === other.#accountId;
   }
 
   toJSON(): any {

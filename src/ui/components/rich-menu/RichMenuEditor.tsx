@@ -1,20 +1,20 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
 import {
   DndContext,
-  DragEndEvent,
   DragOverlay,
-  DragStartEvent,
   PointerSensor,
   TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { createSnapModifier } from '@dnd-kit/modifiers';
-import { RichMenuCanvas } from './RichMenuCanvas';
+import { useCallback, useEffect, useState } from 'react';
 import { RichMenuAreaPanel } from './RichMenuAreaPanel';
-import { RichMenuArea, RICH_MENU_SIZES, EDITOR_SCALE, GRID_SIZE } from './types';
+import { RichMenuCanvas } from './RichMenuCanvas';
+import { LineActionType, type RichMenuArea } from './types';
+import { EDITOR_SCALE, GRID_SIZE, RICH_MENU_SIZES } from './types';
 
 interface RichMenuEditorProps {
   size: 'full' | 'half';
@@ -59,30 +59,39 @@ export function RichMenuEditor({ size, onAreasChange, initialAreas = [] }: RichM
     setActiveAreaId(event.active.id as string);
   }, []);
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, delta } = event;
-    const areaId = active.id as string;
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, delta } = event;
+      const areaId = active.id as string;
 
-    setAreas(prev => {
-      const newAreas = prev.map(area => {
-        if (area.id !== areaId) return area;
+      setAreas((prev) => {
+        const newAreas = prev.map((area) => {
+          if (area.id !== areaId) return area;
 
-        const newX = Math.max(0, Math.min(area.x + delta.x / EDITOR_SCALE, menuSize.width - area.width));
-        const newY = Math.max(0, Math.min(area.y + delta.y / EDITOR_SCALE, menuSize.height - area.height));
+          const newX = Math.max(
+            0,
+            Math.min(area.x + delta.x / EDITOR_SCALE, menuSize.width - area.width)
+          );
+          const newY = Math.max(
+            0,
+            Math.min(area.y + delta.y / EDITOR_SCALE, menuSize.height - area.height)
+          );
 
-        return {
-          ...area,
-          x: Math.round(newX / GRID_SIZE) * GRID_SIZE,
-          y: Math.round(newY / GRID_SIZE) * GRID_SIZE,
-        };
+          return {
+            ...area,
+            x: Math.round(newX / GRID_SIZE) * GRID_SIZE,
+            y: Math.round(newY / GRID_SIZE) * GRID_SIZE,
+          };
+        });
+
+        onAreasChange(newAreas);
+        return newAreas;
       });
 
-      onAreasChange(newAreas);
-      return newAreas;
-    });
-
-    setActiveAreaId(null);
-  }, [menuSize, onAreasChange]);
+      setActiveAreaId(null);
+    },
+    [menuSize, onAreasChange]
+  );
 
   const handleAreaAdd = useCallback(() => {
     const newArea: RichMenuArea = {
@@ -92,13 +101,13 @@ export function RichMenuEditor({ size, onAreasChange, initialAreas = [] }: RichM
       width: 400,
       height: 200,
       action: {
-        type: 'postback',
+        type: LineActionType.Postback,
         data: '',
         displayText: '',
       },
     };
 
-    setAreas(prev => {
+    setAreas((prev) => {
       const newAreas = [...prev, newArea];
       onAreasChange(newAreas);
       return newAreas;
@@ -106,28 +115,34 @@ export function RichMenuEditor({ size, onAreasChange, initialAreas = [] }: RichM
     setSelectedAreaId(newArea.id);
   }, [onAreasChange]);
 
-  const handleAreaUpdate = useCallback((areaId: string, updates: Partial<RichMenuArea>) => {
-    setAreas(prev => {
-      const newAreas = prev.map(area => 
-        area.id === areaId ? { ...area, ...updates } : area
-      );
-      onAreasChange(newAreas);
-      return newAreas;
-    });
-  }, [onAreasChange]);
+  const handleAreaUpdate = useCallback(
+    (areaId: string, updates: Partial<RichMenuArea>) => {
+      setAreas((prev) => {
+        const newAreas = prev.map((area) => (area.id === areaId ? { ...area, ...updates } : area));
+        onAreasChange(newAreas);
+        return newAreas;
+      });
+    },
+    [onAreasChange]
+  );
 
-  const handleAreaDelete = useCallback((areaId: string) => {
-    setAreas(prev => {
-      const newAreas = prev.filter(area => area.id !== areaId);
-      onAreasChange(newAreas);
-      return newAreas;
-    });
-    if (selectedAreaId === areaId) {
-      setSelectedAreaId(null);
-    }
-  }, [onAreasChange, selectedAreaId]);
+  const handleAreaDelete = useCallback(
+    (areaId: string) => {
+      setAreas((prev) => {
+        const newAreas = prev.filter((area) => area.id !== areaId);
+        onAreasChange(newAreas);
+        return newAreas;
+      });
+      if (selectedAreaId === areaId) {
+        setSelectedAreaId(null);
+      }
+    },
+    [onAreasChange, selectedAreaId]
+  );
 
-  const selectedArea = selectedAreaId ? areas.find(area => area.id === selectedAreaId) : null;
+  const selectedArea = selectedAreaId
+    ? (areas.find((area) => area.id === selectedAreaId) ?? null)
+    : null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

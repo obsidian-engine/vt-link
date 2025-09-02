@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
 import { getCampaigns } from '@/ui/actions/campaignActions';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function CampaignsPage() {
   return (
@@ -48,16 +48,14 @@ async function CampaignList() {
   if (!result.success) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600 dark:text-red-400">
-          エラーが発生しました: {result.error}
-        </div>
+        <div className="text-red-600 dark:text-red-400">エラーが発生しました: {result.error}</div>
       </div>
     );
   }
 
   const campaigns = result.data;
 
-  if (campaigns.length === 0) {
+  if (!campaigns || campaigns.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="text-gray-500 dark:text-gray-400 mb-4">
@@ -104,12 +102,10 @@ async function CampaignList() {
       {/* キャンペーン一覧 */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-            キャンペーン一覧
-          </h2>
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">キャンペーン一覧</h2>
         </div>
         <div className="divide-y divide-gray-200 dark:divide-gray-700">
-          {campaigns.map((campaign) => (
+          {campaigns?.map((campaign) => (
             <CampaignCard key={campaign.id} campaign={campaign} />
           ))}
         </div>
@@ -122,17 +118,41 @@ function CampaignCard({ campaign }: { campaign: any }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'draft':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">下書き</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+            下書き
+          </span>
+        );
       case 'scheduled':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">予約済み</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+            予約済み
+          </span>
+        );
       case 'sending':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">送信中</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+            送信中
+          </span>
+        );
       case 'sent':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">送信完了</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+            送信完了
+          </span>
+        );
       case 'failed':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">送信失敗</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+            送信失敗
+          </span>
+        );
       default:
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">{status}</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+            {status}
+          </span>
+        );
     }
   };
 
@@ -154,7 +174,9 @@ function CampaignCard({ campaign }: { campaign: any }) {
                 <div className="flex items-center space-x-4 mt-1">
                   {getStatusBadge(campaign.status)}
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {campaign.type === 'broadcast' ? '全ユーザー' : `${campaign.estimatedRecipients || 0}名`}
+                    {campaign.type === 'broadcast'
+                      ? '全ユーザー'
+                      : `${campaign.estimatedRecipients || 0}名`}
                   </span>
                   {campaign.scheduledAt && (
                     <span className="text-sm text-gray-500 dark:text-gray-400">
@@ -172,10 +194,9 @@ function CampaignCard({ campaign }: { campaign: any }) {
               </span>
             )}
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              {campaign.status === 'sent' && campaign.sentAt 
+              {campaign.status === 'sent' && campaign.sentAt
                 ? `完了: ${new Date(campaign.sentAt).toLocaleDateString('ja-JP')}`
-                : `作成: ${new Date(campaign.createdAt).toLocaleDateString('ja-JP')}`
-              }
+                : `作成: ${new Date(campaign.createdAt).toLocaleDateString('ja-JP')}`}
             </span>
           </div>
         </div>

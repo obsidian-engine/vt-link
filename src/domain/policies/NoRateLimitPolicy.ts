@@ -1,4 +1,4 @@
-import { RateLimitPolicy } from './RateLimitPolicy';
+import type { RateLimitPolicy } from './RateLimitPolicy';
 
 /**
  * レート制限なしのポリシー（Null Object Pattern）

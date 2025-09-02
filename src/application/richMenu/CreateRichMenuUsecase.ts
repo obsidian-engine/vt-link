@@ -1,5 +1,6 @@
-import { RichMenu, RichMenuArea } from '@/domain/entities/RichMenu';
-import { RichMenuRepository } from '@/domain/repositories/RichMenuRepository';
+import { RichMenu } from '@/domain/entities/RichMenu';
+import type { RichMenuArea } from '@/domain/entities/RichMenu';
+import type { RichMenuRepository } from '@/domain/repositories/RichMenuRepository';
 
 export interface CreateRichMenuInput {
   readonly accountId: string;
@@ -17,13 +18,11 @@ export interface CreateRichMenuOutput {
 }
 
 export class CreateRichMenuUsecase {
-  constructor(
-    private readonly richMenuRepository: RichMenuRepository
-  ) {}
+  constructor(private readonly richMenuRepository: RichMenuRepository) {}
 
   async execute(input: CreateRichMenuInput): Promise<CreateRichMenuOutput> {
     const id = crypto.randomUUID();
-    
+
     const richMenu = RichMenu.create(
       id,
       input.accountId,

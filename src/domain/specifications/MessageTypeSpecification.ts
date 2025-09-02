@@ -1,5 +1,5 @@
-import { MessageSpecification } from './MessageSpecification';
-import { IncomingMessage, MessageType } from '../entities/IncomingMessage';
+import type { IncomingMessage, MessageType } from '../entities/IncomingMessage';
+import type { MessageSpecification } from './MessageSpecification';
 
 /**
  * メッセージタイプ条件のSpecification
@@ -11,7 +11,7 @@ export class MessageTypeSpecification implements MessageSpecification {
     if (!allowedTypes || allowedTypes.length === 0) {
       throw new Error('At least one message type must be specified');
     }
-    
+
     this.#allowedTypes = new Set(allowedTypes);
   }
 

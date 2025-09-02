@@ -66,7 +66,7 @@ export class ReplyLog {
     responseType: string,
     responseContent: string,
     status: ReplyStatus,
-    error: string | null = null,
+    error: string | null,
     latencyMs: number,
     timestamp: Date = new Date()
   ): ReplyLog {

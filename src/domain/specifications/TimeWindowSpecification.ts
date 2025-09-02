@@ -1,19 +1,15 @@
-import { MessageSpecification } from './MessageSpecification';
-import { IncomingMessage } from '../entities/IncomingMessage';
+import type { IncomingMessage } from '../entities/IncomingMessage';
+import type { MessageSpecification } from './MessageSpecification';
 
 /**
  * 時間範囲条件のSpecification
  */
 export class TimeWindowSpecification implements MessageSpecification {
   readonly #startTime: string; // "HH:MM" format
-  readonly #endTime: string;   // "HH:MM" format
+  readonly #endTime: string; // "HH:MM" format
   readonly #timeZone: string;
 
-  constructor(
-    startTime: string,
-    endTime: string,
-    timeZone: string = 'Asia/Tokyo'
-  ) {
+  constructor(startTime: string, endTime: string, timeZone = 'Asia/Tokyo') {
     if (!this.isValidTimeFormat(startTime)) {
       throw new Error('Invalid start time format. Expected HH:MM');
     }
@@ -29,7 +25,7 @@ export class TimeWindowSpecification implements MessageSpecification {
   isSatisfiedBy(message: IncomingMessage): boolean {
     const now = new Date();
     const currentTime = this.formatTime(now);
-    
+
     return this.isTimeInRange(currentTime, this.#startTime, this.#endTime);
   }
 
@@ -43,7 +39,7 @@ export class TimeWindowSpecification implements MessageSpecification {
       hour12: false,
       hour: '2-digit',
       minute: '2-digit',
-      timeZone: this.#timeZone
+      timeZone: this.#timeZone,
     });
   }
 
@@ -55,10 +51,9 @@ export class TimeWindowSpecification implements MessageSpecification {
     if (start <= end) {
       // Same day range (e.g., 09:00-17:00)
       return current >= start && current <= end;
-    } else {
-      // Cross midnight range (e.g., 22:00-06:00)
-      return current >= start || current <= end;
     }
+    // Cross midnight range (e.g., 22:00-06:00)
+    return current >= start || current <= end;
   }
 
   private timeToMinutes(time: string): number {

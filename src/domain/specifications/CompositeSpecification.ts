@@ -1,5 +1,5 @@
-import { MessageSpecification } from './MessageSpecification';
-import { IncomingMessage } from '../entities/IncomingMessage';
+import type { IncomingMessage } from '../entities/IncomingMessage';
+import type { MessageSpecification } from './MessageSpecification';
 
 /**
  * 複数の条件を組み合わせるCompositeSpecification

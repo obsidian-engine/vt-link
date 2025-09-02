@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
 import { getCampaignHistory } from '@/ui/actions/campaignActions';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function HistoryPage() {
   return (
@@ -42,14 +42,12 @@ async function HistoryContent() {
   if (!result.success) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600 dark:text-red-400">
-          エラーが発生しました: {result.error}
-        </div>
+        <div className="text-red-600 dark:text-red-400">エラーが発生しました: {result.error}</div>
       </div>
     );
   }
 
-  const { campaigns, totalCount } = result.data;
+  const { campaigns = [], totalCount = 0 } = result.data || {};
 
   return (
     <div className="space-y-6">
@@ -74,7 +72,7 @@ async function HistoryContent() {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
@@ -94,7 +92,7 @@ async function HistoryContent() {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
@@ -114,7 +112,7 @@ async function HistoryContent() {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
@@ -127,11 +125,18 @@ async function HistoryContent() {
                     成功率
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {campaigns.length > 0 
-                      ? Math.round((campaigns.reduce((sum, c) => sum + (c.sentCount || 0), 0) / 
-                          (campaigns.reduce((sum, c) => sum + (c.sentCount || 0) + (c.failedCount || 0), 0) || 1)) * 100)
-                      : 0
-                    }%
+                    {campaigns.length > 0
+                      ? Math.round(
+                          (campaigns.reduce((sum: number, c: any) => sum + (c.sentCount || 0), 0) /
+                            (campaigns.reduce(
+                              (sum: number, c: any) =>
+                                sum + (c.sentCount || 0) + (c.failedCount || 0),
+                              0
+                            ) || 1)) *
+                            100
+                        )
+                      : 0}
+                    %
                   </dd>
                 </dl>
               </div>
@@ -172,9 +177,7 @@ async function HistoryContent() {
 
       {campaigns.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-gray-500 dark:text-gray-400 mb-4">
-            まだ配信履歴がありません
-          </div>
+          <div className="text-gray-500 dark:text-gray-400 mb-4">まだ配信履歴がありません</div>
           <Link
             href="/dashboard/campaigns/new"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
@@ -185,9 +188,7 @@ async function HistoryContent() {
       ) : (
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-              配信履歴一覧
-            </h2>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white">配信履歴一覧</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -233,11 +234,23 @@ function HistoryRow({ campaign }: { campaign: any }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'sent':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">送信完了</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+            送信完了
+          </span>
+        );
       case 'failed':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">送信失敗</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+            送信失敗
+          </span>
+        );
       default:
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">{status}</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+            {status}
+          </span>
+        );
     }
   };
 
@@ -254,9 +267,7 @@ function HistoryRow({ campaign }: { campaign: any }) {
         <div className="flex items-center">
           <span className="text-lg mr-3">{getTypeIcon(campaign.type)}</span>
           <div>
-            <div className="text-sm font-medium text-gray-900 dark:text-white">
-              {campaign.name}
-            </div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white">{campaign.name}</div>
             <div className="text-sm text-gray-500 dark:text-gray-400">
               ID: {campaign.id.slice(0, 8)}...
             </div>
@@ -265,10 +276,7 @@ function HistoryRow({ campaign }: { campaign: any }) {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900 dark:text-white">
-          {campaign.sentAt 
-            ? new Date(campaign.sentAt).toLocaleString('ja-JP')
-            : '-'
-          }
+          {campaign.sentAt ? new Date(campaign.sentAt).toLocaleString('ja-JP') : '-'}
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
@@ -293,23 +301,32 @@ function HistoryRow({ campaign }: { campaign: any }) {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900 dark:text-white">
-          <span className={`font-medium ${successRate >= 95 ? 'text-green-600 dark:text-green-400' : 
-                          successRate >= 90 ? 'text-yellow-600 dark:text-yellow-400' : 
-                          'text-red-600 dark:text-red-400'}`}>
+          <span
+            className={`font-medium ${
+              successRate >= 95
+                ? 'text-green-600 dark:text-green-400'
+                : successRate >= 90
+                  ? 'text-yellow-600 dark:text-yellow-400'
+                  : 'text-red-600 dark:text-red-400'
+            }`}
+          >
             {successRate}%
           </span>
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5 mt-1">
-          <div 
-            className={`h-1.5 rounded-full ${successRate >= 95 ? 'bg-green-500' : 
-                        successRate >= 90 ? 'bg-yellow-500' : 'bg-red-500'}`}
+          <div
+            className={`h-1.5 rounded-full ${
+              successRate >= 95
+                ? 'bg-green-500'
+                : successRate >= 90
+                  ? 'bg-yellow-500'
+                  : 'bg-red-500'
+            }`}
             style={{ width: `${successRate}%` }}
           ></div>
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        {getStatusBadge(campaign.status)}
-      </td>
+      <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(campaign.status)}</td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <Link
           href={`/dashboard/campaigns/${campaign.id}`}

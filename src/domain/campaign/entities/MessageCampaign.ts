@@ -1,18 +1,18 @@
-import { MessageContent } from '../../valueObjects/MessageContent';
+import type { MessageContent } from '../../valueObjects/MessageContent';
 import { PlaceholderData } from '../../valueObjects/PlaceholderData';
 
 export enum CampaignType {
-  Broadcast = 'broadcast',    // 全員配信
-  Segment = 'segment',       // セグメント配信
+  Broadcast = 'broadcast', // 全員配信
+  Segment = 'segment', // セグメント配信
 }
 
 export enum CampaignStatus {
-  Draft = 'draft',           // 下書き
-  Scheduled = 'scheduled',   // 配信予約済み
-  Sending = 'sending',       // 配信中
-  Sent = 'sent',            // 配信完了
-  Failed = 'failed',        // 配信失敗
-  Cancelled = 'cancelled',   // キャンセル
+  Draft = 'draft', // 下書き
+  Scheduled = 'scheduled', // 配信予約済み
+  Sending = 'sending', // 配信中
+  Sent = 'sent', // 配信完了
+  Failed = 'failed', // 配信失敗
+  Cancelled = 'cancelled', // キャンセル
 }
 
 export interface CampaignSettings {
@@ -107,19 +107,21 @@ export class MessageCampaign {
     if (!name || name.trim().length === 0) {
       throw new Error('Campaign name is required');
     }
-    if (name.length > this.MAX_NAME_LENGTH) {
-      throw new Error(`Campaign name cannot exceed ${this.MAX_NAME_LENGTH} characters`);
+    if (name.length > MessageCampaign.MAX_NAME_LENGTH) {
+      throw new Error(`Campaign name cannot exceed ${MessageCampaign.MAX_NAME_LENGTH} characters`);
     }
-    if (description && description.length > this.MAX_DESCRIPTION_LENGTH) {
-      throw new Error(`Campaign description cannot exceed ${this.MAX_DESCRIPTION_LENGTH} characters`);
+    if (description && description.length > MessageCampaign.MAX_DESCRIPTION_LENGTH) {
+      throw new Error(
+        `Campaign description cannot exceed ${MessageCampaign.MAX_DESCRIPTION_LENGTH} characters`
+      );
     }
     if (type === CampaignType.Segment && !segmentId) {
       throw new Error('Segment ID is required for segment campaigns');
     }
 
     const defaultSettings: CampaignSettings = {
-      retryCount: this.DEFAULT_RETRY_COUNT,
-      retryIntervalMinutes: this.DEFAULT_RETRY_INTERVAL_MINUTES,
+      retryCount: MessageCampaign.DEFAULT_RETRY_COUNT,
+      retryIntervalMinutes: MessageCampaign.DEFAULT_RETRY_INTERVAL_MINUTES,
       enableDeliveryTracking: true,
     };
 
@@ -189,24 +191,60 @@ export class MessageCampaign {
   }
 
   // Getters
-  get id(): string { return this.#id; }
-  get accountId(): string { return this.#accountId; }
-  get name(): string { return this.#name; }
-  get description(): string { return this.#description; }
-  get type(): CampaignType { return this.#type; }
-  get templateId(): string | null { return this.#templateId; }
-  get segmentId(): string | null { return this.#segmentId; }
-  get content(): MessageContent { return this.#content; }
-  get placeholderData(): PlaceholderData { return this.#placeholderData; }
-  get scheduledAt(): Date | null { return this.#scheduledAt; }
-  get status(): CampaignStatus { return this.#status; }
-  get settings(): CampaignSettings { return this.#settings; }
-  get sentCount(): number { return this.#sentCount; }
-  get failCount(): number { return this.#failCount; }
-  get sentAt(): Date | null { return this.#sentAt; }
-  get failureReason(): string | null { return this.#failureReason; }
-  get createdAt(): Date { return this.#createdAt; }
-  get updatedAt(): Date { return this.#updatedAt; }
+  get id(): string {
+    return this.#id;
+  }
+  get accountId(): string {
+    return this.#accountId;
+  }
+  get name(): string {
+    return this.#name;
+  }
+  get description(): string {
+    return this.#description;
+  }
+  get type(): CampaignType {
+    return this.#type;
+  }
+  get templateId(): string | null {
+    return this.#templateId;
+  }
+  get segmentId(): string | null {
+    return this.#segmentId;
+  }
+  get content(): MessageContent {
+    return this.#content;
+  }
+  get placeholderData(): PlaceholderData {
+    return this.#placeholderData;
+  }
+  get scheduledAt(): Date | null {
+    return this.#scheduledAt;
+  }
+  get status(): CampaignStatus {
+    return this.#status;
+  }
+  get settings(): CampaignSettings {
+    return this.#settings;
+  }
+  get sentCount(): number {
+    return this.#sentCount;
+  }
+  get failCount(): number {
+    return this.#failCount;
+  }
+  get sentAt(): Date | null {
+    return this.#sentAt;
+  }
+  get failureReason(): string | null {
+    return this.#failureReason;
+  }
+  get createdAt(): Date {
+    return this.#createdAt;
+  }
+  get updatedAt(): Date {
+    return this.#updatedAt;
+  }
 
   /**
    * キャンペーンを更新します
@@ -226,12 +264,16 @@ export class MessageCampaign {
         throw new Error('Campaign name is required');
       }
       if (name.length > MessageCampaign.MAX_NAME_LENGTH) {
-        throw new Error(`Campaign name cannot exceed ${MessageCampaign.MAX_NAME_LENGTH} characters`);
+        throw new Error(
+          `Campaign name cannot exceed ${MessageCampaign.MAX_NAME_LENGTH} characters`
+        );
       }
     }
 
     if (description !== undefined && description.length > MessageCampaign.MAX_DESCRIPTION_LENGTH) {
-      throw new Error(`Campaign description cannot exceed ${MessageCampaign.MAX_DESCRIPTION_LENGTH} characters`);
+      throw new Error(
+        `Campaign description cannot exceed ${MessageCampaign.MAX_DESCRIPTION_LENGTH} characters`
+      );
     }
 
     return new MessageCampaign(
@@ -443,9 +485,11 @@ export class MessageCampaign {
    * スケジュール済みキャンペーンが送信時刻になったかチェックします
    */
   isReadyToSend(currentTime = new Date()): boolean {
-    return this.#status === CampaignStatus.Scheduled &&
-           this.#scheduledAt !== null &&
-           this.#scheduledAt <= currentTime;
+    return (
+      this.#status === CampaignStatus.Scheduled &&
+      this.#scheduledAt !== null &&
+      this.#scheduledAt <= currentTime
+    );
   }
 
   /**
@@ -460,8 +504,7 @@ export class MessageCampaign {
   }
 
   equals(other: MessageCampaign): boolean {
-    return this.#id === other.#id &&
-           this.#accountId === other.#accountId;
+    return this.#id === other.#id && this.#accountId === other.#accountId;
   }
 
   toJSON(): any {

@@ -1,14 +1,15 @@
-import { MessageCampaign, MessageContent } from '@/domain/entities/MessageCampaign';
-import { MessageCampaignRepository } from '@/domain/repositories/MessageCampaignRepository';
+import { CampaignType, MessageCampaign } from '@/domain/campaign/entities/MessageCampaign';
+import type { MessageCampaignRepository } from '@/domain/repositories/MessageCampaignRepository';
+import type { MessageContent } from '@/domain/valueObjects/MessageContent';
 
 export interface BroadcastPort {
-  sendBroadcast(content: ReadonlyArray<MessageContent>): Promise<{ sentCount: number }>;
+  sendBroadcast(content: readonly MessageContent[]): Promise<{ sentCount: number }>;
 }
 
 export interface SendBroadcastMessageInput {
   readonly accountId: string;
   readonly name: string;
-  readonly content: ReadonlyArray<MessageContent>;
+  readonly content: readonly MessageContent[];
   readonly scheduledAt?: Date;
 }
 
@@ -26,19 +27,20 @@ export class SendBroadcastMessageUsecase {
 
   async execute(input: SendBroadcastMessageInput): Promise<SendBroadcastMessageOutput> {
     const id = crypto.randomUUID();
-    
+
     let campaign = MessageCampaign.create(
       id,
       input.accountId,
       input.name,
-      'broadcast',
-      input.content
+      '', // description
+      CampaignType.Broadcast,
+      input.content[0] // 最初のメッセージコンテンツを使用
     );
 
     if (input.scheduledAt) {
       campaign = campaign.schedule(input.scheduledAt);
       await this.messageCampaignRepository.save(campaign);
-      
+
       return {
         id: campaign.id,
         status: 'scheduled',
@@ -53,8 +55,8 @@ export class SendBroadcastMessageUsecase {
     await this.messageCampaignRepository.save(campaign);
 
     try {
-      const result = await this.broadcastPort.sendBroadcast(campaign.content);
-      
+      const result = await this.broadcastPort.sendBroadcast([campaign.content]);
+
       campaign = campaign.markAsSent(result.sentCount);
       await this.messageCampaignRepository.save(campaign);
 
@@ -67,7 +69,7 @@ export class SendBroadcastMessageUsecase {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       campaign = campaign.markAsFailed(errorMessage);
       await this.messageCampaignRepository.save(campaign);
-      
+
       throw error;
     }
   }

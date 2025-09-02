@@ -1,4 +1,4 @@
-import { MessageCampaign, CampaignStatus, CampaignType } from '../entities/MessageCampaign';
+import type { CampaignStatus, CampaignType, MessageCampaign } from '../entities/MessageCampaign';
 
 export interface MessageCampaignRepository {
   /**
@@ -49,12 +49,20 @@ export interface MessageCampaignRepository {
   /**
    * 指定期間内に作成されたキャンペーンを検索します
    */
-  findByCreatedDateRange(accountId: string, startDate: Date, endDate: Date): Promise<MessageCampaign[]>;
+  findByCreatedDateRange(
+    accountId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<MessageCampaign[]>;
 
   /**
    * 指定期間内に送信されたキャンペーンを検索します
    */
-  findBySentDateRange(accountId: string, startDate: Date, endDate: Date): Promise<MessageCampaign[]>;
+  findBySentDateRange(
+    accountId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<MessageCampaign[]>;
 
   /**
    * キャンペーンを削除します

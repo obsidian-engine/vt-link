@@ -1,7 +1,7 @@
-import { MessageCampaignRepository } from '@/domain/campaign/repositories/MessageCampaignRepository';
-import { DeliveryBatchRepository } from '@/domain/campaign/repositories/DeliveryBatchRepository';
-import { DeliveryLogRepository } from '@/domain/campaign/repositories/DeliveryLogRepository';
-import { CampaignStatus, CampaignType } from '@/domain/campaign/entities/MessageCampaign';
+import type { CampaignStatus, CampaignType } from '@/domain/campaign/entities/MessageCampaign';
+import type { DeliveryBatchRepository } from '@/domain/campaign/repositories/DeliveryBatchRepository';
+import type { DeliveryLogRepository } from '@/domain/campaign/repositories/DeliveryLogRepository';
+import type { MessageCampaignRepository } from '@/domain/campaign/repositories/MessageCampaignRepository';
 
 export interface ListHistoryInput {
   readonly accountId: string;
@@ -81,11 +81,17 @@ export class ListHistoryUsecase {
 
     // Get campaigns based on filters
     let campaigns;
-    
+
     if (input.status) {
-      campaigns = await this.#campaignRepository.findByAccountIdAndStatus(input.accountId, input.status);
+      campaigns = await this.#campaignRepository.findByAccountIdAndStatus(
+        input.accountId,
+        input.status
+      );
     } else if (input.type) {
-      campaigns = await this.#campaignRepository.findByAccountIdAndType(input.accountId, input.type);
+      campaigns = await this.#campaignRepository.findByAccountIdAndType(
+        input.accountId,
+        input.type
+      );
     } else if (input.startDate && input.endDate) {
       campaigns = await this.#campaignRepository.findByCreatedDateRange(
         input.accountId,
@@ -102,7 +108,7 @@ export class ListHistoryUsecase {
     if (input.startDate && input.endDate && !input.status && !input.type) {
       // Already filtered by date range
     } else if (input.startDate || input.endDate) {
-      filteredCampaigns = campaigns.filter(campaign => {
+      filteredCampaigns = campaigns.filter((campaign) => {
         const createdAt = campaign.createdAt;
         if (input.startDate && createdAt < input.startDate) return false;
         if (input.endDate && createdAt > input.endDate) return false;
@@ -119,7 +125,7 @@ export class ListHistoryUsecase {
     const hasMore = offset + limit < total;
 
     // Convert to history items
-    const campaignHistoryItems: CampaignHistoryItem[] = paginatedCampaigns.map(campaign => ({
+    const campaignHistoryItems: CampaignHistoryItem[] = paginatedCampaigns.map((campaign) => ({
       id: campaign.id,
       name: campaign.name,
       description: campaign.description,

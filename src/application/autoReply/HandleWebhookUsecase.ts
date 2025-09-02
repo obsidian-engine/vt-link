@@ -1,16 +1,29 @@
+import type { AutoReplyRule } from '@/domain/entities/AutoReplyRule';
 import { IncomingMessage } from '@/domain/entities/IncomingMessage';
-import { AutoReplyRule } from '@/domain/entities/AutoReplyRule';
 import { ReplyLog, ReplyStatus } from '@/domain/entities/ReplyLog';
-import { AutoReplyRuleRepository } from '@/domain/repositories/AutoReplyRuleRepository';
-import { ReplyLogRepository } from '@/domain/repositories/ReplyLogRepository';
-import { RateLimiter } from '@/domain/services/RateLimiter';
+import { type Response, ResponseType } from '@/domain/entities/Response';
+import type {
+  ImageResponsePayload,
+  StickerResponsePayload,
+  TextResponsePayload,
+} from '@/domain/entities/Response';
+import type { AutoReplyRuleRepository } from '@/domain/repositories/AutoReplyRuleRepository';
+import type { ReplyLogRepository } from '@/domain/repositories/ReplyLogRepository';
+import type { RateLimiter } from '@/domain/services/RateLimiter';
+import type {
+  LineImageMessage,
+  LineMessageUnion,
+  LineStickerMessage,
+  LineTextMessage,
+  LineWebhookEvent,
+} from '@/types/line.types';
 
 export interface LineReplyService {
-  reply(replyToken: string, messages: any[]): Promise<void>;
+  reply(replyToken: string, messages: LineMessageUnion[]): Promise<void>;
 }
 
 export interface HandleWebhookInput {
-  readonly events: ReadonlyArray<any>; // LINE webhook events
+  readonly events: ReadonlyArray<LineWebhookEvent>;
   readonly accountId: string;
 }
 
@@ -35,15 +48,15 @@ export class HandleWebhookUsecase {
 
     // Get active rules once for all events
     const activeRules = await this.autoReplyRuleRepository.findActiveByAccountId(input.accountId);
-    
+
     for (const event of input.events) {
       try {
         if (event.type === 'message') {
           processedCount++;
-          
+
           const message = IncomingMessage.fromLineWebhookEvent(event);
           const replied = await this.processMessage(message, activeRules, input.accountId);
-          
+
           if (replied) {
             repliedCount++;
           }
@@ -128,8 +141,8 @@ export class HandleWebhookUsecase {
             rule.id,
             accountId,
             message,
-            response.type,
-            this.getResponseContent(response),
+            response.type.toString(),
+            this.getResponseContent(this.convertResponseToLineMessage(response)),
             ReplyStatus.Success,
             null,
             Date.now() - startTime
@@ -138,14 +151,14 @@ export class HandleWebhookUsecase {
           return true;
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          
+
           // Log failed reply
           await this.logReply(
             rule.id,
             accountId,
             message,
-            response.type,
-            this.getResponseContent(response),
+            response.type.toString(),
+            this.getResponseContent(this.convertResponseToLineMessage(response)),
             ReplyStatus.Failed,
             errorMessage,
             Date.now() - startTime
@@ -188,7 +201,7 @@ export class HandleWebhookUsecase {
       );
 
       // Fire and forget logging to avoid blocking the main flow
-      this.replyLogRepository.save(log).catch(logError => {
+      this.replyLogRepository.save(log).catch((logError) => {
         console.error('Failed to save reply log:', logError);
       });
     } catch (logError) {
@@ -196,7 +209,7 @@ export class HandleWebhookUsecase {
     }
   }
 
-  private getResponseContent(response: any): string {
+  private getResponseContent(response: LineMessageUnion): string {
     switch (response.type) {
       case 'text':
         return response.text || '';
@@ -206,6 +219,33 @@ export class HandleWebhookUsecase {
         return `${response.packageId}:${response.stickerId}`;
       default:
         return response.type;
+    }
+  }
+
+  private convertResponseToLineMessage(response: Response): LineMessageUnion {
+    switch (response.type) {
+      case ResponseType.Text:
+        const textPayload = response.payload as TextResponsePayload;
+        return {
+          type: 'text',
+          text: textPayload.text,
+        } as LineTextMessage;
+      case ResponseType.Image:
+        const imagePayload = response.payload as ImageResponsePayload;
+        return {
+          type: 'image',
+          originalContentUrl: imagePayload.originalContentUrl,
+          previewImageUrl: imagePayload.previewImageUrl,
+        } as LineImageMessage;
+      case ResponseType.Sticker:
+        const stickerPayload = response.payload as StickerResponsePayload;
+        return {
+          type: 'sticker',
+          packageId: stickerPayload.packageId,
+          stickerId: stickerPayload.stickerId,
+        } as LineStickerMessage;
+      default:
+        throw new Error(`Unsupported response type: ${response.type}`);
     }
   }
 }

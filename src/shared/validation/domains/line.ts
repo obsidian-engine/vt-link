@@ -3,18 +3,18 @@
  */
 import { z } from 'zod';
 import {
+  CreateEntitySchemaBase,
   IdSchemaBase,
+  LimitedArraySchemaBase,
   LineChannelIdSchemaBase,
   LineUserIdSchemaBase,
-  UrlSchemaBase,
-  ShortTextSchemaBase,
-  MediumTextSchemaBase,
   LongTextSchemaBase,
+  MediumTextSchemaBase,
   NonNegativeIntSchemaBase,
-  LimitedArraySchemaBase,
-  CreateEntitySchemaBase,
+  ShortTextSchemaBase,
   UpdateEntitySchemaBase,
-  createEnumSchema
+  UrlSchemaBase,
+  createEnumSchema,
 } from '../base';
 import { UserIdSchema } from './user';
 
@@ -24,7 +24,12 @@ import { UserIdSchema } from './user';
 export const RichMenuSizeSchema = createEnumSchema(['full', 'half'] as const);
 export const MessageTypeSchema = createEnumSchema(['text', 'image', 'sticker'] as const);
 export const CampaignStatusSchema = createEnumSchema([
-  'draft', 'scheduled', 'sending', 'sent', 'failed', 'cancelled'
+  'draft',
+  'scheduled',
+  'sending',
+  'sent',
+  'failed',
+  'cancelled',
 ] as const);
 export const CampaignTypeSchema = createEnumSchema(['broadcast', 'narrowcast'] as const);
 

@@ -12,14 +12,14 @@ export async function createAutoReplyRule(formData: FormData) {
     const conditionsJson = formData.get('conditions') as string;
     const responsesJson = formData.get('responses') as string;
     const enabled = formData.get('enabled') === 'true';
-    const priority = parseInt(formData.get('priority') as string) || 0;
+    const priority = Number.parseInt(formData.get('priority') as string) || 0;
     const rateLimitJson = formData.get('rateLimit') as string;
     const timeWindowJson = formData.get('timeWindow') as string;
 
     if (!accountId) {
       throw new Error('Account ID is required');
     }
-    
+
     if (!name) {
       throw new Error('Name is required');
     }
@@ -79,7 +79,7 @@ export async function createAutoReplyRule(formData: FormData) {
     });
 
     revalidatePath('/dashboard/auto-reply');
-    
+
     return {
       success: true,
       data: result,
@@ -106,13 +106,13 @@ export async function getAutoReplyRules(accountId: string) {
 
     return {
       success: true,
-      data: result.rules.map(rule => ({
+      data: result.rules.map((rule) => ({
         id: rule.id,
         name: rule.name,
         enabled: rule.enabled,
         priority: rule.priority,
-        conditionsCount: rule.conditions.length,
-        responsesCount: rule.responses.length,
+        conditionsCount: (rule as any).conditions?.length || 0,
+        responsesCount: (rule as any).responses?.length || 0,
         createdAt: rule.createdAt,
       })),
     };

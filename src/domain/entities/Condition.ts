@@ -1,4 +1,4 @@
-import { IncomingMessage, MessageType } from './IncomingMessage';
+import type { IncomingMessage, MessageType } from './IncomingMessage';
 
 export enum ConditionType {
   Keyword = 'keyword',
@@ -41,12 +41,7 @@ export class KeywordCondition extends Condition {
   readonly #mode: KeywordMatchMode;
   readonly #caseSensitive: boolean;
 
-  private constructor(
-    id: string,
-    keyword: string,
-    mode: KeywordMatchMode,
-    caseSensitive: boolean
-  ) {
+  private constructor(id: string, keyword: string, mode: KeywordMatchMode, caseSensitive: boolean) {
     super(id, ConditionType.Keyword);
     this.#keyword = keyword;
     this.#mode = mode;
@@ -93,22 +88,18 @@ export class KeywordCondition extends Condition {
       return false;
     }
 
-    const messageText = this.#caseSensitive 
-      ? message.text! 
-      : message.text!.toLowerCase();
-    const keyword = this.#caseSensitive 
-      ? this.#keyword 
-      : this.#keyword.toLowerCase();
+    const messageText = this.#caseSensitive ? message.text! : message.text?.toLowerCase();
+    const keyword = this.#caseSensitive ? this.#keyword : this.#keyword.toLowerCase();
 
     switch (this.#mode) {
       case KeywordMatchMode.Exact:
         return messageText === keyword;
       case KeywordMatchMode.Partial:
-        return messageText.includes(keyword);
+        return messageText?.includes(keyword) ?? false;
       case KeywordMatchMode.StartsWith:
-        return messageText.startsWith(keyword);
+        return messageText?.startsWith(keyword) ?? false;
       case KeywordMatchMode.EndsWith:
-        return messageText.endsWith(keyword);
+        return messageText?.endsWith(keyword) ?? false;
       default:
         return false;
     }
@@ -137,11 +128,7 @@ export class RegexCondition extends Condition {
     Object.freeze(this);
   }
 
-  static create(
-    id: string,
-    pattern: string,
-    flags = 'i'
-  ): RegexCondition {
+  static create(id: string, pattern: string, flags = 'i'): RegexCondition {
     if (!pattern || pattern.trim().length === 0) {
       throw new Error('Regex pattern cannot be empty');
     }
@@ -149,7 +136,9 @@ export class RegexCondition extends Condition {
     try {
       new RegExp(pattern, flags);
     } catch (error) {
-      throw new Error(`Invalid regex pattern: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Invalid regex pattern: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
 
     return new RegexCondition(id, pattern.trim(), flags);
@@ -223,7 +212,7 @@ export class MessageTypeCondition extends Condition {
 
 export class TimeCondition extends Condition {
   readonly #startTime: string; // HH:mm format
-  readonly #endTime: string;   // HH:mm format
+  readonly #endTime: string; // HH:mm format
   readonly #timeZone: string;
 
   private constructor(id: string, startTime: string, endTime: string, timeZone: string) {
@@ -240,14 +229,19 @@ export class TimeCondition extends Condition {
     endTime: string,
     timeZone = 'Asia/Tokyo'
   ): TimeCondition {
-    if (!this.isValidTimeFormat(startTime) || !this.isValidTimeFormat(endTime)) {
+    if (!TimeCondition.isValidTimeFormat(startTime) || !TimeCondition.isValidTimeFormat(endTime)) {
       throw new Error('Time must be in HH:mm format');
     }
 
     return new TimeCondition(id, startTime, endTime, timeZone);
   }
 
-  static reconstruct(id: string, startTime: string, endTime: string, timeZone: string): TimeCondition {
+  static reconstruct(
+    id: string,
+    startTime: string,
+    endTime: string,
+    timeZone: string
+  ): TimeCondition {
     return new TimeCondition(id, startTime, endTime, timeZone);
   }
 
@@ -287,10 +281,9 @@ export class TimeCondition extends Condition {
     if (startMinutes <= endMinutes) {
       // Same day range (e.g., 09:00-17:00)
       return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
-    } else {
-      // Overnight range (e.g., 22:00-06:00)
-      return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
     }
+    // Overnight range (e.g., 22:00-06:00)
+    return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
   }
 
   private timeToMinutes(time: string): number {
@@ -354,7 +347,7 @@ export class UserCondition extends Condition {
 
   static fromJSON(data: any): Condition {
     const id = crypto.randomUUID();
-    
+
     switch (data.type) {
       case ConditionType.Keyword:
         return KeywordCondition.reconstruct(
@@ -363,35 +356,19 @@ export class UserCondition extends Condition {
           data.mode as KeywordMatchMode,
           data.caseSensitive
         );
-      
+
       case ConditionType.Regex:
-        return RegexCondition.reconstruct(
-          id,
-          data.pattern,
-          data.flags
-        );
-      
+        return RegexCondition.reconstruct(id, data.pattern, data.flags);
+
       case ConditionType.MessageType:
-        return MessageTypeCondition.reconstruct(
-          id,
-          data.targetTypes as MessageType[]
-        );
-      
+        return MessageTypeCondition.reconstruct(id, data.targetTypes as MessageType[]);
+
       case ConditionType.Time:
-        return TimeCondition.reconstruct(
-          id,
-          data.startTime,
-          data.endTime,
-          data.timeZone
-        );
-      
+        return TimeCondition.reconstruct(id, data.startTime, data.endTime, data.timeZone);
+
       case ConditionType.User:
-        return UserCondition.reconstruct(
-          id,
-          data.targetUsers,
-          data.includeMode
-        );
-      
+        return UserCondition.reconstruct(id, data.targetUsers, data.includeMode);
+
       default:
         throw new Error(`Unsupported condition type: ${data.type}`);
     }

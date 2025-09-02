@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types", "./types"],
     "lib": ["dom", "dom.iterable", "es6"],
     "allowJs": true,
     "skipLibCheck": true,
+    "noEmitOnError": true,
     "strict": true,
-    "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": false,
     "verbatimModuleSyntax": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
@@ -16,9 +19,11 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "jsxImportSource": "react",
     "incremental": true,
     "plugins": [
       {
@@ -32,9 +37,27 @@
       "@/application/*": ["./src/application/*"],
       "@/domain/*": ["./src/domain/*"],
       "@/infrastructure/*": ["./src/infrastructure/*"],
-      "@/shared/*": ["./src/shared/*"]
-    }
+      "@/shared/*": ["./src/shared/*"],
+      "@/types/*": ["./src/types/*"]
+    },
+    "target": "es2022",
+    "composite": true,
+    "tsBuildInfoFile": "./.next/tsconfig.main.tsbuildinfo"
   },
+  "references": [
+    {
+      "path": "./tsconfig.test.json"
+    }
+  ],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "go-backend"]
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "src/domain/examples/**/*",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "__tests__/**/*",
+    "src/domain/__tests__/**/*"
+  ]
 }

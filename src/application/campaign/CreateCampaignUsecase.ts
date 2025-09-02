@@ -1,7 +1,7 @@
-import { MessageCampaign, CampaignType } from '@/domain/campaign/entities/MessageCampaign';
-import { MessageCampaignRepository } from '@/domain/campaign/repositories/MessageCampaignRepository';
-import { MessageTemplateRepository } from '@/domain/campaign/repositories/MessageTemplateRepository';
-import { TargetSegmentRepository } from '@/domain/campaign/repositories/TargetSegmentRepository';
+import { CampaignType, MessageCampaign } from '@/domain/campaign/entities/MessageCampaign';
+import type { MessageCampaignRepository } from '@/domain/campaign/repositories/MessageCampaignRepository';
+import type { MessageTemplateRepository } from '@/domain/campaign/repositories/MessageTemplateRepository';
+import type { TargetSegmentRepository } from '@/domain/campaign/repositories/TargetSegmentRepository';
 import { MessageContent } from '@/domain/valueObjects/MessageContent';
 import { PlaceholderData } from '@/domain/valueObjects/PlaceholderData';
 
@@ -14,13 +14,14 @@ export interface CreateCampaignInput {
   readonly segmentId?: string;
   readonly content?: {
     readonly type: 'text' | 'image' | 'sticker';
-    readonly text?: string;
-    readonly originalContentUrl?: string;
-    readonly previewImageUrl?: string;
-    readonly packageId?: string;
-    readonly stickerId?: string;
+    readonly text?: string | null;
+    readonly originalContentUrl?: string | null;
+    readonly previewImageUrl?: string | null;
+    readonly packageId?: string | null;
+    readonly stickerId?: string | null;
   };
   readonly placeholderData?: Record<string, string>;
+  readonly scheduledAt?: Date;
 }
 
 export interface CreateCampaignOutput {
@@ -83,17 +84,19 @@ export class CreateCampaignUsecase {
       // Apply placeholder data if provided
       if (input.placeholderData) {
         placeholderData = PlaceholderData.create(input.placeholderData);
-        
+
         // Validate that all required placeholders are provided
         if (!template.canRenderWith(placeholderData)) {
-          const missingKeys = placeholderData.getMissingKeysForTemplate(template.content.text || '');
+          const missingKeys = placeholderData.getMissingKeysForTemplate(
+            template.content.text || ''
+          );
           throw new Error(`Missing placeholder values: ${missingKeys.join(', ')}`);
         }
       }
     } else if (input.content) {
       // Use direct content
       messageContent = this.createMessageContentFromInput(input.content);
-      
+
       if (input.placeholderData) {
         placeholderData = PlaceholderData.create(input.placeholderData);
       }
@@ -148,7 +151,9 @@ export class CreateCampaignUsecase {
     };
   }
 
-  private createMessageContentFromInput(contentInput: CreateCampaignInput['content']): MessageContent {
+  private createMessageContentFromInput(
+    contentInput: CreateCampaignInput['content']
+  ): MessageContent {
     if (!contentInput) {
       throw new Error('Content input is required');
     }
@@ -166,17 +171,14 @@ export class CreateCampaignUsecase {
         }
         return MessageContent.createImage(
           contentInput.originalContentUrl,
-          contentInput.previewImageUrl
+          contentInput.previewImageUrl ?? undefined
         );
 
       case 'sticker':
         if (!contentInput.packageId || !contentInput.stickerId) {
           throw new Error('Package ID and Sticker ID are required for sticker message');
         }
-        return MessageContent.createSticker(
-          contentInput.packageId,
-          contentInput.stickerId
-        );
+        return MessageContent.createSticker(contentInput.packageId, contentInput.stickerId);
 
       default:
         throw new Error(`Unsupported content type: ${contentInput.type}`);

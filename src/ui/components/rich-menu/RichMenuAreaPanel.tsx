@@ -1,6 +1,7 @@
 'use client';
 
-import { RichMenuArea, RichMenuAction } from './types';
+import type { RichMenuAction, RichMenuArea } from './types';
+import type { LineActionType } from './types';
 
 interface RichMenuAreaPanelProps {
   area: RichMenuArea | null;
@@ -35,16 +36,14 @@ export function RichMenuAreaPanel({ area, onAreaUpdate, onAreaDelete }: RichMenu
 
   const handleActionChange = (updates: Partial<RichMenuAction>) => {
     onAreaUpdate(area.id, {
-      action: { ...area.action, ...updates }
+      action: { ...area.action, ...updates },
     });
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border p-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-          エリア設定
-        </h3>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white">エリア設定</h3>
         <button
           type="button"
           onClick={() => onAreaDelete(area.id)}
@@ -56,10 +55,8 @@ export function RichMenuAreaPanel({ area, onAreaUpdate, onAreaDelete }: RichMenu
 
       {/* 位置・サイズ設定 */}
       <div className="space-y-4">
-        <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-          位置・サイズ
-        </h4>
-        
+        <h4 className="text-sm font-medium text-gray-900 dark:text-white">位置・サイズ</h4>
+
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -68,7 +65,7 @@ export function RichMenuAreaPanel({ area, onAreaUpdate, onAreaDelete }: RichMenu
             <input
               type="number"
               value={area.x}
-              onChange={(e) => handlePositionChange('x', parseInt(e.target.value) || 0)}
+              onChange={(e) => handlePositionChange('x', Number.parseInt(e.target.value) || 0)}
               className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -79,7 +76,7 @@ export function RichMenuAreaPanel({ area, onAreaUpdate, onAreaDelete }: RichMenu
             <input
               type="number"
               value={area.y}
-              onChange={(e) => handlePositionChange('y', parseInt(e.target.value) || 0)}
+              onChange={(e) => handlePositionChange('y', Number.parseInt(e.target.value) || 0)}
               className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
@@ -90,7 +87,7 @@ export function RichMenuAreaPanel({ area, onAreaUpdate, onAreaDelete }: RichMenu
             <input
               type="number"
               value={area.width}
-              onChange={(e) => handleSizeChange('width', parseInt(e.target.value) || 50)}
+              onChange={(e) => handleSizeChange('width', Number.parseInt(e.target.value) || 50)}
               min="50"
               className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
@@ -102,7 +99,7 @@ export function RichMenuAreaPanel({ area, onAreaUpdate, onAreaDelete }: RichMenu
             <input
               type="number"
               value={area.height}
-              onChange={(e) => handleSizeChange('height', parseInt(e.target.value) || 50)}
+              onChange={(e) => handleSizeChange('height', Number.parseInt(e.target.value) || 50)}
               min="50"
               className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500"
             />
@@ -112,24 +109,24 @@ export function RichMenuAreaPanel({ area, onAreaUpdate, onAreaDelete }: RichMenu
 
       {/* アクション設定 */}
       <div className="space-y-4">
-        <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-          アクション設定
-        </h4>
-        
+        <h4 className="text-sm font-medium text-gray-900 dark:text-white">アクション設定</h4>
+
         <div>
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
             アクションタイプ
           </label>
           <select
             value={area.action.type}
-            onChange={(e) => handleActionChange({ 
-              type: e.target.value as 'postback' | 'message' | 'uri',
-              // タイプ変更時は他のフィールドをリセット
-              text: undefined,
-              data: undefined,
-              uri: undefined,
-              displayText: undefined,
-            })}
+            onChange={(e) =>
+              handleActionChange({
+                type: e.target.value as LineActionType,
+                // タイプ変更時は他のフィールドをリセット
+                text: undefined,
+                data: undefined,
+                uri: undefined,
+                displayText: undefined,
+              })
+            }
             className="w-full text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="postback">ポストバック</option>
@@ -204,8 +201,7 @@ export function RichMenuAreaPanel({ area, onAreaUpdate, onAreaDelete }: RichMenu
         <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
           <div>エリアID: {area.id.substring(0, 8)}...</div>
           <div>
-            位置: ({area.x}, {area.y}) 
-            サイズ: {area.width}×{area.height}
+            位置: ({area.x}, {area.y}) サイズ: {area.width}×{area.height}
           </div>
         </div>
       </div>

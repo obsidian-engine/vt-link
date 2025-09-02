@@ -1,8 +1,8 @@
 export enum RateLimitScope {
-  All = 'all',           // 全体制限
-  User = 'user',         // ユーザー個別制限
-  Group = 'group',       // グループ個別制限
-  Room = 'room',         // ルーム個別制限
+  All = 'all', // 全体制限
+  User = 'user', // ユーザー個別制限
+  Group = 'group', // グループ個別制限
+  Room = 'room', // ルーム個別制限
 }
 
 export class RateLimit {
@@ -24,7 +24,8 @@ export class RateLimit {
     if (windowSeconds <= 0) {
       throw new Error('Window seconds must be greater than 0');
     }
-    if (windowSeconds > 86400) { // 1 day max
+    if (windowSeconds > 86400) {
+      // 1 day max
       throw new Error('Window seconds cannot exceed 1 day (86400 seconds)');
     }
 

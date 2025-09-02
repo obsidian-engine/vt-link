@@ -18,7 +18,7 @@ export interface RateLimitPolicy {
  * レート制限のスコープ
  */
 export enum RateLimitScope {
-  User = 'user',       // ユーザー単位
-  Group = 'group',     // グループ単位  
-  Global = 'global',   // グローバル(すべて)
+  User = 'user', // ユーザー単位
+  Group = 'group', // グループ単位
+  Global = 'global', // グローバル(すべて)
 }

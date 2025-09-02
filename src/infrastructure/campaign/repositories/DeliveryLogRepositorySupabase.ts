@@ -1,5 +1,5 @@
 import { DeliveryLog, DeliveryStatus } from '@/domain/campaign/entities/DeliveryLog';
-import { DeliveryLogRepository } from '@/domain/campaign/repositories/DeliveryLogRepository';
+import type { DeliveryLogRepository } from '@/domain/campaign/repositories/DeliveryLogRepository';
 import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';
 
 export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
@@ -8,19 +8,17 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from('delivery_logs')
-      .insert({
-        id: log.id,
-        batch_id: log.batchId,
-        campaign_id: log.campaignId,
-        line_user_id: log.lineUserId,
-        status: log.status,
-        error_code: log.errorCode,
-        error_message: log.errorMessage,
-        delivered_at: log.deliveredAt.toISOString(),
-        response_latency_ms: log.responseLatencyMs,
-      });
+    const { error } = await supabaseAdmin.from('delivery_logs').insert({
+      id: log.id,
+      batch_id: log.batchId,
+      campaign_id: log.campaignId,
+      line_user_id: log.lineUserId,
+      status: log.status,
+      error_code: log.errorCode,
+      error_message: log.errorMessage,
+      delivered_at: log.deliveredAt.toISOString(),
+      response_latency_ms: log.responseLatencyMs,
+    });
 
     if (error) {
       throw new Error(`Failed to save delivery log: ${error.message}`);
@@ -34,7 +32,7 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
 
     if (logs.length === 0) return;
 
-    const records = logs.map(log => ({
+    const records = logs.map((log) => ({
       id: log.id,
       batch_id: log.batchId,
       campaign_id: log.campaignId,
@@ -46,9 +44,7 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       response_latency_ms: log.responseLatencyMs,
     }));
 
-    const { error } = await supabaseAdmin
-      .from('delivery_logs')
-      .insert(records);
+    const { error } = await supabaseAdmin.from('delivery_logs').insert(records);
 
     if (error) {
       throw new Error(`Failed to save delivery logs: ${error.message}`);
@@ -89,7 +85,7 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       throw new Error(`Failed to find delivery logs by batch: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findByCampaignId(campaignId: string, limit = 1000): Promise<DeliveryLog[]> {
@@ -108,7 +104,7 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       throw new Error(`Failed to find delivery logs by campaign: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findByLineUserId(lineUserId: string, limit = 100): Promise<DeliveryLog[]> {
@@ -127,7 +123,7 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       throw new Error(`Failed to find delivery logs by user: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findByStatus(status: DeliveryStatus, limit = 1000): Promise<DeliveryLog[]> {
@@ -146,7 +142,7 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       throw new Error(`Failed to find delivery logs by status: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findByDateRange(startDate: Date, endDate: Date, limit = 1000): Promise<DeliveryLog[]> {
@@ -166,10 +162,14 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       throw new Error(`Failed to find delivery logs by date range: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
-  async findByCampaignIdAndDateRange(campaignId: string, startDate: Date, endDate: Date): Promise<DeliveryLog[]> {
+  async findByCampaignIdAndDateRange(
+    campaignId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<DeliveryLog[]> {
     if (!supabaseAdmin) {
       throw new Error('Supabase service role key is required');
     }
@@ -186,7 +186,7 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       throw new Error(`Failed to find delivery logs by campaign and date range: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findByErrorCode(errorCode: string, limit = 1000): Promise<DeliveryLog[]> {
@@ -205,7 +205,7 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       throw new Error(`Failed to find delivery logs by error code: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findSlowDeliveries(thresholdMs: number, limit = 1000): Promise<DeliveryLog[]> {
@@ -224,7 +224,7 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       throw new Error(`Failed to find slow deliveries: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async deleteByDateRange(startDate: Date, endDate: Date): Promise<number> {
@@ -299,7 +299,10 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
     };
   }
 
-  async getDateRangeLogStats(startDate: Date, endDate: Date): Promise<{
+  async getDateRangeLogStats(
+    startDate: Date,
+    endDate: Date
+  ): Promise<{
     totalLogs: number;
     successCount: number;
     failureCount: number;
@@ -332,18 +335,22 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
 
     // Calculate daily stats
     const dailyMap = new Map<string, { total: number; success: number; failure: number }>();
-    
-    logs.forEach(log => {
+
+    logs.forEach((log) => {
       const date = log.delivered_at.split('T')[0]; // YYYY-MM-DD
-      const existing = dailyMap.get(date) || { total: 0, success: 0, failure: 0 };
-      
+      const existing = dailyMap.get(date) || {
+        total: 0,
+        success: 0,
+        failure: 0,
+      };
+
       existing.total++;
       if (log.status === DeliveryStatus.Success) {
         existing.success++;
       } else {
         existing.failure++;
       }
-      
+
       dailyMap.set(date, existing);
     });
 
@@ -362,11 +369,16 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
     };
   }
 
-  async getTopErrorCodes(limit = 10, dateRange?: { startDate: Date; endDate: Date }): Promise<Array<{
-    errorCode: string;
-    count: number;
-    percentage: number;
-  }>> {
+  async getTopErrorCodes(
+    limit = 10,
+    dateRange?: { startDate: Date; endDate: Date }
+  ): Promise<
+    Array<{
+      errorCode: string;
+      count: number;
+      percentage: number;
+    }>
+  > {
     if (!supabaseAdmin) {
       throw new Error('Supabase service role key is required');
     }
@@ -392,7 +404,7 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
     const errorCounts = new Map<string, number>();
     let totalErrors = 0;
 
-    (data ?? []).forEach(log => {
+    (data ?? []).forEach((log) => {
       if (log.error_code) {
         const count = errorCounts.get(log.error_code) || 0;
         errorCounts.set(log.error_code, count + 1);
@@ -410,7 +422,10 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       .slice(0, limit);
   }
 
-  async getPerformanceStats(dateRange?: { startDate: Date; endDate: Date }): Promise<{
+  async getPerformanceStats(dateRange?: {
+    startDate: Date;
+    endDate: Date;
+  }): Promise<{
     averageLatencyMs: number;
     medianLatencyMs: number;
     p95LatencyMs: number;
@@ -441,8 +456,8 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
       throw new Error(`Failed to get performance stats: ${error.message}`);
     }
 
-    const latencies = (data ?? []).map(log => log.response_latency_ms).filter(l => l !== null);
-    
+    const latencies = (data ?? []).map((log) => log.response_latency_ms).filter((l) => l !== null);
+
     if (latencies.length === 0) {
       return {
         averageLatencyMs: 0,
@@ -458,9 +473,9 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
     const medianLatencyMs = latencies[Math.floor(latencies.length / 2)];
     const p95LatencyMs = latencies[Math.floor(latencies.length * 0.95)];
     const p99LatencyMs = latencies[Math.floor(latencies.length * 0.99)];
-    
+
     const slowThreshold = 1000; // 1 second
-    const slowDeliveryCount = latencies.filter(l => l > slowThreshold).length;
+    const slowDeliveryCount = latencies.filter((l) => l > slowThreshold).length;
     const slowDeliveryRate = slowDeliveryCount / latencies.length;
 
     return {
@@ -482,22 +497,21 @@ export class DeliveryLogRepositorySupabase implements DeliveryLogRepository {
     errorCodes: { [code: string]: number };
   } {
     const totalLogs = logs.length;
-    const successCount = logs.filter(l => l.status === DeliveryStatus.Success).length;
-    const failureCount = logs.filter(l => l.status === DeliveryStatus.Failed).length;
+    const successCount = logs.filter((l) => l.status === DeliveryStatus.Success).length;
+    const failureCount = logs.filter((l) => l.status === DeliveryStatus.Failed).length;
     const successRate = totalLogs > 0 ? successCount / totalLogs : 0;
-    
+
     const latencies = logs
-      .filter(l => l.response_latency_ms !== null)
-      .map(l => l.response_latency_ms);
-    
-    const averageLatencyMs = latencies.length > 0 
-      ? latencies.reduce((sum, l) => sum + l, 0) / latencies.length
-      : 0;
+      .filter((l) => l.response_latency_ms !== null)
+      .map((l) => l.response_latency_ms);
+
+    const averageLatencyMs =
+      latencies.length > 0 ? latencies.reduce((sum, l) => sum + l, 0) / latencies.length : 0;
 
     const errorCodes: { [code: string]: number } = {};
     logs
-      .filter(l => l.status === DeliveryStatus.Failed && l.error_code)
-      .forEach(l => {
+      .filter((l) => l.status === DeliveryStatus.Failed && l.error_code)
+      .forEach((l) => {
         errorCodes[l.error_code] = (errorCodes[l.error_code] || 0) + 1;
       });
 

@@ -1,4 +1,4 @@
-import { IncomingMessage } from '../entities/IncomingMessage';
+import type { IncomingMessage } from '../entities/IncomingMessage';
 
 /**
  * メッセージコンテキスト - 返信に必要な情報をカプセル化

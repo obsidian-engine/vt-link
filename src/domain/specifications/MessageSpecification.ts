@@ -1,4 +1,4 @@
-import { IncomingMessage } from '../entities/IncomingMessage';
+import type { IncomingMessage } from '../entities/IncomingMessage';
 
 /**
  * メッセージが条件を満たすかを判定するSpecification

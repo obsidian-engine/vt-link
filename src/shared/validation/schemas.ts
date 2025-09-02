@@ -37,7 +37,14 @@ export const ReplyRuleStatusSchema = z.enum(['active', 'inactive']);
 export const MessageTypeSchema = z.enum(['text', 'image', 'sticker']);
 export const GenderSchema = z.enum(['male', 'female', 'other', 'unknown']);
 export const RegionCodeSchema = z.enum(['tokyo', 'osaka', 'nagoya', 'fukuoka', 'sapporo', 'other']);
-export const CampaignStatusSchema = z.enum(['draft', 'scheduled', 'sending', 'sent', 'failed', 'cancelled']);
+export const CampaignStatusSchema = z.enum([
+  'draft',
+  'scheduled',
+  'sending',
+  'sent',
+  'failed',
+  'cancelled',
+]);
 export const CampaignTypeSchema = z.enum(['broadcast', 'narrowcast']);
 
 // ============================================================================
@@ -65,23 +72,25 @@ export const MessageContentSchema = z.object({
 });
 
 // AgeRange用のスキーマ
-export const AgeRangeSchema = z.object({
-  min: z.number().int().min(0).max(120),
-  max: z.number().int().min(0).max(120),
-}).refine(
-  (data) => data.min <= data.max,
-  { message: "最小年齢は最大年齢以下である必要があります" }
-);
+export const AgeRangeSchema = z
+  .object({
+    min: z.number().int().min(0).max(120),
+    max: z.number().int().min(0).max(120),
+  })
+  .refine((data) => data.min <= data.max, {
+    message: '最小年齢は最大年齢以下である必要があります',
+  });
 
 // SegmentCriteria用のスキーマ
-export const SegmentCriteriaSchema = z.object({
-  genders: z.array(GenderSchema).optional(),
-  ageRange: AgeRangeSchema.optional(),
-  regions: z.array(RegionCodeSchema).optional(),
-}).refine(
-  (data) => data.genders || data.ageRange || data.regions,
-  { message: "少なくとも1つの条件を指定する必要があります" }
-);
+export const SegmentCriteriaSchema = z
+  .object({
+    genders: z.array(GenderSchema).optional(),
+    ageRange: AgeRangeSchema.optional(),
+    regions: z.array(RegionCodeSchema).optional(),
+  })
+  .refine((data) => data.genders || data.ageRange || data.regions, {
+    message: '少なくとも1つの条件を指定する必要があります',
+  });
 
 // PlaceholderData用のスキーマ
 export const PlaceholderDataSchema = z.record(z.string(), z.string());
@@ -110,7 +119,9 @@ export const LineAccountCreateSchema = z.object({
   is_active: z.boolean().default(true),
 });
 
-export const LineAccountUpdateSchema = LineAccountCreateSchema.partial().omit({ user_id: true });
+export const LineAccountUpdateSchema = LineAccountCreateSchema.partial().omit({
+  user_id: true,
+});
 
 // RichMenu関連
 export const RichMenuAreaSchema = z.object({
@@ -140,7 +151,9 @@ export const RichMenuCreateSchema = z.object({
   is_published: z.boolean().default(false),
 });
 
-export const RichMenuUpdateSchema = RichMenuCreateSchema.partial().omit({ account_id: true });
+export const RichMenuUpdateSchema = RichMenuCreateSchema.partial().omit({
+  account_id: true,
+});
 
 // Campaign関連
 export const CampaignCreateSchema = z.object({
@@ -154,9 +167,11 @@ export const CampaignCreateSchema = z.object({
   scheduled_at: z.string().datetime().optional(),
 });
 
-export const CampaignUpdateSchema = CampaignCreateSchema.partial().omit({ account_id: true });
+export const CampaignUpdateSchema = CampaignCreateSchema.partial().omit({
+  account_id: true,
+});
 
-// MessageTemplate関連  
+// MessageTemplate関連
 export const MessageTemplateCreateSchema = z.object({
   account_id: AccountIDSchema,
   name: z.string().min(1).max(255),
@@ -166,7 +181,9 @@ export const MessageTemplateCreateSchema = z.object({
   placeholders: z.array(z.string()).default([]),
 });
 
-export const MessageTemplateUpdateSchema = MessageTemplateCreateSchema.partial().omit({ account_id: true });
+export const MessageTemplateUpdateSchema = MessageTemplateCreateSchema.partial().omit({
+  account_id: true,
+});
 
 // TargetSegment関連
 export const TargetSegmentCreateSchema = z.object({
@@ -176,7 +193,9 @@ export const TargetSegmentCreateSchema = z.object({
   criteria: SegmentCriteriaSchema,
 });
 
-export const TargetSegmentUpdateSchema = TargetSegmentCreateSchema.partial().omit({ account_id: true });
+export const TargetSegmentUpdateSchema = TargetSegmentCreateSchema.partial().omit({
+  account_id: true,
+});
 
 // ============================================================================
 // API Request/Response スキーマ

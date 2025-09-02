@@ -1,25 +1,25 @@
+import type {
+  AccountID,
+  AutoReplyRuleID,
+  BatchID,
+  CampaignID,
+  DeliveryLogID,
+  EmailAddress,
+  LineChannelID,
+  LineRichMenuID,
+  LineUserID,
+  PhoneNumber,
+  RichMenuID,
+  SegmentID,
+  TemplateID,
+  URL,
+  UserID,
+} from '@/domain/valueObjects/BaseTypes';
 /**
  * API関連の型定義
  * フロントエンド・バックエンド間で共有される型
  */
 import type { z } from 'zod';
-import type {
-  UserID,
-  AccountID,
-  LineChannelID,
-  LineUserID,
-  CampaignID,
-  TemplateID,
-  SegmentID,
-  RichMenuID,
-  LineRichMenuID,
-  AutoReplyRuleID,
-  BatchID,
-  DeliveryLogID,
-  EmailAddress,
-  PhoneNumber,
-  URL
-} from '@/domain/valueObjects/BaseTypes';
 
 // ============================================================================
 // 基本的なAPI応答型
@@ -32,7 +32,7 @@ export interface ApiResponse<T = unknown> {
 }
 
 export interface PaginatedResponse<T = unknown> {
-  readonly items: ReadonlyArray<T>;
+  readonly items: readonly T[];
   readonly total: number;
   readonly page: number;
   readonly pageSize: number;
@@ -130,7 +130,7 @@ export interface RichMenuDto {
   readonly name: string;
   readonly size: 'full' | 'half';
   readonly chatBarText?: string;
-  readonly areas: ReadonlyArray<RichMenuAreaDto>;
+  readonly areas: readonly RichMenuAreaDto[];
   readonly imageUrl?: URL;
   readonly isDefault: boolean;
   readonly isPublished: boolean;
@@ -144,14 +144,14 @@ export interface CreateRichMenuRequest {
   readonly name: string;
   readonly size?: 'full' | 'half';
   readonly chatBarText?: string;
-  readonly areas: ReadonlyArray<RichMenuAreaDto>;
+  readonly areas: readonly RichMenuAreaDto[];
 }
 
 export interface UpdateRichMenuRequest {
   readonly name?: string;
   readonly size?: 'full' | 'half';
   readonly chatBarText?: string;
-  readonly areas?: ReadonlyArray<RichMenuAreaDto>;
+  readonly areas?: readonly RichMenuAreaDto[];
 }
 
 // ============================================================================
@@ -174,8 +174,8 @@ export interface MessageTemplateDto {
   readonly name: string;
   readonly description?: string;
   readonly category: string;
-  readonly content: ReadonlyArray<MessageContentDto>;
-  readonly placeholders: ReadonlyArray<string>;
+  readonly content: readonly MessageContentDto[];
+  readonly placeholders: readonly string[];
   readonly usageCount: number;
   readonly createdAt: string;
   readonly updatedAt: string;
@@ -186,16 +186,16 @@ export interface CreateMessageTemplateRequest {
   readonly name: string;
   readonly description?: string;
   readonly category: string;
-  readonly content: ReadonlyArray<MessageContentDto>;
-  readonly placeholders?: ReadonlyArray<string>;
+  readonly content: readonly MessageContentDto[];
+  readonly placeholders?: readonly string[];
 }
 
 export interface UpdateMessageTemplateRequest {
   readonly name?: string;
   readonly description?: string;
   readonly category?: string;
-  readonly content?: ReadonlyArray<MessageContentDto>;
-  readonly placeholders?: ReadonlyArray<string>;
+  readonly content?: readonly MessageContentDto[];
+  readonly placeholders?: readonly string[];
 }
 
 // ============================================================================
@@ -207,7 +207,7 @@ export interface SegmentCriteriaDto {
     readonly min: number;
     readonly max: number;
   };
-  readonly regions?: ReadonlyArray<string>;
+  readonly regions?: readonly string[];
 }
 
 export interface TargetSegmentDto {
@@ -244,7 +244,7 @@ export interface CampaignDto {
   readonly name: string;
   readonly type: 'broadcast' | 'narrowcast';
   readonly status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed' | 'cancelled';
-  readonly content: ReadonlyArray<MessageContentDto>;
+  readonly content: readonly MessageContentDto[];
   readonly templateId?: TemplateID;
   readonly segmentId?: SegmentID;
   readonly scheduledAt?: string;
@@ -259,7 +259,7 @@ export interface CreateCampaignRequest {
   readonly accountId: string;
   readonly name: string;
   readonly type: 'broadcast' | 'narrowcast';
-  readonly content?: ReadonlyArray<MessageContentDto>;
+  readonly content?: readonly MessageContentDto[];
   readonly templateId?: string;
   readonly segmentId?: string;
   readonly scheduledAt?: string;
@@ -268,7 +268,7 @@ export interface CreateCampaignRequest {
 
 export interface UpdateCampaignRequest {
   readonly name?: string;
-  readonly content?: ReadonlyArray<MessageContentDto>;
+  readonly content?: readonly MessageContentDto[];
   readonly templateId?: string;
   readonly segmentId?: string;
   readonly scheduledAt?: string;
@@ -299,8 +299,8 @@ export interface AutoReplyRuleDto {
   readonly id: AutoReplyRuleID;
   readonly accountId: AccountID;
   readonly name: string;
-  readonly conditions: ReadonlyArray<AutoReplyConditionDto>;
-  readonly responses: ReadonlyArray<AutoReplyResponseDto>;
+  readonly conditions: readonly AutoReplyConditionDto[];
+  readonly responses: readonly AutoReplyResponseDto[];
   readonly enabled: boolean;
   readonly priority: number;
   readonly rateLimit?: {
@@ -310,7 +310,7 @@ export interface AutoReplyRuleDto {
   readonly timeWindow?: {
     readonly startHour: number;
     readonly endHour: number;
-    readonly daysOfWeek: ReadonlyArray<number>;
+    readonly daysOfWeek: readonly number[];
   };
   readonly replyCount: number;
   readonly createdAt: string;
@@ -320,8 +320,8 @@ export interface AutoReplyRuleDto {
 export interface CreateAutoReplyRuleRequest {
   readonly accountId: string;
   readonly name: string;
-  readonly conditions: ReadonlyArray<AutoReplyConditionDto>;
-  readonly responses: ReadonlyArray<AutoReplyResponseDto>;
+  readonly conditions: readonly AutoReplyConditionDto[];
+  readonly responses: readonly AutoReplyResponseDto[];
   readonly enabled?: boolean;
   readonly priority?: number;
   readonly rateLimit?: {
@@ -331,14 +331,14 @@ export interface CreateAutoReplyRuleRequest {
   readonly timeWindow?: {
     readonly startHour: number;
     readonly endHour: number;
-    readonly daysOfWeek: ReadonlyArray<number>;
+    readonly daysOfWeek: readonly number[];
   };
 }
 
 export interface UpdateAutoReplyRuleRequest {
   readonly name?: string;
-  readonly conditions?: ReadonlyArray<AutoReplyConditionDto>;
-  readonly responses?: ReadonlyArray<AutoReplyResponseDto>;
+  readonly conditions?: readonly AutoReplyConditionDto[];
+  readonly responses?: readonly AutoReplyResponseDto[];
   readonly enabled?: boolean;
   readonly priority?: number;
   readonly rateLimit?: {
@@ -348,7 +348,7 @@ export interface UpdateAutoReplyRuleRequest {
   readonly timeWindow?: {
     readonly startHour: number;
     readonly endHour: number;
-    readonly daysOfWeek: ReadonlyArray<number>;
+    readonly daysOfWeek: readonly number[];
   };
 }
 
@@ -371,7 +371,7 @@ export interface DeliveryBatchDto {
   readonly id: BatchID;
   readonly campaignId: CampaignID;
   readonly accountId: AccountID;
-  readonly targetUserIds: ReadonlyArray<LineUserID>;
+  readonly targetUserIds: readonly LineUserID[];
   readonly status: 'pending' | 'processing' | 'completed' | 'failed';
   readonly totalCount: number;
   readonly sentCount: number;
@@ -492,7 +492,7 @@ export const createApiResponse = <T>(
 });
 
 export const createPaginatedResponse = <T>(
-  items: ReadonlyArray<T>,
+  items: readonly T[],
   total: number,
   page: number,
   pageSize: number
@@ -501,7 +501,7 @@ export const createPaginatedResponse = <T>(
   total,
   page,
   pageSize,
-  hasNext: (page * pageSize) < total,
+  hasNext: page * pageSize < total,
   hasPrev: page > 1,
 });
 

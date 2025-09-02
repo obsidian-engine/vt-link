@@ -1,29 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { ExecuteBatchUsecase } from '@/application/campaign/ExecuteBatchUsecase';
 import { DeliveryBatchRepositorySupabase } from '@/infrastructure/campaign/repositories/DeliveryBatchRepositorySupabase';
 import { DeliveryLogRepositorySupabase } from '@/infrastructure/campaign/repositories/DeliveryLogRepositorySupabase';
 import { MessageCampaignRepositorySupabase } from '@/infrastructure/campaign/repositories/MessageCampaignRepositorySupabase';
 import { LineMessagingGateway } from '@/infrastructure/gateways/line/LineMessagingGateway';
-import { ExecuteBatchUsecase } from '@/application/campaign/ExecuteBatchUsecase';
+import { type NextRequest, NextResponse } from 'next/server';
 
 // バッチ実行用のCronジョブエンドポイント
 export async function POST(request: NextRequest) {
   try {
     // 認証チェック
     const authHeader = request.headers.get('Authorization');
-    const cronSecret = process.env.CRON_SECRET;
-    
+    const cronSecret = process.env['CRON_SECRET'];
+
     if (!cronSecret) {
-      return NextResponse.json(
-        { error: 'CRON_SECRET is not configured' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'CRON_SECRET is not configured' }, { status: 500 });
     }
 
     if (authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const currentTime = new Date();
@@ -34,7 +28,7 @@ export async function POST(request: NextRequest) {
     const logRepository = new DeliveryLogRepositorySupabase();
     const campaignRepository = new MessageCampaignRepositorySupabase();
 
-    const channelAccessToken = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+    const channelAccessToken = process.env['LINE_CHANNEL_ACCESS_TOKEN'];
     if (!channelAccessToken) {
       console.error('[BATCH_EXECUTOR] LINE_CHANNEL_ACCESS_TOKEN is not configured');
       return NextResponse.json(
@@ -46,16 +40,11 @@ export async function POST(request: NextRequest) {
     const lineGateway = new LineMessagingGateway(channelAccessToken);
 
     // Usecaseを初期化
-    const executeBatchUsecase = new ExecuteBatchUsecase(
-      batchRepository,
-      logRepository,
-      campaignRepository,
-      lineGateway
-    );
+    const executeBatchUsecase = new ExecuteBatchUsecase();
 
     // 実行準備ができたバッチを取得（最大10件まで並行処理）
-    const readyBatches = await batchRepository.findReadyToSend(currentTime, 10);
-    
+    const readyBatches = await batchRepository.findReadyToSend(10);
+
     if (readyBatches.length === 0) {
       console.log('[BATCH_EXECUTOR] No batches ready for execution');
       return NextResponse.json({
@@ -71,16 +60,20 @@ export async function POST(request: NextRequest) {
       readyBatches.map(async (batch, index) => {
         try {
           // スタッガード実行（500ms間隔でバッチを開始してレート制限を回避）
-          await new Promise(resolve => setTimeout(resolve, index * 500));
-          
-          console.log(`[BATCH_EXECUTOR] Executing batch: ${batch.id} for campaign: ${batch.campaignId}`);
-          
+          await new Promise((resolve) => setTimeout(resolve, index * 500));
+
+          console.log(
+            `[BATCH_EXECUTOR] Executing batch: ${batch.id} for campaign: ${batch.campaignId}`
+          );
+
           const result = await executeBatchUsecase.execute({
             batchId: batch.id,
           });
 
-          console.log(`[BATCH_EXECUTOR] Batch ${batch.id} executed successfully. Sent: ${result.sentCount}, Failed: ${result.failedCount}`);
-          
+          console.log(
+            `[BATCH_EXECUTOR] Batch ${batch.id} executed successfully. Sent: ${result.sentCount}, Failed: ${result.failedCount}`
+          );
+
           return {
             batchId: batch.id,
             campaignId: batch.campaignId,
@@ -91,7 +84,7 @@ export async function POST(request: NextRequest) {
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
           console.error(`[BATCH_EXECUTOR] Failed to execute batch ${batch.id}:`, errorMessage);
-          
+
           return {
             batchId: batch.id,
             campaignId: batch.campaignId,
@@ -103,15 +96,19 @@ export async function POST(request: NextRequest) {
     );
 
     // 結果を集計
-    const successful = results.filter(r => r.status === 'fulfilled' && r.value.status === 'success').length;
-    const failed = results.filter(r => r.status === 'rejected' || (r.status === 'fulfilled' && r.value.status === 'error')).length;
-    
+    const successful = results.filter(
+      (r) => r.status === 'fulfilled' && r.value.status === 'success'
+    ).length;
+    const failed = results.filter(
+      (r) => r.status === 'rejected' || (r.status === 'fulfilled' && r.value.status === 'error')
+    ).length;
+
     const totalSent = results
-      .filter(r => r.status === 'fulfilled' && r.value.status === 'success')
+      .filter((r) => r.status === 'fulfilled' && r.value.status === 'success')
       .reduce((sum, r) => sum + (r.status === 'fulfilled' ? r.value.sentCount || 0 : 0), 0);
-      
+
     const totalFailed = results
-      .filter(r => r.status === 'fulfilled' && r.value.status === 'success')
+      .filter((r) => r.status === 'fulfilled' && r.value.status === 'success')
       .reduce((sum, r) => sum + (r.status === 'fulfilled' ? r.value.failedCount || 0 : 0), 0);
 
     const response = {
@@ -121,18 +118,19 @@ export async function POST(request: NextRequest) {
       failed,
       totalSent,
       totalFailed,
-      results: results.map(r => r.status === 'fulfilled' ? r.value : { error: 'Promise rejected' }),
+      results: results.map((r) =>
+        r.status === 'fulfilled' ? r.value : { error: 'Promise rejected' }
+      ),
       timestamp: currentTime.toISOString(),
     };
 
     console.log(`[BATCH_EXECUTOR] Execution completed:`, response);
 
     return NextResponse.json(response);
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     console.error('[BATCH_EXECUTOR] Batch execution failed:', errorMessage);
-    
+
     return NextResponse.json(
       {
         error: 'Batch execution failed',

@@ -1,7 +1,7 @@
-import { IncomingMessage } from './IncomingMessage';
-import { MessageSpecification } from '../specifications';
-import { ReplyCommand, MessageContext } from '../commands';
-import { RateLimitPolicy } from '../policies';
+import type { MessageContext, ReplyCommand } from '../commands';
+import type { RateLimitPolicy } from '../policies';
+import type { MessageSpecification } from '../specifications';
+import type { IncomingMessage } from './IncomingMessage';
 
 /**
  * スリム化されたAutoReplyRule（V2）
@@ -57,7 +57,7 @@ export class AutoReplyRuleV2 {
     trigger: MessageSpecification,
     response: ReplyCommand,
     rateLimit: RateLimitPolicy | null = null,
-    enabled: boolean = true
+    enabled = true
   ): AutoReplyRuleV2 {
     if (!id) {
       throw new Error('Rule ID is required');
@@ -68,8 +68,8 @@ export class AutoReplyRuleV2 {
     if (!name || name.trim().length === 0) {
       throw new Error('Rule name is required');
     }
-    if (name.length > this.MAX_NAME_LENGTH) {
-      throw new Error(`Rule name cannot exceed ${this.MAX_NAME_LENGTH} characters`);
+    if (name.length > AutoReplyRuleV2.MAX_NAME_LENGTH) {
+      throw new Error(`Rule name cannot exceed ${AutoReplyRuleV2.MAX_NAME_LENGTH} characters`);
     }
     if (priority < 0) {
       throw new Error('Priority must be non-negative');
@@ -139,7 +139,7 @@ export class AutoReplyRuleV2 {
         message.userId,
         message.groupId || undefined
       );
-      
+
       if (!canExecute) {
         return false;
       }
@@ -151,18 +151,14 @@ export class AutoReplyRuleV2 {
       replyToken: message.replyToken,
       userId: message.userId,
       groupId: message.groupId || undefined,
-      roomId: message.roomId || undefined
+      roomId: message.roomId || undefined,
     };
 
     await this.#response.execute(context);
 
     // 4. 実行履歴記録（Policy）
     if (this.#rateLimit) {
-      await this.#rateLimit.recordExecution(
-        this.#id,
-        message.userId,
-        message.groupId || undefined
-      );
+      await this.#rateLimit.recordExecution(this.#id, message.userId, message.groupId || undefined);
     }
 
     return true;

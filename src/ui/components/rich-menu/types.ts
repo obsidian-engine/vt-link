@@ -11,6 +11,10 @@ export enum LineActionType {
   Postback = 'postback',
   Message = 'message',
   Uri = 'uri',
+  DatetimePicker = 'datetimepicker',
+  Camera = 'camera',
+  CameraRoll = 'cameraRoll',
+  Location = 'location',
 }
 
 export interface RichMenuAction {
@@ -26,10 +30,9 @@ export interface RichMenuSize {
   readonly height: number;
 }
 
-export const RICH_MENU_SIZES: Record<'full' | 'half', RichMenuSize> = {
-  full: { width: 2500, height: 1686 },
-  half: { width: 2500, height: 843 },
-} as const;
+import { RICH_MENU_DISPLAY_SIZES } from '@/constants';
+
+export const RICH_MENU_SIZES: Record<'full' | 'half', RichMenuSize> = RICH_MENU_DISPLAY_SIZES;
 
 export const EDITOR_SCALE = 0.3; // エディター表示用のスケール
 

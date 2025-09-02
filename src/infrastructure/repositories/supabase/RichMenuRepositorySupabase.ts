@@ -1,5 +1,5 @@
-import { RichMenu, RichMenuArea } from '@/domain/entities/RichMenu';
-import { RichMenuRepository } from '@/domain/repositories/RichMenuRepository';
+import { RichMenu, type RichMenuArea } from '@/domain/entities/RichMenu';
+import type { RichMenuRepository } from '@/domain/repositories/RichMenuRepository';
 import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';
 
 export class RichMenuRepositorySupabase implements RichMenuRepository {
@@ -8,20 +8,18 @@ export class RichMenuRepositorySupabase implements RichMenuRepository {
       throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from('rich_menus')
-      .upsert({
-        id: richMenu.id,
-        account_id: richMenu.accountId,
-        line_rich_menu_id: richMenu.lineRichMenuId,
-        name: richMenu.name,
-        size: richMenu.size,
-        chat_bar_text: richMenu.chatBarText,
-        areas: richMenu.areas as unknown,
-        image_url: richMenu.imageUrl,
-        is_default: richMenu.isDefault,
-        is_published: richMenu.isPublished,
-      });
+    const { error } = await supabaseAdmin.from('rich_menus').upsert({
+      id: richMenu.id,
+      account_id: richMenu.accountId,
+      line_rich_menu_id: richMenu.lineRichMenuId,
+      name: richMenu.name,
+      size: richMenu.size,
+      chat_bar_text: richMenu.chatBarText,
+      areas: richMenu.areas as unknown,
+      image_url: richMenu.imageUrl,
+      is_default: richMenu.isDefault,
+      is_published: richMenu.isPublished,
+    });
 
     if (error) {
       throw new Error(`Failed to save rich menu: ${error.message}`);
@@ -62,7 +60,7 @@ export class RichMenuRepositorySupabase implements RichMenuRepository {
       throw new Error(`Failed to find rich menus: ${error.message}`);
     }
 
-    return (data ?? []).map(item => this.mapToEntity(item));
+    return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
   async findDefaultByAccountId(accountId: string): Promise<RichMenu | null> {
@@ -90,10 +88,7 @@ export class RichMenuRepositorySupabase implements RichMenuRepository {
       throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from('rich_menus')
-      .delete()
-      .eq('id', id);
+    const { error } = await supabaseAdmin.from('rich_menus').delete().eq('id', id);
 
     if (error) {
       throw new Error(`Failed to delete rich menu: ${error.message}`);

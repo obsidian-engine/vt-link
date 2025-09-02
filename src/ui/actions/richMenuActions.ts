@@ -15,7 +15,7 @@ export async function createRichMenu(formData: FormData) {
     if (!accountId) {
       throw new Error('Account ID is required');
     }
-    
+
     if (!name) {
       throw new Error('Name is required');
     }
@@ -42,7 +42,7 @@ export async function createRichMenu(formData: FormData) {
     });
 
     revalidatePath('/dashboard/rich-menu');
-    
+
     return {
       success: true,
       data: result,
@@ -67,7 +67,7 @@ export async function getRichMenus(accountId: string) {
 
     return {
       success: true,
-      data: richMenus.map(menu => ({
+      data: richMenus.map((menu) => ({
         id: menu.id,
         name: menu.name,
         size: menu.size,

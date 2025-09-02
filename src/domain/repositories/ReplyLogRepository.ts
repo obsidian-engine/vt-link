@@ -1,4 +1,4 @@
-import { ReplyLog, ReplyStatus } from '../entities/ReplyLog';
+import type { ReplyLog, ReplyStatus } from '../entities/ReplyLog';
 
 export interface ReplyLogSearchCriteria {
   readonly accountId: string;

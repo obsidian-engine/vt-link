@@ -1,20 +1,20 @@
 import { z } from 'zod';
-import { 
-  UserID, 
-  AccountID, 
-  LineChannelID, 
-  LineUserID, 
-  CampaignID, 
-  TemplateID, 
-  SegmentID, 
-  RichMenuID, 
-  LineRichMenuID, 
-  AutoReplyRuleID, 
-  BatchID, 
+import type {
+  AccountID,
+  AutoReplyRuleID,
+  BatchID,
+  CampaignID,
   DeliveryLogID,
   EmailAddress,
+  LineChannelID,
+  LineRichMenuID,
+  LineUserID,
   PhoneNumber,
-  URL
+  RichMenuID,
+  SegmentID,
+  TemplateID,
+  URL,
+  UserID,
 } from './BaseTypes';
 
 /**
@@ -189,5 +189,5 @@ export const TypeGuards = {
     } catch {
       return false;
     }
-  }
+  },
 };
