@@ -6,45 +6,45 @@ import type {
   LineChannelID,
   LineUserID,
   LineRichMenuID,
-  URL
-} from '@/domain/valueObjects/BaseTypes';
+  URL,
+} from "@/domain/valueObjects/BaseTypes";
 
 // ============================================================================
 // 基本型定義
 // ============================================================================
-export type LineEventType = 
-  | 'message' 
-  | 'follow' 
-  | 'unfollow' 
-  | 'join' 
-  | 'leave' 
-  | 'memberJoined' 
-  | 'memberLeft' 
-  | 'postback' 
-  | 'videoPlayComplete'
-  | 'beacon'
-  | 'accountLink'
-  | 'things';
+export type LineEventType =
+  | "message"
+  | "follow"
+  | "unfollow"
+  | "join"
+  | "leave"
+  | "memberJoined"
+  | "memberLeft"
+  | "postback"
+  | "videoPlayComplete"
+  | "beacon"
+  | "accountLink"
+  | "things";
 
-export type LineMessageType = 
-  | 'text' 
-  | 'image' 
-  | 'video' 
-  | 'audio' 
-  | 'file' 
-  | 'location' 
-  | 'sticker' 
-  | 'imagemap' 
-  | 'template' 
-  | 'flex';
+export type LineMessageType =
+  | "text"
+  | "image"
+  | "video"
+  | "audio"
+  | "file"
+  | "location"
+  | "sticker"
+  | "imagemap"
+  | "template"
+  | "flex";
 
-export type LineSourceType = 'user' | 'group' | 'room';
+export type LineSourceType = "user" | "group" | "room";
 
 // ============================================================================
 // メッセージ関連型定義
 // ============================================================================
 export interface LineTextMessage {
-  readonly type: 'text';
+  readonly type: "text";
   readonly text: string;
   readonly emojis?: ReadonlyArray<LineEmoji>;
   readonly mention?: LineMention;
@@ -53,31 +53,31 @@ export interface LineTextMessage {
 }
 
 export interface LineImageMessage {
-  readonly type: 'image';
+  readonly type: "image";
   readonly originalContentUrl: URL;
   readonly previewImageUrl: URL;
 }
 
 export interface LineVideoMessage {
-  readonly type: 'video';
+  readonly type: "video";
   readonly originalContentUrl: URL;
   readonly previewImageUrl: URL;
   readonly trackingId?: string;
 }
 
 export interface LineAudioMessage {
-  readonly type: 'audio';
+  readonly type: "audio";
   readonly originalContentUrl: URL;
   readonly duration: number;
 }
 
 export interface LineFileMessage {
-  readonly type: 'file';
+  readonly type: "file";
   readonly fileName: string;
 }
 
 export interface LineLocationMessage {
-  readonly type: 'location';
+  readonly type: "location";
   readonly title: string;
   readonly address: string;
   readonly latitude: number;
@@ -85,16 +85,24 @@ export interface LineLocationMessage {
 }
 
 export interface LineStickerMessage {
-  readonly type: 'sticker';
+  readonly type: "sticker";
   readonly packageId: string;
   readonly stickerId: string;
-  readonly stickerResourceType?: 'STATIC' | 'ANIMATION' | 'SOUND' | 'ANIMATION_SOUND' | 'POPUP' | 'POPUP_SOUND' | 'CUSTOM' | 'MESSAGE';
+  readonly stickerResourceType?:
+    | "STATIC"
+    | "ANIMATION"
+    | "SOUND"
+    | "ANIMATION_SOUND"
+    | "POPUP"
+    | "POPUP_SOUND"
+    | "CUSTOM"
+    | "MESSAGE";
   readonly keywords?: ReadonlyArray<string>;
   readonly text?: string;
 }
 
 export interface LineImagemapMessage {
-  readonly type: 'imagemap';
+  readonly type: "imagemap";
   readonly baseUrl: URL;
   readonly altText: string;
   readonly baseSize: LineSize;
@@ -103,13 +111,13 @@ export interface LineImagemapMessage {
 }
 
 export interface LineTemplateMessage {
-  readonly type: 'template';
+  readonly type: "template";
   readonly altText: string;
   readonly template: LineTemplate;
 }
 
 export interface LineFlexMessage {
-  readonly type: 'flex';
+  readonly type: "flex";
   readonly altText: string;
   readonly contents: LineFlexContainer;
   readonly quickReply?: LineQuickReply;
@@ -117,7 +125,7 @@ export interface LineFlexMessage {
 }
 
 // Union type for all message types
-export type LineMessage = 
+export type LineMessage =
   | LineTextMessage
   | LineImageMessage
   | LineVideoMessage
@@ -133,18 +141,18 @@ export type LineMessage =
 // ソース関連型定義
 // ============================================================================
 export interface LineUserSource {
-  readonly type: 'user';
+  readonly type: "user";
   readonly userId: LineUserID;
 }
 
 export interface LineGroupSource {
-  readonly type: 'group';
+  readonly type: "group";
   readonly groupId: string;
   readonly userId?: LineUserID;
 }
 
 export interface LineRoomSource {
-  readonly type: 'room';
+  readonly type: "room";
   readonly roomId: string;
   readonly userId?: LineUserID;
 }
@@ -156,7 +164,7 @@ export type LineSource = LineUserSource | LineGroupSource | LineRoomSource;
 // ============================================================================
 export interface LineBaseEvent {
   readonly type: LineEventType;
-  readonly mode: 'active' | 'standby';
+  readonly mode: "active" | "standby";
   readonly timestamp: number;
   readonly source: LineSource;
   readonly webhookEventId: string;
@@ -166,7 +174,7 @@ export interface LineBaseEvent {
 }
 
 export interface LineMessageEvent extends LineBaseEvent {
-  readonly type: 'message';
+  readonly type: "message";
   readonly replyToken: string;
   readonly message: LineMessage & {
     readonly id: string;
@@ -175,20 +183,20 @@ export interface LineMessageEvent extends LineBaseEvent {
 }
 
 export interface LineFollowEvent extends LineBaseEvent {
-  readonly type: 'follow';
+  readonly type: "follow";
   readonly replyToken: string;
   readonly link?: {
-    readonly result: 'ok' | 'failed';
+    readonly result: "ok" | "failed";
     readonly nonce?: string;
   };
 }
 
 export interface LineUnfollowEvent extends LineBaseEvent {
-  readonly type: 'unfollow';
+  readonly type: "unfollow";
 }
 
 export interface LinePostbackEvent extends LineBaseEvent {
-  readonly type: 'postback';
+  readonly type: "postback";
   readonly replyToken: string;
   readonly postback: {
     readonly data: string;
@@ -196,10 +204,10 @@ export interface LinePostbackEvent extends LineBaseEvent {
   };
 }
 
-export type LineEvent = 
-  | LineMessageEvent 
-  | LineFollowEvent 
-  | LineUnfollowEvent 
+export type LineEvent =
+  | LineMessageEvent
+  | LineFollowEvent
+  | LineUnfollowEvent
   | LinePostbackEvent;
 
 // ============================================================================
@@ -234,7 +242,7 @@ export interface LineQuickReply {
 }
 
 export interface LineQuickReplyItem {
-  readonly type: 'action';
+  readonly type: "action";
   readonly imageUrl?: URL;
   readonly action: LineAction;
 }
@@ -242,7 +250,7 @@ export interface LineQuickReplyItem {
 // ============================================================================
 // アクション関連型定義
 // ============================================================================
-export type LineAction = 
+export type LineAction =
   | LinePostbackAction
   | LineMessageAction
   | LineURIAction
@@ -252,7 +260,7 @@ export type LineAction =
   | LineLocationAction;
 
 export interface LinePostbackAction {
-  readonly type: 'postback';
+  readonly type: "postback";
   readonly label?: string;
   readonly data: string;
   readonly displayText?: string;
@@ -260,13 +268,13 @@ export interface LinePostbackAction {
 }
 
 export interface LineMessageAction {
-  readonly type: 'message';
+  readonly type: "message";
   readonly label?: string;
   readonly text: string;
 }
 
 export interface LineURIAction {
-  readonly type: 'uri';
+  readonly type: "uri";
   readonly label?: string;
   readonly uri: URL;
   readonly altUri?: {
@@ -275,44 +283,44 @@ export interface LineURIAction {
 }
 
 export interface LineDatetimePickerAction {
-  readonly type: 'datetimepicker';
+  readonly type: "datetimepicker";
   readonly label?: string;
   readonly data: string;
-  readonly mode: 'date' | 'time' | 'datetime';
+  readonly mode: "date" | "time" | "datetime";
   readonly initial?: string;
   readonly max?: string;
   readonly min?: string;
 }
 
 export interface LineCameraAction {
-  readonly type: 'camera';
+  readonly type: "camera";
   readonly label?: string;
 }
 
 export interface LineCameraRollAction {
-  readonly type: 'cameraRoll';
+  readonly type: "cameraRoll";
   readonly label?: string;
 }
 
 export interface LineLocationAction {
-  readonly type: 'location';
+  readonly type: "location";
   readonly label?: string;
 }
 
 // ============================================================================
 // テンプレート関連型定義
 // ============================================================================
-export type LineTemplate = 
+export type LineTemplate =
   | LineButtonsTemplate
   | LineConfirmTemplate
   | LineCarouselTemplate
   | LineImageCarouselTemplate;
 
 export interface LineButtonsTemplate {
-  readonly type: 'buttons';
+  readonly type: "buttons";
   readonly thumbnailImageUrl?: URL;
-  readonly imageAspectRatio?: '1:1.51' | '1:1';
-  readonly imageSize?: 'cover' | 'contain';
+  readonly imageAspectRatio?: "1:1.51" | "1:1";
+  readonly imageSize?: "cover" | "contain";
   readonly imageBackgroundColor?: string;
   readonly title?: string;
   readonly text: string;
@@ -321,16 +329,16 @@ export interface LineButtonsTemplate {
 }
 
 export interface LineConfirmTemplate {
-  readonly type: 'confirm';
+  readonly type: "confirm";
   readonly text: string;
   readonly actions: readonly [LineAction, LineAction];
 }
 
 export interface LineCarouselTemplate {
-  readonly type: 'carousel';
+  readonly type: "carousel";
   readonly columns: ReadonlyArray<LineCarouselColumn>;
-  readonly imageAspectRatio?: '1:1.51' | '1:1';
-  readonly imageSize?: 'cover' | 'contain';
+  readonly imageAspectRatio?: "1:1.51" | "1:1";
+  readonly imageSize?: "cover" | "contain";
 }
 
 export interface LineCarouselColumn {
@@ -343,7 +351,7 @@ export interface LineCarouselColumn {
 }
 
 export interface LineImageCarouselTemplate {
-  readonly type: 'image_carousel';
+  readonly type: "image_carousel";
   readonly columns: ReadonlyArray<LineImageCarouselColumn>;
 }
 
@@ -365,18 +373,18 @@ export interface LineImagemapVideo {
   };
 }
 
-export type LineImagemapAction = 
+export type LineImagemapAction =
   | LineImagemapURIAction
   | LineImagemapMessageAction;
 
 export interface LineImagemapURIAction {
-  readonly type: 'uri';
+  readonly type: "uri";
   readonly linkUri: URL;
   readonly area: LineImagemapArea;
 }
 
 export interface LineImagemapMessageAction {
-  readonly type: 'message';
+  readonly type: "message";
   readonly text: string;
   readonly area: LineImagemapArea;
 }
@@ -391,13 +399,11 @@ export interface LineImagemapArea {
 // ============================================================================
 // Flex関連型定義（簡略版）
 // ============================================================================
-export type LineFlexContainer = 
-  | LineFlexBubble
-  | LineFlexCarousel;
+export type LineFlexContainer = LineFlexBubble | LineFlexCarousel;
 
 export interface LineFlexBubble {
-  readonly type: 'bubble';
-  readonly size?: 'nano' | 'micro' | 'kilo' | 'mega' | 'giga';
+  readonly type: "bubble";
+  readonly size?: "nano" | "micro" | "kilo" | "mega" | "giga";
   readonly header?: LineFlexBox;
   readonly hero?: LineFlexComponent;
   readonly body?: LineFlexBox;
@@ -407,13 +413,13 @@ export interface LineFlexBubble {
 }
 
 export interface LineFlexCarousel {
-  readonly type: 'carousel';
+  readonly type: "carousel";
   readonly contents: ReadonlyArray<LineFlexBubble>;
 }
 
 export interface LineFlexBox {
-  readonly type: 'box';
-  readonly layout: 'horizontal' | 'vertical' | 'baseline';
+  readonly type: "box";
+  readonly layout: "horizontal" | "vertical" | "baseline";
   readonly contents: ReadonlyArray<LineFlexComponent>;
   readonly backgroundColor?: string;
   readonly borderColor?: string;
@@ -427,13 +433,19 @@ export interface LineFlexBox {
   readonly paddingEnd?: string;
   readonly spacing?: string;
   readonly flex?: number;
-  readonly justifyContent?: 'flex-start' | 'center' | 'flex-end' | 'space-between' | 'space-around' | 'space-evenly';
-  readonly alignItems?: 'flex-start' | 'center' | 'flex-end';
+  readonly justifyContent?:
+    | "flex-start"
+    | "center"
+    | "flex-end"
+    | "space-between"
+    | "space-around"
+    | "space-evenly";
+  readonly alignItems?: "flex-start" | "center" | "flex-end";
   readonly background?: LineFlexBoxBackground;
   readonly action?: LineAction;
 }
 
-export type LineFlexComponent = 
+export type LineFlexComponent =
   | LineFlexBox
   | LineFlexButton
   | LineFlexImage
@@ -442,60 +454,60 @@ export type LineFlexComponent =
   | LineFlexSpacer;
 
 export interface LineFlexButton {
-  readonly type: 'button';
+  readonly type: "button";
   readonly action: LineAction;
   readonly flex?: number;
   readonly margin?: string;
-  readonly height?: 'sm' | 'md';
-  readonly style?: 'link' | 'primary' | 'secondary';
+  readonly height?: "sm" | "md";
+  readonly style?: "link" | "primary" | "secondary";
   readonly color?: string;
-  readonly gravity?: 'top' | 'bottom' | 'center';
+  readonly gravity?: "top" | "bottom" | "center";
 }
 
 export interface LineFlexImage {
-  readonly type: 'image';
+  readonly type: "image";
   readonly url: URL;
   readonly flex?: number;
   readonly margin?: string;
-  readonly align?: 'start' | 'end' | 'center';
-  readonly gravity?: 'top' | 'bottom' | 'center';
+  readonly align?: "start" | "end" | "center";
+  readonly gravity?: "top" | "bottom" | "center";
   readonly size?: string;
   readonly aspectRatio?: string;
-  readonly aspectMode?: 'cover' | 'fit';
+  readonly aspectMode?: "cover" | "fit";
   readonly backgroundColor?: string;
   readonly action?: LineAction;
 }
 
 export interface LineFlexText {
-  readonly type: 'text';
+  readonly type: "text";
   readonly text: string;
   readonly flex?: number;
   readonly margin?: string;
   readonly size?: string;
-  readonly align?: 'start' | 'end' | 'center';
-  readonly gravity?: 'top' | 'bottom' | 'center';
+  readonly align?: "start" | "end" | "center";
+  readonly gravity?: "top" | "bottom" | "center";
   readonly wrap?: boolean;
   readonly lineSpacing?: string;
-  readonly weight?: 'regular' | 'bold';
+  readonly weight?: "regular" | "bold";
   readonly color?: string;
   readonly action?: LineAction;
-  readonly style?: 'normal' | 'italic';
-  readonly decoration?: 'none' | 'underline' | 'line-through';
+  readonly style?: "normal" | "italic";
+  readonly decoration?: "none" | "underline" | "line-through";
 }
 
 export interface LineFlexSeparator {
-  readonly type: 'separator';
+  readonly type: "separator";
   readonly margin?: string;
   readonly color?: string;
 }
 
 export interface LineFlexSpacer {
-  readonly type: 'spacer';
+  readonly type: "spacer";
   readonly size?: string;
 }
 
 export interface LineFlexBoxBackground {
-  readonly type: 'linearGradient';
+  readonly type: "linearGradient";
   readonly angle: string;
   readonly startColor: string;
   readonly endColor: string;
@@ -573,7 +585,7 @@ export interface LineBroadcastRequest {
 export interface LineNarrowcastRequest {
   readonly messages: ReadonlyArray<LineMessage>;
   readonly recipient: {
-    readonly type: 'user' | 'audience';
+    readonly type: "user" | "audience";
     readonly userIds?: ReadonlyArray<LineUserID>;
     readonly audienceGroupId?: number;
   };
@@ -584,7 +596,7 @@ export interface LineNarrowcastRequest {
         readonly lt?: number;
       };
       readonly genderFilter?: {
-        readonly oneOf: ReadonlyArray<'male' | 'female'>;
+        readonly oneOf: ReadonlyArray<"male" | "female">;
       };
       readonly areaFilter?: {
         readonly oneOf: ReadonlyArray<string>;
@@ -621,32 +633,38 @@ export interface LineWebhookRequest {
 // ============================================================================
 // 型ガード関数
 // ============================================================================
-export const isLineTextMessage = (message: LineMessage): message is LineTextMessage => 
-  message.type === 'text';
+export const isLineTextMessage = (
+  message: LineMessage,
+): message is LineTextMessage => message.type === "text";
 
-export const isLineImageMessage = (message: LineMessage): message is LineImageMessage => 
-  message.type === 'image';
+export const isLineImageMessage = (
+  message: LineMessage,
+): message is LineImageMessage => message.type === "image";
 
-export const isLineStickerMessage = (message: LineMessage): message is LineStickerMessage => 
-  message.type === 'sticker';
+export const isLineStickerMessage = (
+  message: LineMessage,
+): message is LineStickerMessage => message.type === "sticker";
 
-export const isLineMessageEvent = (event: LineEvent): event is LineMessageEvent => 
-  event.type === 'message';
+export const isLineMessageEvent = (
+  event: LineEvent,
+): event is LineMessageEvent => event.type === "message";
 
-export const isLineFollowEvent = (event: LineEvent): event is LineFollowEvent => 
-  event.type === 'follow';
+export const isLineFollowEvent = (event: LineEvent): event is LineFollowEvent =>
+  event.type === "follow";
 
-export const isLineUnfollowEvent = (event: LineEvent): event is LineUnfollowEvent => 
-  event.type === 'unfollow';
+export const isLineUnfollowEvent = (
+  event: LineEvent,
+): event is LineUnfollowEvent => event.type === "unfollow";
 
-export const isLinePostbackEvent = (event: LineEvent): event is LinePostbackEvent => 
-  event.type === 'postback';
+export const isLinePostbackEvent = (
+  event: LineEvent,
+): event is LinePostbackEvent => event.type === "postback";
 
-export const isUserSource = (source: LineSource): source is LineUserSource => 
-  source.type === 'user';
+export const isUserSource = (source: LineSource): source is LineUserSource =>
+  source.type === "user";
 
-export const isGroupSource = (source: LineSource): source is LineGroupSource => 
-  source.type === 'group';
+export const isGroupSource = (source: LineSource): source is LineGroupSource =>
+  source.type === "group";
 
-export const isRoomSource = (source: LineSource): source is LineRoomSource => 
-  source.type === 'room';
+export const isRoomSource = (source: LineSource): source is LineRoomSource =>
+  source.type === "room";

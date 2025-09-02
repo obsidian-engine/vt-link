@@ -1,4 +1,4 @@
-import { RateLimit } from '../entities/RateLimit';
+import { RateLimit } from "../entities/RateLimit";
 
 export interface RateLimitCheck {
   readonly allowed: boolean;

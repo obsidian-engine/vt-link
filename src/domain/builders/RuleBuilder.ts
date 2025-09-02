@@ -1,7 +1,12 @@
-import { AutoReplyRuleV2 } from '../entities/AutoReplyRuleV2';
-import { MessageSpecification } from '../specifications';
-import { ReplyCommand } from '../commands';
-import { RateLimitPolicy, RateLimitScope, SlidingWindowPolicy, NoRateLimitPolicy, RateLimitStorage } from '../policies';
+import { AutoReplyRuleV2 } from "../entities/AutoReplyRuleV2";
+import type { MessageSpecification } from "../specifications";
+import type { ReplyCommand } from "../commands";
+import type { RateLimitPolicy, RateLimitStorage } from "../policies";
+import {
+  RateLimitScope,
+  SlidingWindowPolicy,
+  NoRateLimitPolicy,
+} from "../policies";
 
 /**
  * AutoReplyRuleを直感的に組み立てるBuilderクラス
@@ -67,12 +72,22 @@ export class RuleBuilder {
   /**
    * レート制限を設定（Policy）
    */
-  limitTo(maxCount: number, windowSeconds: number, scope: RateLimitScope = RateLimitScope.User, storage?: RateLimitStorage): RuleBuilder {
+  limitTo(
+    maxCount: number,
+    windowSeconds: number,
+    scope: RateLimitScope = RateLimitScope.User,
+    storage?: RateLimitStorage,
+  ): RuleBuilder {
     if (!storage) {
-      throw new Error('RateLimitStorage is required for rate limiting');
+      throw new Error("RateLimitStorage is required for rate limiting");
     }
-    
-    this.rateLimit = new SlidingWindowPolicy(maxCount, windowSeconds, scope, storage);
+
+    this.rateLimit = new SlidingWindowPolicy(
+      maxCount,
+      windowSeconds,
+      scope,
+      storage,
+    );
     return this;
   }
 
@@ -100,16 +115,16 @@ export class RuleBuilder {
       this.id = crypto.randomUUID();
     }
     if (!this.accountId) {
-      throw new Error('Account ID is required');
+      throw new Error("Account ID is required");
     }
     if (!this.name) {
-      throw new Error('Rule name is required');
+      throw new Error("Rule name is required");
     }
     if (!this.trigger) {
-      throw new Error('Trigger specification is required');
+      throw new Error("Trigger specification is required");
     }
     if (!this.response) {
-      throw new Error('Response command is required');
+      throw new Error("Response command is required");
     }
     if (this.priority === undefined) {
       this.priority = 0;
@@ -123,7 +138,7 @@ export class RuleBuilder {
       this.trigger,
       this.response,
       this.rateLimit,
-      this.enabled
+      this.enabled,
     );
   }
 

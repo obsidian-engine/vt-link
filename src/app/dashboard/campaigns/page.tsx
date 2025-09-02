@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { getCampaigns } from '@/ui/actions/campaignActions';
+import { Suspense } from "react";
+import Link from "next/link";
+import { getCampaigns } from "@/ui/actions/campaignActions";
 
 export default function CampaignsPage() {
   return (
@@ -42,7 +42,7 @@ export default function CampaignsPage() {
 
 async function CampaignList() {
   // 実際のアプリケーションでは認証からaccountIdを取得
-  const accountId = 'demo-account-id';
+  const accountId = "demo-account-id";
   const result = await getCampaigns(accountId);
 
   if (!result.success) {
@@ -121,23 +121,47 @@ async function CampaignList() {
 function CampaignCard({ campaign }: { campaign: any }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'draft':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">下書き</span>;
-      case 'scheduled':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">予約済み</span>;
-      case 'sending':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">送信中</span>;
-      case 'sent':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">送信完了</span>;
-      case 'failed':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">送信失敗</span>;
+      case "draft":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+            下書き
+          </span>
+        );
+      case "scheduled":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+            予約済み
+          </span>
+        );
+      case "sending":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+            送信中
+          </span>
+        );
+      case "sent":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+            送信完了
+          </span>
+        );
+      case "failed":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+            送信失敗
+          </span>
+        );
       default:
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">{status}</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+            {status}
+          </span>
+        );
     }
   };
 
   const getTypeIcon = (type: string) => {
-    return type === 'broadcast' ? '📢' : '🎯';
+    return type === "broadcast" ? "📢" : "🎯";
   };
 
   return (
@@ -154,11 +178,14 @@ function CampaignCard({ campaign }: { campaign: any }) {
                 <div className="flex items-center space-x-4 mt-1">
                   {getStatusBadge(campaign.status)}
                   <span className="text-sm text-gray-500 dark:text-gray-400">
-                    {campaign.type === 'broadcast' ? '全ユーザー' : `${campaign.estimatedRecipients || 0}名`}
+                    {campaign.type === "broadcast"
+                      ? "全ユーザー"
+                      : `${campaign.estimatedRecipients || 0}名`}
                   </span>
                   {campaign.scheduledAt && (
                     <span className="text-sm text-gray-500 dark:text-gray-400">
-                      配信予定: {new Date(campaign.scheduledAt).toLocaleString('ja-JP')}
+                      配信予定:{" "}
+                      {new Date(campaign.scheduledAt).toLocaleString("ja-JP")}
                     </span>
                   )}
                 </div>
@@ -172,10 +199,9 @@ function CampaignCard({ campaign }: { campaign: any }) {
               </span>
             )}
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              {campaign.status === 'sent' && campaign.sentAt 
-                ? `完了: ${new Date(campaign.sentAt).toLocaleDateString('ja-JP')}`
-                : `作成: ${new Date(campaign.createdAt).toLocaleDateString('ja-JP')}`
-              }
+              {campaign.status === "sent" && campaign.sentAt
+                ? `完了: ${new Date(campaign.sentAt).toLocaleDateString("ja-JP")}`
+                : `作成: ${new Date(campaign.createdAt).toLocaleDateString("ja-JP")}`}
             </span>
           </div>
         </div>

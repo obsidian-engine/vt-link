@@ -1,4 +1,4 @@
-import { AutoReplyRule } from '../entities/AutoReplyRule';
+import { AutoReplyRule } from "../entities/AutoReplyRule";
 
 export interface AutoReplyRuleRepository {
   /**
@@ -29,5 +29,8 @@ export interface AutoReplyRuleRepository {
   /**
    * アカウント内でのルールの優先度を更新する
    */
-  updatePriorities(accountId: string, rulePriorities: Array<{ id: string; priority: number }>): Promise<void>;
+  updatePriorities(
+    accountId: string,
+    rulePriorities: Array<{ id: string; priority: number }>,
+  ): Promise<void>;
 }

@@ -1,15 +1,15 @@
 export enum MessageType {
-  Text = 'text',
-  Image = 'image',
-  Video = 'video',
-  Audio = 'audio',
-  File = 'file',
-  Location = 'location',
-  Sticker = 'sticker',
+  Text = "text",
+  Image = "image",
+  Video = "video",
+  Audio = "audio",
+  File = "file",
+  Location = "location",
+  Sticker = "sticker",
 }
 
 export interface MessageSource {
-  readonly type: 'user' | 'group' | 'room';
+  readonly type: "user" | "group" | "room";
   readonly userId: string;
   readonly groupId?: string;
   readonly roomId?: string;
@@ -29,7 +29,7 @@ export class IncomingMessage {
     text: string | null,
     source: MessageSource,
     timestamp: Date,
-    replyToken: string
+    replyToken: string,
   ) {
     this.#id = id;
     this.#type = type;
@@ -46,16 +46,16 @@ export class IncomingMessage {
     text: string | null,
     source: MessageSource,
     timestamp: Date,
-    replyToken: string
+    replyToken: string,
   ): IncomingMessage {
     if (!id) {
-      throw new Error('Message ID is required');
+      throw new Error("Message ID is required");
     }
     if (!replyToken) {
-      throw new Error('Reply token is required');
+      throw new Error("Reply token is required");
     }
     if (!source.userId) {
-      throw new Error('User ID is required');
+      throw new Error("User ID is required");
     }
 
     return new IncomingMessage(id, type, text, source, timestamp, replyToken);
@@ -64,7 +64,7 @@ export class IncomingMessage {
   static fromLineWebhookEvent(event: any): IncomingMessage {
     return IncomingMessage.create(
       event.message?.id || crypto.randomUUID(),
-      event.message?.type as MessageType || MessageType.Text,
+      (event.message?.type as MessageType) || MessageType.Text,
       event.message?.text || null,
       {
         type: event.source.type,
@@ -73,7 +73,7 @@ export class IncomingMessage {
         roomId: event.source.roomId,
       },
       new Date(event.timestamp),
-      event.replyToken
+      event.replyToken,
     );
   }
 

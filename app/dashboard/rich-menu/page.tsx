@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { getRichMenus } from '@/ui/actions/richMenuActions';
+import { Suspense } from "react";
+import Link from "next/link";
+import { getRichMenus } from "@/ui/actions/richMenuActions";
 
 export default async function RichMenuPage() {
   return (
@@ -42,10 +42,10 @@ export default async function RichMenuPage() {
 
 async function RichMenuList() {
   // TODO: アカウントIDの取得ロジックを後で実装
-  const accountId = 'temp-account-id';
-  
+  const accountId = "temp-account-id";
+
   const result = await getRichMenus(accountId);
-  
+
   if (!result.success) {
     return (
       <div className="text-center py-12">
@@ -92,9 +92,9 @@ interface RichMenuCardProps {
   menu: {
     id: string;
     name: string;
-    size: 'full' | 'half';
-    chatBarText?: string;
-    imageUrl?: string;
+    size: "full" | "half";
+    chatBarText: string | null;
+    imageUrl: string | null;
     isDefault: boolean;
     isPublished: boolean;
     canBePublished: boolean;
@@ -122,10 +122,10 @@ function RichMenuCard({ menu }: RichMenuCardProps) {
             )}
           </div>
         </div>
-        
+
         <div className="mt-4">
           <div className="text-sm text-gray-600 dark:text-gray-300">
-            サイズ: {menu.size === 'full' ? 'フル' : 'ハーフ'}
+            サイズ: {menu.size === "full" ? "フル" : "ハーフ"}
           </div>
           {menu.chatBarText && (
             <div className="text-sm text-gray-600 dark:text-gray-300">
@@ -151,7 +151,7 @@ function RichMenuCard({ menu }: RichMenuCardProps) {
           >
             編集
           </Link>
-          
+
           <div className="flex space-x-4">
             {!menu.isDefault && menu.canBePublished && (
               <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 text-sm font-medium">
@@ -172,7 +172,10 @@ function RichMenuListSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div
+          key={i}
+          className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg"
+        >
           <div className="p-5">
             <div className="animate-pulse">
               <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>

@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { getTemplates } from '@/ui/actions/templateActions';
+import { Suspense } from "react";
+import Link from "next/link";
+import { getTemplates } from "@/ui/actions/templateActions";
 
 export default function TemplatesPage() {
   return (
@@ -42,7 +42,7 @@ export default function TemplatesPage() {
 
 async function TemplateList() {
   // 実際のアプリケーションでは認証からaccountIdを取得
-  const accountId = 'demo-account-id';
+  const accountId = "demo-account-id";
   const result = await getTemplates(accountId);
 
   if (!result.success) {
@@ -114,42 +114,61 @@ async function TemplateList() {
 function TemplateCard({ template }: { template: any }) {
   const getTypeIcon = (contentType: string) => {
     switch (contentType) {
-      case 'text':
-        return '💬';
-      case 'image':
-        return '🖼️';
-      case 'sticker':
-        return '😊';
+      case "text":
+        return "💬";
+      case "image":
+        return "🖼️";
+      case "sticker":
+        return "😊";
       default:
-        return '📄';
+        return "📄";
     }
   };
 
   const getCategoryBadge = (category: string) => {
     switch (category) {
-      case 'notification':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">お知らせ</span>;
-      case 'promotion':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">プロモーション</span>;
-      case 'greeting':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">挨拶</span>;
+      case "notification":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
+            お知らせ
+          </span>
+        );
+      case "promotion":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+            プロモーション
+          </span>
+        );
+      case "greeting":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
+            挨拶
+          </span>
+        );
       default:
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">その他</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+            その他
+          </span>
+        );
     }
   };
 
   const getPreviewText = (content: any[]) => {
-    if (!content || content.length === 0) return 'コンテンツがありません';
-    
+    if (!content || content.length === 0) return "コンテンツがありません";
+
     const firstContent = content[0];
-    if (firstContent.type === 'text') {
-      return firstContent.payload?.text?.slice(0, 100) + (firstContent.payload?.text?.length > 100 ? '...' : '');
-    } else if (firstContent.type === 'image') {
-      return '🖼️ 画像メッセージ';
-    } else if (firstContent.type === 'sticker') {
-      return '😊 スタンプメッセージ';
+    if (firstContent.type === "text") {
+      return (
+        firstContent.payload?.text?.slice(0, 100) +
+        (firstContent.payload?.text?.length > 100 ? "..." : "")
+      );
+    } else if (firstContent.type === "image") {
+      return "🖼️ 画像メッセージ";
+    } else if (firstContent.type === "sticker") {
+      return "😊 スタンプメッセージ";
     }
-    return 'メッセージコンテンツ';
+    return "メッセージコンテンツ";
   };
 
   return (
@@ -159,7 +178,9 @@ function TemplateCard({ template }: { template: any }) {
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
               <div className="flex items-center space-x-2 mb-2">
-                <span className="text-xl">{getTypeIcon(template.contentType)}</span>
+                <span className="text-xl">
+                  {getTypeIcon(template.contentType)}
+                </span>
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate">
                   {template.name}
                 </h3>
@@ -172,7 +193,7 @@ function TemplateCard({ template }: { template: any }) {
               </div>
             </div>
           </div>
-          
+
           <div className="mb-4">
             <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
               {template.description || getPreviewText(template.content)}
@@ -183,14 +204,16 @@ function TemplateCard({ template }: { template: any }) {
           {template.placeholders && template.placeholders.length > 0 && (
             <div className="mb-4">
               <div className="flex flex-wrap gap-1">
-                {template.placeholders.slice(0, 3).map((placeholder: string) => (
-                  <span
-                    key={placeholder}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
-                  >
-                    {placeholder}
-                  </span>
-                ))}
+                {template.placeholders
+                  .slice(0, 3)
+                  .map((placeholder: string) => (
+                    <span
+                      key={placeholder}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300"
+                    >
+                      {placeholder}
+                    </span>
+                  ))}
                 {template.placeholders.length > 3 && (
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
                     +{template.placeholders.length - 3}個
@@ -201,7 +224,7 @@ function TemplateCard({ template }: { template: any }) {
           )}
 
           <div className="text-xs text-gray-500 dark:text-gray-400">
-            最終更新: {new Date(template.updatedAt).toLocaleDateString('ja-JP')}
+            最終更新: {new Date(template.updatedAt).toLocaleDateString("ja-JP")}
           </div>
         </div>
       </div>
@@ -226,7 +249,10 @@ function TemplateListSkeleton() {
       {/* テンプレート一覧のスケルトン */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <div
+            key={i}
+            className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden"
+          >
             <div className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
@@ -240,7 +266,7 @@ function TemplateListSkeleton() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mb-4 space-y-2">
                 <div className="h-4 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
                 <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>

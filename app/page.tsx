@@ -9,7 +9,7 @@ export default function HomePage() {
           <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-12">
             VTuber向けLINE公式アカウント管理ツール
           </p>
-          
+
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <FeatureCard
               icon="🎨"
@@ -27,7 +27,7 @@ export default function HomePage() {
               description="予約配信・一斉配信対応"
             />
           </div>
-          
+
           <div className="mt-12">
             <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg text-lg transition-colors">
               Get Started

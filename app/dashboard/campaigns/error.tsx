@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 export default function Error({
   error,
@@ -11,7 +11,7 @@ export default function Error({
 }) {
   useEffect(() => {
     // エラーをログに記録（本番環境では適切なログサービスに送信）
-    console.error('Campaign page error:', error);
+    console.error("Campaign page error:", error);
   }, [error]);
 
   return (
@@ -39,7 +39,7 @@ export default function Error({
             ダッシュボードに戻る
           </a>
         </div>
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === "development" && (
           <details className="mt-6 text-left">
             <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
               技術的な詳細（開発モードのみ）

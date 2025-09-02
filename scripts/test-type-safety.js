@@ -5,18 +5,18 @@
  * Brand型、IDFactory、Server Actionsの型安全性を検証
  */
 
-import { execSync } from 'child_process';
-import { promises as fs } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { execSync } from "child_process";
+import { promises as fs } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, join } from "path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const TEST_DIR = join(__dirname, '../__tests__/type-safety');
+const TEST_DIR = join(__dirname, "../__tests__/type-safety");
 
 async function runTypeSafetyTests() {
-  console.log('🔍 型安全性テストを実行中...');
+  console.log("🔍 型安全性テストを実行中...");
 
   try {
     // テストディレクトリが存在しない場合は作成
@@ -24,27 +24,26 @@ async function runTypeSafetyTests() {
 
     // Brand型テスト
     await createBrandTypeTest();
-    
+
     // IDFactoryテスト
     await createIdFactoryTest();
-    
+
     // Server Actionsテスト
     await createServerActionsTest();
-    
+
     // API契約テスト
     await createApiContractTest();
 
     // 全テストを実行
-    console.log('▶️  テストを実行中...');
-    execSync('npm run test __tests__/type-safety', { 
-      stdio: 'inherit',
-      cwd: join(__dirname, '..')
+    console.log("▶️  テストを実行中...");
+    execSync("npm run test __tests__/type-safety", {
+      stdio: "inherit",
+      cwd: join(__dirname, ".."),
     });
 
-    console.log('✅ 全ての型安全性テストが完了しました');
-
+    console.log("✅ 全ての型安全性テストが完了しました");
   } catch (error) {
-    console.error('❌ 型安全性テストに失敗しました:', error.message);
+    console.error("❌ 型安全性テストに失敗しました:", error.message);
     process.exit(1);
   }
 }
@@ -96,7 +95,7 @@ describe('Brand Type Safety', () => {
   });
 });`;
 
-  await fs.writeFile(join(TEST_DIR, 'brand-types.test.ts'), testContent);
+  await fs.writeFile(join(TEST_DIR, "brand-types.test.ts"), testContent);
 }
 
 async function createIdFactoryTest() {
@@ -141,7 +140,7 @@ describe('IDFactory', () => {
   });
 });`;
 
-  await fs.writeFile(join(TEST_DIR, 'id-factory.test.ts'), testContent);
+  await fs.writeFile(join(TEST_DIR, "id-factory.test.ts"), testContent);
 }
 
 async function createServerActionsTest() {
@@ -212,7 +211,7 @@ describe('Server Actions Type Safety', () => {
   });
 });`;
 
-  await fs.writeFile(join(TEST_DIR, 'server-actions.test.ts'), testContent);
+  await fs.writeFile(join(TEST_DIR, "server-actions.test.ts"), testContent);
 }
 
 async function createApiContractTest() {
@@ -264,7 +263,7 @@ describe('API Contracts', () => {
   });
 });`;
 
-  await fs.writeFile(join(TEST_DIR, 'api-contracts.test.ts'), testContent);
+  await fs.writeFile(join(TEST_DIR, "api-contracts.test.ts"), testContent);
 }
 
 // スクリプト直接実行時の処理

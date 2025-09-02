@@ -1,5 +1,5 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
+import { Suspense } from "react";
+import Link from "next/link";
 
 export default function DashboardPage() {
   return (
@@ -11,20 +11,20 @@ export default function DashboardPage() {
               🎭 VTube LINE Manager
             </h1>
             <nav className="flex space-x-8">
-              <Link 
-                href="/dashboard/rich-menu" 
+              <Link
+                href="/dashboard/rich-menu"
                 className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
               >
                 リッチメニュー
               </Link>
-              <Link 
-                href="/dashboard/auto-reply" 
+              <Link
+                href="/dashboard/auto-reply"
                 className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
               >
                 自動返信
               </Link>
-              <Link 
-                href="/dashboard/messages" 
+              <Link
+                href="/dashboard/messages"
                 className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
               >
                 メッセージ配信
@@ -44,7 +44,7 @@ export default function DashboardPage() {
               href="/dashboard/rich-menu"
               stats="0 個作成済み"
             />
-            
+
             <DashboardCard
               title="自動返信Bot"
               description="キーワードに基づく自動応答"
@@ -52,7 +52,7 @@ export default function DashboardPage() {
               href="/dashboard/auto-reply"
               stats="0 ルール設定済み"
             />
-            
+
             <DashboardCard
               title="メッセージ配信"
               description="一斉配信・予約配信対応"
@@ -60,7 +60,7 @@ export default function DashboardPage() {
               href="/dashboard/messages"
               stats="0 件送信済み"
             />
-            
+
             <DashboardCard
               title="分析・レポート"
               description="メッセージ効果を可視化"
@@ -68,7 +68,7 @@ export default function DashboardPage() {
               href="/dashboard/analytics"
               stats="準備中"
             />
-            
+
             <DashboardCard
               title="設定"
               description="LINE公式アカウント設定"
@@ -77,7 +77,7 @@ export default function DashboardPage() {
               stats="未設定"
             />
           </div>
-          
+
           <div className="mt-8">
             <Suspense fallback={<div>読み込み中...</div>}>
               <QuickActions />
@@ -97,7 +97,13 @@ interface DashboardCardProps {
   stats: string;
 }
 
-function DashboardCard({ title, description, icon, href, stats }: DashboardCardProps) {
+function DashboardCard({
+  title,
+  description,
+  icon,
+  href,
+  stats,
+}: DashboardCardProps) {
   return (
     <Link href={href}>
       <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">

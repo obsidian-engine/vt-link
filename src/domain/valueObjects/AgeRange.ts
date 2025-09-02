@@ -10,16 +10,18 @@ export class AgeRange {
 
   static create(min: number, max: number): AgeRange {
     if (min < 0) {
-      throw new Error('Minimum age must be 0 or greater');
+      throw new Error("Minimum age must be 0 or greater");
     }
     if (max < 0) {
-      throw new Error('Maximum age must be 0 or greater');
+      throw new Error("Maximum age must be 0 or greater");
     }
     if (max < min) {
-      throw new Error('Maximum age must be greater than or equal to minimum age');
+      throw new Error(
+        "Maximum age must be greater than or equal to minimum age",
+      );
     }
     if (max > 120) {
-      throw new Error('Maximum age must be 120 or less');
+      throw new Error("Maximum age must be 120 or less");
     }
 
     return new AgeRange(min, max);

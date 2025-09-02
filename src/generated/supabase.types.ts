@@ -81,7 +81,7 @@ export interface Database {
           account_id: string;
           name: string;
           description: string | null;
-          status: 'draft' | 'active' | 'paused' | 'completed';
+          status: "draft" | "active" | "paused" | "completed";
           created_at: string;
           updated_at: string;
         };
@@ -90,7 +90,7 @@ export interface Database {
           account_id: string;
           name: string;
           description?: string | null;
-          status?: 'draft' | 'active' | 'paused' | 'completed';
+          status?: "draft" | "active" | "paused" | "completed";
           created_at?: string;
           updated_at?: string;
         };
@@ -99,7 +99,7 @@ export interface Database {
           account_id?: string;
           name?: string;
           description?: string | null;
-          status?: 'draft' | 'active' | 'paused' | 'completed';
+          status?: "draft" | "active" | "paused" | "completed";
           updated_at?: string;
         };
       };
@@ -108,7 +108,7 @@ export interface Database {
           id: string;
           account_id: string;
           name: string;
-          size: 'full' | 'half';
+          size: "full" | "half";
           chat_bar_text: string | null;
           line_rich_menu_id: string | null;
           areas: any; // JSON
@@ -120,7 +120,7 @@ export interface Database {
           id?: string;
           account_id: string;
           name: string;
-          size: 'full' | 'half';
+          size: "full" | "half";
           chat_bar_text?: string | null;
           line_rich_menu_id?: string | null;
           areas?: any; // JSON
@@ -132,7 +132,7 @@ export interface Database {
           id?: string;
           account_id?: string;
           name?: string;
-          size?: 'full' | 'half';
+          size?: "full" | "half";
           chat_bar_text?: string | null;
           line_rich_menu_id?: string | null;
           areas?: any; // JSON

@@ -1,4 +1,4 @@
-import { ReplyCommand, MessageContext } from './ReplyCommand';
+import type { ReplyCommand, MessageContext } from "./ReplyCommand";
 
 /**
  * スタンプ返信コマンド
@@ -10,15 +10,15 @@ export class StickerReplyCommand implements ReplyCommand {
 
   constructor(packageId: string, stickerId: string, probability: number = 1.0) {
     if (!packageId || packageId.trim().length === 0) {
-      throw new Error('Package ID cannot be empty');
+      throw new Error("Package ID cannot be empty");
     }
     if (!stickerId || stickerId.trim().length === 0) {
-      throw new Error('Sticker ID cannot be empty');
+      throw new Error("Sticker ID cannot be empty");
     }
     if (probability < 0 || probability > 1) {
-      throw new Error('Probability must be between 0 and 1');
+      throw new Error("Probability must be between 0 and 1");
     }
-    
+
     this.#packageId = packageId;
     this.#stickerId = stickerId;
     this.#probability = probability;
@@ -31,8 +31,10 @@ export class StickerReplyCommand implements ReplyCommand {
     }
 
     // TODO: ここで実際のLINE API呼び出しを行う
-    console.log(`Sending sticker reply to ${context.userId}: ${this.#packageId}/${this.#stickerId}`);
-    
+    console.log(
+      `Sending sticker reply to ${context.userId}: ${this.#packageId}/${this.#stickerId}`,
+    );
+
     // 実際の実装では以下のような処理になる:
     // await this.lineApiClient.replyMessage(context.replyToken, {
     //   type: 'sticker',

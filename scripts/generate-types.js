@@ -5,21 +5,21 @@
  * Supabase CLIを使用してTypeScript型定義を自動生成
  */
 
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import path from 'path';
-import fs from 'fs/promises';
+import { exec } from "child_process";
+import { promisify } from "util";
+import path from "path";
+import fs from "fs/promises";
 
 const execAsync = promisify(exec);
 
 const CONFIG = {
-  outputPath: 'src/generated/supabase.types.ts',
+  outputPath: "src/generated/supabase.types.ts",
   projectRef: process.env.SUPABASE_PROJECT_REF,
   dbUrl: process.env.SUPABASE_DB_URL || process.env.DATABASE_URL,
 };
 
 async function generateTypes() {
-  console.log('🏗️  Supabaseデータベース型を生成中...');
+  console.log("🏗️  Supabaseデータベース型を生成中...");
 
   try {
     // ディレクトリが存在しない場合は作成
@@ -27,7 +27,7 @@ async function generateTypes() {
     await fs.mkdir(outputDir, { recursive: true });
 
     let command;
-    if (process.env.NODE_ENV === 'production' && CONFIG.projectRef) {
+    if (process.env.NODE_ENV === "production" && CONFIG.projectRef) {
       // 本番環境: Supabaseプロジェクトから型生成
       command = `npx supabase gen types typescript --project-id ${CONFIG.projectRef}`;
     } else if (CONFIG.dbUrl) {
@@ -35,34 +35,35 @@ async function generateTypes() {
       command = `npx supabase gen types typescript --db-url "${CONFIG.dbUrl}"`;
     } else {
       // ローカル開発環境
-      command = 'npx supabase gen types typescript --local';
+      command = "npx supabase gen types typescript --local";
     }
 
     console.log(`実行コマンド: ${command}`);
-    
+
     const { stdout, stderr } = await execAsync(command);
-    
-    if (stderr && !stderr.includes('warning')) {
-      console.warn('⚠️  警告:', stderr);
+
+    if (stderr && !stderr.includes("warning")) {
+      console.warn("⚠️  警告:", stderr);
     }
 
     // 生成された型定義をファイルに書き込み
-    await fs.writeFile(CONFIG.outputPath, stdout, 'utf8');
+    await fs.writeFile(CONFIG.outputPath, stdout, "utf8");
 
-    console.log('✅ Supabaseデータベース型の生成が完了しました');
+    console.log("✅ Supabaseデータベース型の生成が完了しました");
     console.log(`📁 出力ファイル: ${CONFIG.outputPath}`);
 
     // 型定義のカスタマイズファイルも生成
     await generateCustomTypes();
-
   } catch (error) {
-    console.error('❌ 型生成に失敗しました:', error.message);
-    
-    if (error.message.includes('supabase')) {
-      console.log('💡 ヒント: Supabase CLIがインストールされていない可能性があります');
-      console.log('   インストール: npm install -g supabase');
+    console.error("❌ 型生成に失敗しました:", error.message);
+
+    if (error.message.includes("supabase")) {
+      console.log(
+        "💡 ヒント: Supabase CLIがインストールされていない可能性があります",
+      );
+      console.log("   インストール: npm install -g supabase");
     }
-    
+
     process.exit(1);
   }
 }
@@ -205,9 +206,9 @@ export type CampaignInsert = Database['public']['Tables']['campaigns']['Insert']
 export type CampaignUpdate = Database['public']['Tables']['campaigns']['Update'];
 `;
 
-  const customTypesPath = 'src/generated/database.types.ts';
-  await fs.writeFile(customTypesPath, customTypesContent, 'utf8');
-  
+  const customTypesPath = "src/generated/database.types.ts";
+  await fs.writeFile(customTypesPath, customTypesContent, "utf8");
+
   console.log(`📁 カスタム型定義: ${customTypesPath}`);
 }
 

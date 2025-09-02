@@ -1,7 +1,7 @@
 /**
  * LINEドメイン専用Zodスキーマ
  */
-import { z } from 'zod';
+import { z } from "zod";
 import {
   IdSchemaBase,
   LineChannelIdSchemaBase,
@@ -14,19 +14,31 @@ import {
   LimitedArraySchemaBase,
   CreateEntitySchemaBase,
   UpdateEntitySchemaBase,
-  createEnumSchema
-} from '../base';
-import { UserIdSchema } from './user';
+  createEnumSchema,
+} from "../base";
+import { UserIdSchema } from "./user";
 
 // ============================================================================
 // LINE関連Enum
 // ============================================================================
-export const RichMenuSizeSchema = createEnumSchema(['full', 'half'] as const);
-export const MessageTypeSchema = createEnumSchema(['text', 'image', 'sticker'] as const);
-export const CampaignStatusSchema = createEnumSchema([
-  'draft', 'scheduled', 'sending', 'sent', 'failed', 'cancelled'
+export const RichMenuSizeSchema = createEnumSchema(["full", "half"] as const);
+export const MessageTypeSchema = createEnumSchema([
+  "text",
+  "image",
+  "sticker",
 ] as const);
-export const CampaignTypeSchema = createEnumSchema(['broadcast', 'narrowcast'] as const);
+export const CampaignStatusSchema = createEnumSchema([
+  "draft",
+  "scheduled",
+  "sending",
+  "sent",
+  "failed",
+  "cancelled",
+] as const);
+export const CampaignTypeSchema = createEnumSchema([
+  "broadcast",
+  "narrowcast",
+] as const);
 
 // ============================================================================
 // LINE ID関連
@@ -49,7 +61,9 @@ const LineAccountFieldsSchema = {
   is_active: z.boolean().default(true),
 } as const;
 
-export const LineAccountSchema = CreateEntitySchemaBase(LineAccountFieldsSchema);
+export const LineAccountSchema = CreateEntitySchemaBase(
+  LineAccountFieldsSchema,
+);
 
 export const CreateLineAccountSchema = z.object({
   user_id: UserIdSchema,
@@ -98,7 +112,7 @@ const RichMenuFieldsSchema = {
   account_id: AccountIdSchema,
   line_rich_menu_id: LineRichMenuIdSchema.optional(),
   name: ShortTextSchemaBase,
-  size: RichMenuSizeSchema.default('full'),
+  size: RichMenuSizeSchema.default("full"),
   chat_bar_text: z.string().max(14).optional(),
   areas: LimitedArraySchemaBase(RichMenuAreaSchema, 20).default([]),
   image_url: UrlSchemaBase.optional(),
@@ -111,7 +125,7 @@ export const RichMenuSchema = CreateEntitySchemaBase(RichMenuFieldsSchema);
 export const CreateRichMenuSchema = z.object({
   account_id: AccountIdSchema,
   name: ShortTextSchemaBase,
-  size: RichMenuSizeSchema.default('full'),
+  size: RichMenuSizeSchema.default("full"),
   chat_bar_text: z.string().max(14).optional(),
   areas: LimitedArraySchemaBase(RichMenuAreaSchema, 20).default([]),
   image_url: UrlSchemaBase.optional(),
@@ -148,7 +162,11 @@ export const StickerContentSchema = z.object({
 
 export const MessageContentSchema = z.object({
   type: MessageTypeSchema,
-  payload: z.union([TextContentSchema, ImageContentSchema, StickerContentSchema]),
+  payload: z.union([
+    TextContentSchema,
+    ImageContentSchema,
+    StickerContentSchema,
+  ]),
 });
 
 // ============================================================================

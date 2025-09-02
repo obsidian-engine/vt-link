@@ -1,4 +1,4 @@
-import { TargetSegment, LineUser } from '../entities/TargetSegment';
+import { TargetSegment, LineUser } from "../entities/TargetSegment";
 
 export interface TargetSegmentRepository {
   /**
@@ -24,7 +24,10 @@ export interface TargetSegmentRepository {
   /**
    * セグメント名での部分一致検索
    */
-  findByNamePattern(accountId: string, namePattern: string): Promise<TargetSegment[]>;
+  findByNamePattern(
+    accountId: string,
+    namePattern: string,
+  ): Promise<TargetSegment[]>;
 
   /**
    * セグメントを削除します

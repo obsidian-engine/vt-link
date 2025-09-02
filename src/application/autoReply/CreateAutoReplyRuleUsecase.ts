@@ -1,19 +1,19 @@
-import { AutoReplyRule } from '@/domain/entities/AutoReplyRule';
-import { 
-  Condition, 
-  KeywordCondition, 
-  RegexCondition, 
+import { AutoReplyRule } from "@/domain/entities/AutoReplyRule";
+import {
+  Condition,
+  KeywordCondition,
+  RegexCondition,
   MessageTypeCondition,
   TimeCondition,
   UserCondition,
   ConditionType,
-  KeywordMatchMode
-} from '@/domain/entities/Condition';
-import { Response, ResponseType } from '@/domain/entities/Response';
-import { RateLimit, RateLimitScope } from '@/domain/entities/RateLimit';
-import { TimeWindow } from '@/domain/entities/TimeWindow';
-import { MessageType } from '@/domain/entities/IncomingMessage';
-import { AutoReplyRuleRepository } from '@/domain/repositories/AutoReplyRuleRepository';
+  KeywordMatchMode,
+} from "@/domain/entities/Condition";
+import { Response, ResponseType } from "@/domain/entities/Response";
+import { RateLimit, RateLimitScope } from "@/domain/entities/RateLimit";
+import { TimeWindow } from "@/domain/entities/TimeWindow";
+import { MessageType } from "@/domain/entities/IncomingMessage";
+import type { AutoReplyRuleRepository } from "@/domain/repositories/AutoReplyRuleRepository";
 
 interface ConditionInputData {
   readonly type: ConditionType;
@@ -90,15 +90,18 @@ export interface CreateAutoReplyRuleOutput {
 
 export class CreateAutoReplyRuleUsecase {
   constructor(
-    private readonly autoReplyRuleRepository: AutoReplyRuleRepository
+    private readonly autoReplyRuleRepository: AutoReplyRuleRepository,
   ) {}
 
-  async execute(input: CreateAutoReplyRuleInput): Promise<CreateAutoReplyRuleOutput> {
+  async execute(
+    input: CreateAutoReplyRuleInput,
+  ): Promise<CreateAutoReplyRuleOutput> {
     const id = crypto.randomUUID();
-    
+
     // Get next priority if not specified
-    const priority = input.priority ?? await this.getNextPriority(input.accountId);
-    
+    const priority =
+      input.priority ?? (await this.getNextPriority(input.accountId));
+
     // Build conditions
     const conditions = input.conditions.map((conditionData, index) => {
       const conditionId = crypto.randomUUID();
@@ -116,7 +119,7 @@ export class CreateAutoReplyRuleUsecase {
       ? RateLimit.create(
           input.rateLimit.scope,
           input.rateLimit.limit,
-          input.rateLimit.windowSeconds
+          input.rateLimit.windowSeconds,
         )
       : null;
 
@@ -126,7 +129,7 @@ export class CreateAutoReplyRuleUsecase {
           input.timeWindow.startTime,
           input.timeWindow.endTime,
           input.timeWindow.timeZone,
-          input.timeWindow.daysOfWeek
+          input.timeWindow.daysOfWeek,
         )
       : null;
 
@@ -139,7 +142,7 @@ export class CreateAutoReplyRuleUsecase {
       responses,
       rateLimit,
       timeWindow,
-      input.enabled ?? true
+      input.enabled ?? true,
     );
 
     await this.autoReplyRuleRepository.save(rule);
@@ -153,9 +156,11 @@ export class CreateAutoReplyRuleUsecase {
   }
 
   private async getNextPriority(accountId: string): Promise<number> {
-    const existingRules = await this.autoReplyRuleRepository.findAllByAccountId(accountId);
-    const maxPriority = existingRules.reduce((max, rule) => 
-      Math.max(max, rule.priority), -1
+    const existingRules =
+      await this.autoReplyRuleRepository.findAllByAccountId(accountId);
+    const maxPriority = existingRules.reduce(
+      (max, rule) => Math.max(max, rule.priority),
+      -1,
     );
     return maxPriority + 1;
   }
@@ -164,55 +169,52 @@ export class CreateAutoReplyRuleUsecase {
     switch (data.type) {
       case ConditionType.Keyword:
         if (!data.keyword || data.keyword.trim().length === 0) {
-          throw new Error('Keyword is required for keyword condition');
+          throw new Error("Keyword is required for keyword condition");
         }
         return KeywordCondition.create(
           id,
           data.keyword,
           data.mode ?? KeywordMatchMode.Partial,
-          data.caseSensitive ?? false
+          data.caseSensitive ?? false,
         );
-      
+
       case ConditionType.Regex:
         if (!data.pattern || data.pattern.trim().length === 0) {
-          throw new Error('Pattern is required for regex condition');
+          throw new Error("Pattern is required for regex condition");
         }
-        return RegexCondition.create(
-          id,
-          data.pattern,
-          data.flags ?? 'i'
-        );
-      
+        return RegexCondition.create(id, data.pattern, data.flags ?? "i");
+
       case ConditionType.MessageType:
         if (!data.allowedTypes || data.allowedTypes.length === 0) {
-          throw new Error('Allowed types are required for message type condition');
+          throw new Error(
+            "Allowed types are required for message type condition",
+          );
         }
-        return MessageTypeCondition.create(
-          id,
-          data.allowedTypes
-        );
-      
+        return MessageTypeCondition.create(id, data.allowedTypes);
+
       case ConditionType.Time:
         if (!data.startTime || !data.endTime) {
-          throw new Error('Start time and end time are required for time condition');
+          throw new Error(
+            "Start time and end time are required for time condition",
+          );
         }
         return TimeCondition.create(
           id,
           data.startTime,
           data.endTime,
-          data.timeZone ?? 'Asia/Tokyo'
+          data.timeZone ?? "Asia/Tokyo",
         );
-      
+
       case ConditionType.User:
         if (!data.targetUsers || data.targetUsers.length === 0) {
-          throw new Error('Target users are required for user condition');
+          throw new Error("Target users are required for user condition");
         }
         return UserCondition.create(
           id,
           data.targetUsers,
-          data.includeMode ?? true
+          data.includeMode ?? true,
         );
-      
+
       default:
         throw new Error(`Unsupported condition type: ${data.type}`);
     }
@@ -222,36 +224,36 @@ export class CreateAutoReplyRuleUsecase {
     switch (data.type) {
       case ResponseType.Text:
         if (!data.text || data.text.trim().length === 0) {
-          throw new Error('Text is required for text response');
+          throw new Error("Text is required for text response");
         }
-        return Response.createText(
-          id,
-          data.text,
-          data.probability ?? 1.0
-        );
-      
+        return Response.createText(id, data.text, data.probability ?? 1.0);
+
       case ResponseType.Image:
         if (!data.originalContentUrl || !data.previewImageUrl) {
-          throw new Error('Original content URL and preview image URL are required for image response');
+          throw new Error(
+            "Original content URL and preview image URL are required for image response",
+          );
         }
         return Response.createImage(
           id,
           data.originalContentUrl,
           data.previewImageUrl,
-          data.probability ?? 1.0
+          data.probability ?? 1.0,
         );
-      
+
       case ResponseType.Sticker:
         if (!data.packageId || !data.stickerId) {
-          throw new Error('Package ID and sticker ID are required for sticker response');
+          throw new Error(
+            "Package ID and sticker ID are required for sticker response",
+          );
         }
         return Response.createSticker(
           id,
           data.packageId,
           data.stickerId,
-          data.probability ?? 1.0
+          data.probability ?? 1.0,
         );
-      
+
       default:
         throw new Error(`Unsupported response type: ${data.type}`);
     }

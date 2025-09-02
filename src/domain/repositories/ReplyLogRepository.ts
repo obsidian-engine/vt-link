@@ -1,4 +1,4 @@
-import { ReplyLog, ReplyStatus } from '../entities/ReplyLog';
+import { ReplyLog, ReplyStatus } from "../entities/ReplyLog";
 
 export interface ReplyLogSearchCriteria {
   readonly accountId: string;
@@ -41,7 +41,9 @@ export interface ReplyLogRepository {
   /**
    * 統計情報を取得する
    */
-  getStats(criteria: Omit<ReplyLogSearchCriteria, 'limit' | 'offset'>): Promise<ReplyLogStats>;
+  getStats(
+    criteria: Omit<ReplyLogSearchCriteria, "limit" | "offset">,
+  ): Promise<ReplyLogStats>;
 
   /**
    * 古いログを削除する（保存期間管理）

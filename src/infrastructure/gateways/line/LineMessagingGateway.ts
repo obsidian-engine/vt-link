@@ -1,7 +1,7 @@
-import { BroadcastPort } from '@/application/message/SendBroadcastMessageUsecase';
-import { MessageContent } from '@/domain/entities/MessageCampaign';
-import { NarrowcastPort } from '@/application/campaign/SendNowUsecase';
-import { MessageContent as CampaignMessageContent } from '@/domain/valueObjects/MessageContent';
+import { BroadcastPort } from "@/application/message/SendBroadcastMessageUsecase";
+import { MessageContent } from "@/domain/entities/MessageCampaign";
+import { NarrowcastPort } from "@/application/campaign/SendNowUsecase";
+import { MessageContent as CampaignMessageContent } from "@/domain/valueObjects/MessageContent";
 export interface LineRichMenuCreateRequest {
   size: {
     width: number;
@@ -37,24 +37,26 @@ export interface LineMessage {
 }
 
 export class LineMessagingGateway implements BroadcastPort, NarrowcastPort {
-  readonly #baseUrl = 'https://api.line.me/v2/bot';
+  readonly #baseUrl = "https://api.line.me/v2/bot";
   readonly #channelAccessToken: string;
 
   constructor(channelAccessToken: string) {
     if (!channelAccessToken) {
-      throw new Error('LINE channel access token is required');
+      throw new Error("LINE channel access token is required");
     }
     this.#channelAccessToken = channelAccessToken;
   }
 
-  async sendBroadcast(content: ReadonlyArray<MessageContent>): Promise<{ sentCount: number }> {
+  async sendBroadcast(
+    content: ReadonlyArray<MessageContent>,
+  ): Promise<{ sentCount: number }> {
     const messages = this.convertToLineMessages(content);
-    
+
     const response = await fetch(`${this.#baseUrl}/message/broadcast`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${this.#channelAccessToken}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.#channelAccessToken}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         messages,
@@ -69,26 +71,29 @@ export class LineMessagingGateway implements BroadcastPort, NarrowcastPort {
     return { sentCount: 0 };
   }
 
-  async sendNarrowcast(content: ReadonlyArray<CampaignMessageContent>, userIds: ReadonlyArray<string>): Promise<{ sentCount: number }> {
+  async sendNarrowcast(
+    content: ReadonlyArray<CampaignMessageContent>,
+    userIds: ReadonlyArray<string>,
+  ): Promise<{ sentCount: number }> {
     const messages = this.convertCampaignToLineMessages(content);
 
     // LINE APIは最大500件のユーザーIDまで一度に送信可能
     const BATCH_SIZE = LINE_API_LIMITS.MAX_BATCH_SIZE;
     let totalSent = 0;
-    
+
     for (let i = 0; i < userIds.length; i += BATCH_SIZE) {
       const batch = userIds.slice(i, i + BATCH_SIZE);
-      
+
       const response = await fetch(`${this.#baseUrl}/message/narrowcast`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${this.#channelAccessToken}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.#channelAccessToken}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           messages,
           recipient: {
-            type: 'user',
+            type: "user",
             userIds: batch,
           },
         }),
@@ -98,19 +103,21 @@ export class LineMessagingGateway implements BroadcastPort, NarrowcastPort {
         const errorText = await response.text();
         throw new Error(`LINE API error: ${response.status} ${errorText}`);
       }
-      
+
       totalSent += batch.length;
     }
 
     return { sentCount: totalSent };
   }
 
-  async createRichMenu(request: LineRichMenuCreateRequest): Promise<{ richMenuId: string }> {
+  async createRichMenu(
+    request: LineRichMenuCreateRequest,
+  ): Promise<{ richMenuId: string }> {
     const response = await fetch(`${this.#baseUrl}/richmenu`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${this.#channelAccessToken}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.#channelAccessToken}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(request),
     });
@@ -124,15 +131,21 @@ export class LineMessagingGateway implements BroadcastPort, NarrowcastPort {
     return { richMenuId: result.richMenuId };
   }
 
-  async uploadRichMenuImage(richMenuId: string, imageBuffer: Buffer): Promise<void> {
-    const response = await fetch(`${this.#baseUrl}/richmenu/${richMenuId}/content`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.#channelAccessToken}`,
-        'Content-Type': 'image/png',
+  async uploadRichMenuImage(
+    richMenuId: string,
+    imageBuffer: Buffer,
+  ): Promise<void> {
+    const response = await fetch(
+      `${this.#baseUrl}/richmenu/${richMenuId}/content`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.#channelAccessToken}`,
+          "Content-Type": "image/png",
+        },
+        body: imageBuffer,
       },
-      body: imageBuffer,
-    });
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -141,12 +154,15 @@ export class LineMessagingGateway implements BroadcastPort, NarrowcastPort {
   }
 
   async setDefaultRichMenu(richMenuId: string): Promise<void> {
-    const response = await fetch(`${this.#baseUrl}/user/all/richmenu/${richMenuId}`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.#channelAccessToken}`,
+    const response = await fetch(
+      `${this.#baseUrl}/user/all/richmenu/${richMenuId}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${this.#channelAccessToken}`,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -154,32 +170,36 @@ export class LineMessagingGateway implements BroadcastPort, NarrowcastPort {
     }
   }
 
-  private convertToLineMessages(content: ReadonlyArray<MessageContent>): LineMessage[] {
-    return content.map(item => {
+  private convertToLineMessages(
+    content: ReadonlyArray<MessageContent>,
+  ): LineMessage[] {
+    return content.map((item) => {
       switch (item.type) {
-        case 'text':
+        case "text":
           if (!item.text) {
-            throw new Error('Text content is required for text message');
+            throw new Error("Text content is required for text message");
           }
           return {
-            type: 'text',
+            type: "text",
             text: item.text,
           };
-        case 'image':
+        case "image":
           if (!item.imageUrl) {
-            throw new Error('Image URL is required for image message');
+            throw new Error("Image URL is required for image message");
           }
           return {
-            type: 'image',
+            type: "image",
             originalContentUrl: item.imageUrl,
             previewImageUrl: item.imageUrl,
           };
-        case 'sticker':
+        case "sticker":
           if (!item.packageId || !item.stickerId) {
-            throw new Error('Package ID and Sticker ID are required for sticker message');
+            throw new Error(
+              "Package ID and Sticker ID are required for sticker message",
+            );
           }
           return {
-            type: 'sticker',
+            type: "sticker",
             packageId: item.packageId,
             stickerId: item.stickerId,
           };
@@ -189,8 +209,10 @@ export class LineMessagingGateway implements BroadcastPort, NarrowcastPort {
     });
   }
 
-  private convertCampaignToLineMessages(content: ReadonlyArray<CampaignMessageContent>): LineMessage[] {
-    return content.map(item => {
+  private convertCampaignToLineMessages(
+    content: ReadonlyArray<CampaignMessageContent>,
+  ): LineMessage[] {
+    return content.map((item) => {
       const lineMessage = item.toLineMessageObject();
       return lineMessage;
     });

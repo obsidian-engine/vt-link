@@ -1,5 +1,5 @@
-import { MessageSpecification } from './MessageSpecification';
-import { IncomingMessage } from '../entities/IncomingMessage';
+import type { MessageSpecification } from "./MessageSpecification";
+import { IncomingMessage } from "../entities/IncomingMessage";
 
 /**
  * 正規表現マッチング条件のSpecification
@@ -7,9 +7,9 @@ import { IncomingMessage } from '../entities/IncomingMessage';
 export class RegexSpecification implements MessageSpecification {
   readonly #pattern: RegExp;
 
-  constructor(pattern: string, flags: string = 'i') {
+  constructor(pattern: string, flags: string = "i") {
     if (!pattern || pattern.trim().length === 0) {
-      throw new Error('Regex pattern cannot be empty');
+      throw new Error("Regex pattern cannot be empty");
     }
 
     try {
@@ -20,10 +20,13 @@ export class RegexSpecification implements MessageSpecification {
   }
 
   isSatisfiedBy(message: IncomingMessage): boolean {
-    if (message.type !== 'text') {
+    if (message.type !== "text") {
       return false;
     }
 
+    if (!message.text) {
+      return false; // null text cannot match regex
+    }
     return this.#pattern.test(message.text);
   }
 

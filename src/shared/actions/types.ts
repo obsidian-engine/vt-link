@@ -2,7 +2,7 @@
  * Server Actions用の型定義
  * 型安全なServer Actionsのための共通型
  */
-import type { z } from 'zod';
+import type { z } from "zod";
 
 // ============================================================================
 // Server Action 結果型
@@ -31,7 +31,7 @@ export class FormDataParser {
   getString(key: string, defaultValue?: string): string | undefined {
     const value = this.#formData.get(key);
     if (value === null) return defaultValue;
-    return typeof value === 'string' ? value : defaultValue;
+    return typeof value === "string" ? value : defaultValue;
   }
 
   getRequiredString(key: string): string {
@@ -45,7 +45,7 @@ export class FormDataParser {
   getBoolean(key: string, defaultValue: boolean = false): boolean {
     const value = this.getString(key);
     if (value === undefined) return defaultValue;
-    return value === 'true' || value === '1' || value === 'on';
+    return value === "true" || value === "1" || value === "on";
   }
 
   getNumber(key: string, defaultValue?: number): number | undefined {
@@ -64,15 +64,15 @@ export class FormDataParser {
   }
 
   getArray(key: string): ReadonlyArray<string> {
-    return this.#formData.getAll(key).map(value => 
-      typeof value === 'string' ? value : String(value)
-    );
+    return this.#formData
+      .getAll(key)
+      .map((value) => (typeof value === "string" ? value : String(value)));
   }
 
   getJSON<T>(key: string, defaultValue?: T): T | undefined {
     const value = this.getString(key);
     if (value === undefined) return defaultValue;
-    
+
     try {
       return JSON.parse(value) as T;
     } catch {
@@ -98,7 +98,7 @@ export class ActionExecutor {
    */
   static async execute<T>(
     action: () => Promise<T>,
-    onError?: (error: unknown) => string
+    onError?: (error: unknown) => string,
   ): Promise<ActionState<T>> {
     try {
       const data = await action();
@@ -108,21 +108,21 @@ export class ActionExecutor {
         timestamp: new Date().toISOString(),
       };
     } catch (error) {
-      console.error('Server Action Error:', error);
-      
+      console.error("Server Action Error:", error);
+
       // Zodエラーの場合は詳細なバリデーションエラーを返す
       if (error instanceof z.ZodError) {
         return {
           success: false,
-          error: 'Validation failed',
-          validationErrors: error.errors.map(err => ({
-            field: err.path.join('.'),
+          error: "Validation failed",
+          validationErrors: error.errors.map((err) => ({
+            field: err.path.join("."),
             message: err.message,
           })),
           timestamp: new Date().toISOString(),
         };
       }
-      
+
       // カスタムエラーメッセージがある場合はそれを使用
       if (onError) {
         return {
@@ -131,9 +131,10 @@ export class ActionExecutor {
           timestamp: new Date().toISOString(),
         };
       }
-      
+
       // デフォルトエラーメッセージ
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
       return {
         success: false,
         error: errorMessage,
@@ -148,25 +149,25 @@ export class ActionExecutor {
   static async executeWithFormData<T>(
     formData: FormData,
     schema: z.ZodType<T>,
-    action: (validatedData: T) => Promise<any>
+    action: (validatedData: T) => Promise<any>,
   ): Promise<ActionState<any>> {
     return this.execute(async () => {
       // FormDataを適切な形式に変換
       const rawData: Record<string, unknown> = {};
       const parser = new FormDataParser(formData);
-      
+
       // FormDataの全てのキーを処理
       for (const [key, value] of formData.entries()) {
-        if (key.endsWith('[]')) {
+        if (key.endsWith("[]")) {
           // 配列形式の処理
           const arrayKey = key.slice(0, -2);
           if (!rawData[arrayKey]) {
             rawData[arrayKey] = [];
           }
           (rawData[arrayKey] as unknown[]).push(value);
-        } else if (key.includes('.')) {
+        } else if (key.includes(".")) {
           // ネストされたオブジェクトの処理（例: "user.name"）
-          const keys = key.split('.');
+          const keys = key.split(".");
           let current = rawData;
           for (let i = 0; i < keys.length - 1; i++) {
             if (!(keys[i] in current)) {
@@ -180,10 +181,10 @@ export class ActionExecutor {
           rawData[key] = value;
         }
       }
-      
+
       // スキーマでバリデーション
       const validatedData = schema.parse(rawData);
-      
+
       // アクションを実行
       return await action(validatedData);
     });
@@ -195,12 +196,12 @@ export class ActionExecutor {
   static async executeWithJSON<T>(
     jsonData: unknown,
     schema: z.ZodType<T>,
-    action: (validatedData: T) => Promise<any>
+    action: (validatedData: T) => Promise<any>,
   ): Promise<ActionState<any>> {
     return this.execute(async () => {
       // スキーマでバリデーション
       const validatedData = schema.parse(jsonData);
-      
+
       // アクションを実行
       return await action(validatedData);
     });
@@ -215,26 +216,34 @@ export class ActionExecutor {
  */
 export function withActionLogging<T extends any[], R>(
   actionName: string,
-  originalFunction: (...args: T) => Promise<ActionState<R>>
+  originalFunction: (...args: T) => Promise<ActionState<R>>,
 ) {
   return async (...args: T): Promise<ActionState<R>> => {
     const startTime = Date.now();
     console.log(`[Server Action] ${actionName} started`);
-    
+
     try {
       const result = await originalFunction(...args);
       const duration = Date.now() - startTime;
-      
+
       if (result.success) {
-        console.log(`[Server Action] ${actionName} completed successfully in ${duration}ms`);
+        console.log(
+          `[Server Action] ${actionName} completed successfully in ${duration}ms`,
+        );
       } else {
-        console.warn(`[Server Action] ${actionName} failed in ${duration}ms:`, result.error);
+        console.warn(
+          `[Server Action] ${actionName} failed in ${duration}ms:`,
+          result.error,
+        );
       }
-      
+
       return result;
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error(`[Server Action] ${actionName} threw error in ${duration}ms:`, error);
+      console.error(
+        `[Server Action] ${actionName} threw error in ${duration}ms:`,
+        error,
+      );
       throw error;
     }
   };
@@ -247,30 +256,30 @@ export function withRateLimit<T extends any[], R>(
   key: string,
   maxRequests: number,
   windowMs: number,
-  originalFunction: (...args: T) => Promise<ActionState<R>>
+  originalFunction: (...args: T) => Promise<ActionState<R>>,
 ) {
   const requests = new Map<string, number[]>();
-  
+
   return async (...args: T): Promise<ActionState<R>> => {
     const now = Date.now();
     const requestKey = `${key}`;
-    
+
     // 現在の時刻から計算したウィンドウ内のリクエスト回数を取得
     const requestTimes = requests.get(requestKey) || [];
-    const validRequests = requestTimes.filter(time => now - time < windowMs);
-    
+    const validRequests = requestTimes.filter((time) => now - time < windowMs);
+
     if (validRequests.length >= maxRequests) {
       return {
         success: false,
-        error: 'Rate limit exceeded. Please try again later.',
+        error: "Rate limit exceeded. Please try again later.",
         timestamp: new Date().toISOString(),
       };
     }
-    
+
     // 新しいリクエスト時刻を記録
     validRequests.push(now);
     requests.set(requestKey, validRequests);
-    
+
     return await originalFunction(...args);
   };
 }
@@ -279,12 +288,12 @@ export function withRateLimit<T extends any[], R>(
 // バリデーション済みServer Action型
 // ============================================================================
 export type ValidatedServerAction<TInput, TOutput> = (
-  input: TInput
+  input: TInput,
 ) => Promise<ActionState<TOutput>>;
 
 export type FormServerAction<TOutput> = (
   prevState: ActionState<TOutput> | null,
-  formData: FormData
+  formData: FormData,
 ) => Promise<ActionState<TOutput>>;
 
 // ============================================================================
@@ -307,7 +316,7 @@ export interface ValidationResult<T> {
 export const createValidationResult = <T>(
   success: boolean,
   data?: T,
-  errors?: ReadonlyArray<FieldError>
+  errors?: ReadonlyArray<FieldError>,
 ): ValidationResult<T> => ({
   success,
   data,
@@ -317,9 +326,11 @@ export const createValidationResult = <T>(
 /**
  * ZodエラーからFieldErrorの配列に変換
  */
-export const zodErrorToFieldErrors = (error: z.ZodError): ReadonlyArray<FieldError> => {
-  return error.errors.map(err => ({
-    field: err.path.join('.'),
+export const zodErrorToFieldErrors = (
+  error: z.ZodError,
+): ReadonlyArray<FieldError> => {
+  return error.errors.map((err) => ({
+    field: err.path.join("."),
     message: err.message,
   }));
 };

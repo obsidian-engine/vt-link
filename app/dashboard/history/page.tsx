@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { getCampaignHistory } from '@/ui/actions/campaignActions';
+import { Suspense } from "react";
+import Link from "next/link";
+import { getCampaignHistory } from "@/ui/actions/campaignActions";
 
 export default function HistoryPage() {
   return (
@@ -36,7 +36,7 @@ export default function HistoryPage() {
 
 async function HistoryContent() {
   // 実際のアプリケーションでは認証からaccountIdを取得
-  const accountId = 'demo-account-id';
+  const accountId = "demo-account-id";
   const result = await getCampaignHistory(accountId);
 
   if (!result.success) {
@@ -49,7 +49,10 @@ async function HistoryContent() {
     );
   }
 
-  const { campaigns, totalCount } = result.data ?? { campaigns: [], totalCount: 0 };
+  const { campaigns, totalCount } = result.data ?? {
+    campaigns: [],
+    totalCount: 0,
+  };
 
   return (
     <div className="space-y-6">
@@ -74,7 +77,7 @@ async function HistoryContent() {
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
@@ -87,14 +90,19 @@ async function HistoryContent() {
                     成功配信
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {campaigns.reduce((sum: number, c: any) => sum + (c.sentCount || 0), 0).toLocaleString()}
+                    {campaigns
+                      .reduce(
+                        (sum: number, c: any) => sum + (c.sentCount || 0),
+                        0,
+                      )
+                      .toLocaleString()}
                   </dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
@@ -107,14 +115,19 @@ async function HistoryContent() {
                     失敗配信
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {campaigns.reduce((sum: number, c: any) => sum + (c.failedCount || 0), 0).toLocaleString()}
+                    {campaigns
+                      .reduce(
+                        (sum: number, c: any) => sum + (c.failedCount || 0),
+                        0,
+                      )
+                      .toLocaleString()}
                   </dd>
                 </dl>
               </div>
             </div>
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="flex items-center">
@@ -127,11 +140,21 @@ async function HistoryContent() {
                     成功率
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                    {campaigns.length > 0 
-                      ? Math.round((campaigns.reduce((sum: number, c: any) => sum + (c.sentCount || 0), 0) / 
-                          (campaigns.reduce((sum: number, c: any) => sum + (c.sentCount || 0) + (c.failedCount || 0), 0) || 1)) * 100)
-                      : 0
-                    }%
+                    {campaigns.length > 0
+                      ? Math.round(
+                          (campaigns.reduce(
+                            (sum: number, c: any) => sum + (c.sentCount || 0),
+                            0,
+                          ) /
+                            (campaigns.reduce(
+                              (sum: number, c: any) =>
+                                sum + (c.sentCount || 0) + (c.failedCount || 0),
+                              0,
+                            ) || 1)) *
+                            100,
+                        )
+                      : 0}
+                    %
                   </dd>
                 </dl>
               </div>
@@ -232,21 +255,36 @@ async function HistoryContent() {
 function HistoryRow({ campaign }: { campaign: any }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'sent':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">送信完了</span>;
-      case 'failed':
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">送信失敗</span>;
+      case "sent":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
+            送信完了
+          </span>
+        );
+      case "failed":
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
+            送信失敗
+          </span>
+        );
       default:
-        return <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">{status}</span>;
+        return (
+          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+            {status}
+          </span>
+        );
     }
   };
 
   const getTypeIcon = (type: string) => {
-    return type === 'broadcast' ? '📢' : '🎯';
+    return type === "broadcast" ? "📢" : "🎯";
   };
 
   const totalSent = (campaign.sentCount || 0) + (campaign.failedCount || 0);
-  const successRate = totalSent > 0 ? Math.round(((campaign.sentCount || 0) / totalSent) * 100) : 0;
+  const successRate =
+    totalSent > 0
+      ? Math.round(((campaign.sentCount || 0) / totalSent) * 100)
+      : 0;
 
   return (
     <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
@@ -265,15 +303,14 @@ function HistoryRow({ campaign }: { campaign: any }) {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900 dark:text-white">
-          {campaign.sentAt 
-            ? new Date(campaign.sentAt).toLocaleString('ja-JP')
-            : '-'
-          }
+          {campaign.sentAt
+            ? new Date(campaign.sentAt).toLocaleString("ja-JP")
+            : "-"}
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900 dark:text-white">
-          {campaign.type === 'broadcast' ? '一斉配信' : 'セグメント配信'}
+          {campaign.type === "broadcast" ? "一斉配信" : "セグメント配信"}
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
@@ -293,16 +330,27 @@ function HistoryRow({ campaign }: { campaign: any }) {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900 dark:text-white">
-          <span className={`font-medium ${successRate >= 95 ? 'text-green-600 dark:text-green-400' : 
-                          successRate >= 90 ? 'text-yellow-600 dark:text-yellow-400' : 
-                          'text-red-600 dark:text-red-400'}`}>
+          <span
+            className={`font-medium ${
+              successRate >= 95
+                ? "text-green-600 dark:text-green-400"
+                : successRate >= 90
+                  ? "text-yellow-600 dark:text-yellow-400"
+                  : "text-red-600 dark:text-red-400"
+            }`}
+          >
             {successRate}%
           </span>
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5 mt-1">
-          <div 
-            className={`h-1.5 rounded-full ${successRate >= 95 ? 'bg-green-500' : 
-                        successRate >= 90 ? 'bg-yellow-500' : 'bg-red-500'}`}
+          <div
+            className={`h-1.5 rounded-full ${
+              successRate >= 95
+                ? "bg-green-500"
+                : successRate >= 90
+                  ? "bg-yellow-500"
+                  : "bg-red-500"
+            }`}
             style={{ width: `${successRate}%` }}
           ></div>
         </div>
@@ -328,7 +376,10 @@ function HistoryListSkeleton() {
       {/* 統計サマリーのスケルトン */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div
+            key={i}
+            className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg"
+          >
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">

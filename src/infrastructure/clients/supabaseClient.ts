@@ -1,20 +1,22 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL'];
-const supabaseAnonKey = process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'];
+const supabaseUrl = process.env["NEXT_PUBLIC_SUPABASE_URL"];
+const supabaseAnonKey = process.env["NEXT_PUBLIC_SUPABASE_ANON_KEY"];
 
 if (!supabaseUrl) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_URL environment variable is required');
+  throw new Error("NEXT_PUBLIC_SUPABASE_URL environment variable is required");
 }
 
 if (!supabaseAnonKey) {
-  throw new Error('NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable is required');
+  throw new Error(
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY environment variable is required",
+  );
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Server-side client with service role key
-const supabaseServiceRoleKey = process.env['SUPABASE_SERVICE_ROLE_KEY'];
+const supabaseServiceRoleKey = process.env["SUPABASE_SERVICE_ROLE_KEY"];
 
 export const supabaseAdmin = supabaseServiceRoleKey
   ? createClient(supabaseUrl, supabaseServiceRoleKey, {
@@ -35,7 +37,7 @@ export type Database = {
           line_user_id: string;
           display_name: string;
           avatar_url: string | null;
-          role: 'admin' | 'member' | 'viewer';
+          role: "admin" | "member" | "viewer";
           created_at: string;
           updated_at: string;
         };
@@ -44,7 +46,7 @@ export type Database = {
           line_user_id: string;
           display_name: string;
           avatar_url?: string | null;
-          role?: 'admin' | 'member' | 'viewer';
+          role?: "admin" | "member" | "viewer";
           created_at?: string;
           updated_at?: string;
         };
@@ -53,7 +55,7 @@ export type Database = {
           line_user_id?: string;
           display_name?: string;
           avatar_url?: string | null;
-          role?: 'admin' | 'member' | 'viewer';
+          role?: "admin" | "member" | "viewer";
           created_at?: string;
           updated_at?: string;
         };
@@ -99,7 +101,7 @@ export type Database = {
           account_id: string;
           line_rich_menu_id: string | null;
           name: string;
-          size: 'full' | 'half';
+          size: "full" | "half";
           chat_bar_text: string | null;
           areas: unknown;
           image_url: string | null;
@@ -113,7 +115,7 @@ export type Database = {
           account_id: string;
           line_rich_menu_id?: string | null;
           name: string;
-          size?: 'full' | 'half';
+          size?: "full" | "half";
           chat_bar_text?: string | null;
           areas?: unknown;
           image_url?: string | null;
@@ -127,7 +129,7 @@ export type Database = {
           account_id?: string;
           line_rich_menu_id?: string | null;
           name?: string;
-          size?: 'full' | 'half';
+          size?: "full" | "half";
           chat_bar_text?: string | null;
           areas?: unknown;
           image_url?: string | null;

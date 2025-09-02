@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { CreateCampaignForm } from '@/ui/components/campaign/CreateCampaignForm';
+import { Suspense } from "react";
+import Link from "next/link";
+import { CreateCampaignForm } from "@/ui/components/campaign/CreateCampaignForm";
 
 export default function NewCampaignPage() {
   return (

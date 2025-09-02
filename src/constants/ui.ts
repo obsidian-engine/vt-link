@@ -24,10 +24,10 @@ export const LAYOUT_SETTINGS = {
 
 // カラーテーマ設定
 export const THEME_COLORS = {
-  PRIMARY: '#3b82f6',
-  SECONDARY: '#6b7280',
-  SUCCESS: '#10b981',
-  WARNING: '#f59e0b',
-  ERROR: '#ef4444',
-  INFO: '#06b6d4',
+  PRIMARY: "#3b82f6",
+  SECONDARY: "#6b7280",
+  SUCCESS: "#10b981",
+  WARNING: "#f59e0b",
+  ERROR: "#ef4444",
+  INFO: "#06b6d4",
 } as const;

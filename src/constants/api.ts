@@ -12,7 +12,7 @@ export const HTTP_STATUS = {
 
 // Supabaseエラーコード
 export const SUPABASE_ERROR_CODE = {
-  NOT_FOUND: 'PGRST116',
+  NOT_FOUND: "PGRST116",
 } as const;
 
 // APIレスポンス制限

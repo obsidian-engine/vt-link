@@ -1,7 +1,7 @@
-import { IncomingMessage } from './IncomingMessage';
-import { MessageSpecification } from '../specifications';
-import { ReplyCommand, MessageContext } from '../commands';
-import { RateLimitPolicy } from '../policies';
+import { IncomingMessage } from "./IncomingMessage";
+import type { MessageSpecification } from "../specifications";
+import type { ReplyCommand, MessageContext } from "../commands";
+import type { RateLimitPolicy } from "../policies";
 
 /**
  * スリム化されたAutoReplyRule（V2）
@@ -31,7 +31,7 @@ export class AutoReplyRuleV2 {
     rateLimit: RateLimitPolicy | null,
     enabled: boolean,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
   ) {
     this.#id = id;
     this.#accountId = accountId;
@@ -57,22 +57,24 @@ export class AutoReplyRuleV2 {
     trigger: MessageSpecification,
     response: ReplyCommand,
     rateLimit: RateLimitPolicy | null = null,
-    enabled: boolean = true
+    enabled: boolean = true,
   ): AutoReplyRuleV2 {
     if (!id) {
-      throw new Error('Rule ID is required');
+      throw new Error("Rule ID is required");
     }
     if (!accountId) {
-      throw new Error('Account ID is required');
+      throw new Error("Account ID is required");
     }
     if (!name || name.trim().length === 0) {
-      throw new Error('Rule name is required');
+      throw new Error("Rule name is required");
     }
     if (name.length > this.MAX_NAME_LENGTH) {
-      throw new Error(`Rule name cannot exceed ${this.MAX_NAME_LENGTH} characters`);
+      throw new Error(
+        `Rule name cannot exceed ${this.MAX_NAME_LENGTH} characters`,
+      );
     }
     if (priority < 0) {
-      throw new Error('Priority must be non-negative');
+      throw new Error("Priority must be non-negative");
     }
 
     const now = new Date();
@@ -86,7 +88,7 @@ export class AutoReplyRuleV2 {
       rateLimit,
       enabled,
       now,
-      now
+      now,
     );
   }
 
@@ -103,7 +105,7 @@ export class AutoReplyRuleV2 {
     rateLimit: RateLimitPolicy | null,
     enabled: boolean,
     createdAt: Date,
-    updatedAt: Date
+    updatedAt: Date,
   ): AutoReplyRuleV2 {
     return new AutoReplyRuleV2(
       id,
@@ -115,7 +117,7 @@ export class AutoReplyRuleV2 {
       rateLimit,
       enabled,
       createdAt,
-      updatedAt
+      updatedAt,
     );
   }
 
@@ -137,9 +139,9 @@ export class AutoReplyRuleV2 {
       const canExecute = await this.#rateLimit.canExecute(
         this.#id,
         message.userId,
-        message.groupId || undefined
+        message.groupId || undefined,
       );
-      
+
       if (!canExecute) {
         return false;
       }
@@ -151,7 +153,7 @@ export class AutoReplyRuleV2 {
       replyToken: message.replyToken,
       userId: message.userId,
       groupId: message.groupId || undefined,
-      roomId: message.roomId || undefined
+      roomId: message.roomId || undefined,
     };
 
     await this.#response.execute(context);
@@ -161,7 +163,7 @@ export class AutoReplyRuleV2 {
       await this.#rateLimit.recordExecution(
         this.#id,
         message.userId,
-        message.groupId || undefined
+        message.groupId || undefined,
       );
     }
 
@@ -173,10 +175,12 @@ export class AutoReplyRuleV2 {
    */
   updateName(name: string): AutoReplyRuleV2 {
     if (!name || name.trim().length === 0) {
-      throw new Error('Rule name is required');
+      throw new Error("Rule name is required");
     }
     if (name.length > AutoReplyRuleV2.MAX_NAME_LENGTH) {
-      throw new Error(`Rule name cannot exceed ${AutoReplyRuleV2.MAX_NAME_LENGTH} characters`);
+      throw new Error(
+        `Rule name cannot exceed ${AutoReplyRuleV2.MAX_NAME_LENGTH} characters`,
+      );
     }
 
     return AutoReplyRuleV2.reconstruct(
@@ -189,7 +193,7 @@ export class AutoReplyRuleV2 {
       this.#rateLimit,
       this.#enabled,
       this.#createdAt,
-      new Date()
+      new Date(),
     );
   }
 
@@ -198,7 +202,7 @@ export class AutoReplyRuleV2 {
    */
   updatePriority(priority: number): AutoReplyRuleV2 {
     if (priority < 0) {
-      throw new Error('Priority must be non-negative');
+      throw new Error("Priority must be non-negative");
     }
 
     return AutoReplyRuleV2.reconstruct(
@@ -211,7 +215,7 @@ export class AutoReplyRuleV2 {
       this.#rateLimit,
       this.#enabled,
       this.#createdAt,
-      new Date()
+      new Date(),
     );
   }
 
@@ -233,7 +237,7 @@ export class AutoReplyRuleV2 {
       this.#rateLimit,
       true,
       this.#createdAt,
-      new Date()
+      new Date(),
     );
   }
 
@@ -255,7 +259,7 @@ export class AutoReplyRuleV2 {
       this.#rateLimit,
       false,
       this.#createdAt,
-      new Date()
+      new Date(),
     );
   }
 

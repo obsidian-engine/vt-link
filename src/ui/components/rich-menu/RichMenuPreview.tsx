@@ -1,15 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { RichMenuArea, RichMenuSize, RICH_MENU_SIZES } from './types';
+import { useEffect, useRef, useState } from "react";
+import { RichMenuArea, RichMenuSize, RICH_MENU_SIZES } from "./types";
 
 interface RichMenuPreviewProps {
-  size: 'full' | 'half';
+  size: "full" | "half";
   areas: RichMenuArea[];
   className?: string;
 }
 
-export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreviewProps) {
+export function RichMenuPreview({
+  size,
+  areas,
+  className = "",
+}: RichMenuPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -25,10 +29,10 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
     if (!canvasRef.current) return;
 
     setIsGenerating(true);
-    
+
     try {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
       // キャンバスサイズを設定
@@ -36,7 +40,7 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
       canvas.height = menuSize.height;
 
       // 背景を描画
-      ctx.fillStyle = '#f8fafc';
+      ctx.fillStyle = "#f8fafc";
       ctx.fillRect(0, 0, menuSize.width, menuSize.height);
 
       // グリッドを描画
@@ -49,7 +53,7 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
 
       // プレビュー画像を生成
       const blob = await new Promise<Blob | null>((resolve) => {
-        canvas.toBlob(resolve, 'image/png', 0.8);
+        canvas.toBlob(resolve, "image/png", 0.8);
       });
 
       if (blob) {
@@ -60,14 +64,14 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
         setPreviewUrl(url);
       }
     } catch (error) {
-      console.error('プレビュー生成エラー:', error);
+      console.error("プレビュー生成エラー:", error);
     } finally {
       setIsGenerating(false);
     }
   };
 
   const drawGrid = (ctx: CanvasRenderingContext2D, size: RichMenuSize) => {
-    ctx.strokeStyle = '#e2e8f0';
+    ctx.strokeStyle = "#e2e8f0";
     ctx.lineWidth = 1;
     ctx.globalAlpha = 0.3;
 
@@ -92,17 +96,21 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
     ctx.globalAlpha = 1;
   };
 
-  const drawArea = (ctx: CanvasRenderingContext2D, area: RichMenuArea, index: number) => {
+  const drawArea = (
+    ctx: CanvasRenderingContext2D,
+    area: RichMenuArea,
+    index: number,
+  ) => {
     const { x, y, width, height, action } = area;
 
     // エリアの背景色を決定
     const colors = [
-      '#3b82f6', // blue
-      '#10b981', // emerald
-      '#f59e0b', // amber
-      '#ef4444', // red
-      '#8b5cf6', // violet
-      '#06b6d4', // cyan
+      "#3b82f6", // blue
+      "#10b981", // emerald
+      "#f59e0b", // amber
+      "#ef4444", // red
+      "#8b5cf6", // violet
+      "#06b6d4", // cyan
     ];
     const color = colors[index % colors.length];
 
@@ -121,52 +129,68 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
     drawActionContent(ctx, area, color);
   };
 
-  const drawActionContent = (ctx: CanvasRenderingContext2D, area: RichMenuArea, color: string) => {
+  const drawActionContent = (
+    ctx: CanvasRenderingContext2D,
+    area: RichMenuArea,
+    color: string,
+  ) => {
     const { x, y, width, height, action } = area;
     const centerX = x + width / 2;
     const centerY = y + height / 2;
 
     // アイコンを描画
     const icon = getActionIcon(action.type);
-    ctx.font = 'bold 80px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'white';
+    ctx.font = "bold 80px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "white";
     ctx.fillText(icon, centerX, centerY - 40);
 
     // テキストを描画
     const text = getActionText(action);
     if (text) {
-      ctx.font = 'bold 32px Arial';
-      ctx.fillStyle = 'white';
+      ctx.font = "bold 32px Arial";
+      ctx.fillStyle = "white";
       ctx.fillText(text, centerX, centerY + 40);
     }
 
     // アクションタイプを描画
-    ctx.font = 'bold 24px Arial';
-    ctx.fillStyle = 'white';
+    ctx.font = "bold 24px Arial";
+    ctx.fillStyle = "white";
     ctx.fillText(action.type.toUpperCase(), centerX, centerY + 80);
   };
 
   const getActionIcon = (type: string): string => {
     switch (type) {
-      case 'postback': return '📋';
-      case 'message': return '💬';
-      case 'uri': return '🔗';
-      default: return '❓';
+      case "postback":
+        return "📋";
+      case "message":
+        return "💬";
+      case "uri":
+        return "🔗";
+      default:
+        return "❓";
     }
   };
 
-  const getActionText = (action: RichMenuArea['action']): string => {
+  const getActionText = (action: RichMenuArea["action"]): string => {
     switch (action.type) {
-      case 'message':
-        return action.text?.substring(0, 10) + (action.text && action.text.length > 10 ? '...' : '') || '';
-      case 'uri':
-        return action.uri ? new URL(action.uri).hostname : '';
-      case 'postback':
-        return action.displayText?.substring(0, 10) + (action.displayText && action.displayText.length > 10 ? '...' : '') || '';
+      case "message":
+        return (
+          action.text?.substring(0, 10) +
+            (action.text && action.text.length > 10 ? "..." : "") || ""
+        );
+      case "uri":
+        return action.uri ? new URL(action.uri).hostname : "";
+      case "postback":
+        return (
+          action.displayText?.substring(0, 10) +
+            (action.displayText && action.displayText.length > 10
+              ? "..."
+              : "") || ""
+        );
       default:
-        return '';
+        return "";
     }
   };
 
@@ -180,7 +204,9 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
   }, [previewUrl]);
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg border p-4 ${className}`}>
+    <div
+      className={`bg-white dark:bg-gray-800 rounded-lg border p-4 ${className}`}
+    >
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-medium text-gray-900 dark:text-white">
           プレビュー
@@ -193,11 +219,8 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
       </div>
 
       <div className="flex flex-col items-center">
-        <canvas
-          ref={canvasRef}
-          className="hidden"
-        />
-        
+        <canvas ref={canvasRef} className="hidden" />
+
         {previewUrl ? (
           <img
             src={previewUrl}
@@ -209,7 +232,7 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
             }}
           />
         ) : (
-          <div 
+          <div
             className="flex items-center justify-center border border-gray-300 dark:border-gray-600 rounded bg-gray-50 dark:bg-gray-700"
             style={{
               width: `${menuSize.width * previewScale}px`,
@@ -225,8 +248,8 @@ export function RichMenuPreview({ size, areas, className = '' }: RichMenuPreview
 
         <div className="mt-4 text-center">
           <div className="text-sm text-gray-600 dark:text-gray-400">
-            {size === 'full' ? 'フルサイズ' : 'ハーフサイズ'} 
-            ({menuSize.width}×{menuSize.height}px)
+            {size === "full" ? "フルサイズ" : "ハーフサイズ"}({menuSize.width}×
+            {menuSize.height}px)
           </div>
           <div className="text-xs text-gray-500 dark:text-gray-500 mt-1">
             エリア数: {areas.length}

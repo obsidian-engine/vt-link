@@ -1,4 +1,4 @@
-import { DeliveryLog, DeliveryStatus } from '../entities/DeliveryLog';
+import { DeliveryLog, DeliveryStatus } from "../entities/DeliveryLog";
 
 export interface DeliveryLogRepository {
   /**
@@ -39,12 +39,20 @@ export interface DeliveryLogRepository {
   /**
    * 指定期間内のログを検索します
    */
-  findByDateRange(startDate: Date, endDate: Date, limit?: number): Promise<DeliveryLog[]>;
+  findByDateRange(
+    startDate: Date,
+    endDate: Date,
+    limit?: number,
+  ): Promise<DeliveryLog[]>;
 
   /**
    * キャンペーンと期間でログを検索します
    */
-  findByCampaignIdAndDateRange(campaignId: string, startDate: Date, endDate: Date): Promise<DeliveryLog[]>;
+  findByCampaignIdAndDateRange(
+    campaignId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<DeliveryLog[]>;
 
   /**
    * エラーコードでログを検索します
@@ -54,7 +62,10 @@ export interface DeliveryLogRepository {
   /**
    * 応答時間が閾値を超えるログを検索します
    */
-  findSlowDeliveries(thresholdMs: number, limit?: number): Promise<DeliveryLog[]>;
+  findSlowDeliveries(
+    thresholdMs: number,
+    limit?: number,
+  ): Promise<DeliveryLog[]>;
 
   /**
    * ログを削除します（通常は古いログの削除用）
@@ -87,7 +98,10 @@ export interface DeliveryLogRepository {
   /**
    * 指定期間の配信ログ統計を取得します
    */
-  getDateRangeLogStats(startDate: Date, endDate: Date): Promise<{
+  getDateRangeLogStats(
+    startDate: Date,
+    endDate: Date,
+  ): Promise<{
     totalLogs: number;
     successCount: number;
     failureCount: number;
@@ -104,11 +118,16 @@ export interface DeliveryLogRepository {
   /**
    * 最も頻繁に発生しているエラーコードを取得します
    */
-  getTopErrorCodes(limit?: number, dateRange?: { startDate: Date; endDate: Date }): Promise<Array<{
-    errorCode: string;
-    count: number;
-    percentage: number;
-  }>>;
+  getTopErrorCodes(
+    limit?: number,
+    dateRange?: { startDate: Date; endDate: Date },
+  ): Promise<
+    Array<{
+      errorCode: string;
+      count: number;
+      percentage: number;
+    }>
+  >;
 
   /**
    * 配信パフォーマンス統計を取得します

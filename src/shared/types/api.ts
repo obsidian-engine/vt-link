@@ -2,7 +2,7 @@
  * API関連の型定義
  * フロントエンド・バックエンド間で共有される型
  */
-import type { z } from 'zod';
+import type { z } from "zod";
 import type {
   UserID,
   AccountID,
@@ -18,8 +18,8 @@ import type {
   DeliveryLogID,
   EmailAddress,
   PhoneNumber,
-  URL
-} from '@/domain/valueObjects/BaseTypes';
+  URL,
+} from "@/domain/valueObjects/BaseTypes";
 
 // ============================================================================
 // 基本的なAPI応答型
@@ -57,7 +57,7 @@ export interface UserDto {
   readonly lineUserId: LineUserID;
   readonly displayName: string;
   readonly avatarUrl?: URL;
-  readonly role: 'admin' | 'member' | 'viewer';
+  readonly role: "admin" | "member" | "viewer";
   readonly createdAt: string;
   readonly updatedAt: string;
 }
@@ -66,13 +66,13 @@ export interface CreateUserRequest {
   readonly lineUserId: string;
   readonly displayName: string;
   readonly avatarUrl?: string;
-  readonly role?: 'admin' | 'member' | 'viewer';
+  readonly role?: "admin" | "member" | "viewer";
 }
 
 export interface UpdateUserRequest {
   readonly displayName?: string;
   readonly avatarUrl?: string;
-  readonly role?: 'admin' | 'member' | 'viewer';
+  readonly role?: "admin" | "member" | "viewer";
 }
 
 // ============================================================================
@@ -128,7 +128,7 @@ export interface RichMenuDto {
   readonly accountId: AccountID;
   readonly lineRichMenuId?: LineRichMenuID;
   readonly name: string;
-  readonly size: 'full' | 'half';
+  readonly size: "full" | "half";
   readonly chatBarText?: string;
   readonly areas: ReadonlyArray<RichMenuAreaDto>;
   readonly imageUrl?: URL;
@@ -142,14 +142,14 @@ export interface RichMenuDto {
 export interface CreateRichMenuRequest {
   readonly accountId: string;
   readonly name: string;
-  readonly size?: 'full' | 'half';
+  readonly size?: "full" | "half";
   readonly chatBarText?: string;
   readonly areas: ReadonlyArray<RichMenuAreaDto>;
 }
 
 export interface UpdateRichMenuRequest {
   readonly name?: string;
-  readonly size?: 'full' | 'half';
+  readonly size?: "full" | "half";
   readonly chatBarText?: string;
   readonly areas?: ReadonlyArray<RichMenuAreaDto>;
 }
@@ -158,7 +158,7 @@ export interface UpdateRichMenuRequest {
 // メッセージ関連DTO
 // ============================================================================
 export interface MessageContentDto {
-  readonly type: 'text' | 'image' | 'sticker';
+  readonly type: "text" | "image" | "sticker";
   readonly payload: {
     readonly text?: string;
     readonly originalContentUrl?: string;
@@ -202,7 +202,7 @@ export interface UpdateMessageTemplateRequest {
 // セグメント関連DTO
 // ============================================================================
 export interface SegmentCriteriaDto {
-  readonly genders?: ReadonlyArray<'male' | 'female' | 'other' | 'unknown'>;
+  readonly genders?: ReadonlyArray<"male" | "female" | "other" | "unknown">;
   readonly ageRange?: {
     readonly min: number;
     readonly max: number;
@@ -242,8 +242,14 @@ export interface CampaignDto {
   readonly id: CampaignID;
   readonly accountId: AccountID;
   readonly name: string;
-  readonly type: 'broadcast' | 'narrowcast';
-  readonly status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed' | 'cancelled';
+  readonly type: "broadcast" | "narrowcast";
+  readonly status:
+    | "draft"
+    | "scheduled"
+    | "sending"
+    | "sent"
+    | "failed"
+    | "cancelled";
   readonly content: ReadonlyArray<MessageContentDto>;
   readonly templateId?: TemplateID;
   readonly segmentId?: SegmentID;
@@ -258,7 +264,7 @@ export interface CampaignDto {
 export interface CreateCampaignRequest {
   readonly accountId: string;
   readonly name: string;
-  readonly type: 'broadcast' | 'narrowcast';
+  readonly type: "broadcast" | "narrowcast";
   readonly content?: ReadonlyArray<MessageContentDto>;
   readonly templateId?: string;
   readonly segmentId?: string;
@@ -283,14 +289,14 @@ export interface SendCampaignRequest {
 // 自動返信関連DTO
 // ============================================================================
 export interface AutoReplyConditionDto {
-  readonly type: 'text' | 'sticker' | 'image';
-  readonly match: 'exact' | 'contains' | 'startsWith' | 'endsWith' | 'regex';
+  readonly type: "text" | "sticker" | "image";
+  readonly match: "exact" | "contains" | "startsWith" | "endsWith" | "regex";
   readonly value: string;
   readonly caseSensitive: boolean;
 }
 
 export interface AutoReplyResponseDto {
-  readonly type: 'text' | 'sticker' | 'image';
+  readonly type: "text" | "sticker" | "image";
   readonly content: MessageContentDto;
   readonly delay?: number;
 }
@@ -360,7 +366,7 @@ export interface DeliveryLogDto {
   readonly batchId: BatchID;
   readonly campaignId: CampaignID;
   readonly userId: LineUserID;
-  readonly status: 'pending' | 'sent' | 'failed';
+  readonly status: "pending" | "sent" | "failed";
   readonly errorMessage?: string;
   readonly sentAt?: string;
   readonly deliveredAt?: string;
@@ -372,7 +378,7 @@ export interface DeliveryBatchDto {
   readonly campaignId: CampaignID;
   readonly accountId: AccountID;
   readonly targetUserIds: ReadonlyArray<LineUserID>;
-  readonly status: 'pending' | 'processing' | 'completed' | 'failed';
+  readonly status: "pending" | "processing" | "completed" | "failed";
   readonly totalCount: number;
   readonly sentCount: number;
   readonly failedCount: number;
@@ -415,7 +421,7 @@ export interface WebhookEventDto {
   readonly type: string;
   readonly timestamp: number;
   readonly source: {
-    readonly type: 'user' | 'group' | 'room';
+    readonly type: "user" | "group" | "room";
     readonly userId?: LineUserID;
     readonly groupId?: string;
     readonly roomId?: string;
@@ -450,30 +456,34 @@ export interface ServerActionResult<T = unknown> {
 // ============================================================================
 export const isApiResponse = <T>(value: unknown): value is ApiResponse<T> => {
   return (
-    typeof value === 'object' &&
+    typeof value === "object" &&
     value !== null &&
-    'success' in value &&
-    typeof (value as any).success === 'boolean'
+    "success" in value &&
+    typeof (value as any).success === "boolean"
   );
 };
 
-export const isPaginatedResponse = <T>(value: unknown): value is PaginatedResponse<T> => {
+export const isPaginatedResponse = <T>(
+  value: unknown,
+): value is PaginatedResponse<T> => {
   return (
-    typeof value === 'object' &&
+    typeof value === "object" &&
     value !== null &&
-    'items' in value &&
+    "items" in value &&
     Array.isArray((value as any).items) &&
-    'total' in value &&
-    typeof (value as any).total === 'number'
+    "total" in value &&
+    typeof (value as any).total === "number"
   );
 };
 
-export const isServerActionResult = <T>(value: unknown): value is ServerActionResult<T> => {
+export const isServerActionResult = <T>(
+  value: unknown,
+): value is ServerActionResult<T> => {
   return (
-    typeof value === 'object' &&
+    typeof value === "object" &&
     value !== null &&
-    'success' in value &&
-    typeof (value as any).success === 'boolean'
+    "success" in value &&
+    typeof (value as any).success === "boolean"
   );
 };
 
@@ -483,7 +493,7 @@ export const isServerActionResult = <T>(value: unknown): value is ServerActionRe
 export const createApiResponse = <T>(
   success: boolean,
   data?: T,
-  error?: string
+  error?: string,
 ): ApiResponse<T> => ({
   success,
   data,
@@ -495,13 +505,13 @@ export const createPaginatedResponse = <T>(
   items: ReadonlyArray<T>,
   total: number,
   page: number,
-  pageSize: number
+  pageSize: number,
 ): PaginatedResponse<T> => ({
   items,
   total,
   page,
   pageSize,
-  hasNext: (page * pageSize) < total,
+  hasNext: page * pageSize < total,
   hasPrev: page > 1,
 });
 
@@ -512,7 +522,7 @@ export const createServerActionResult = <T>(
   validationErrors?: ReadonlyArray<{
     path: ReadonlyArray<string | number>;
     message: string;
-  }>
+  }>,
 ): ServerActionResult<T> => ({
   success,
   data,

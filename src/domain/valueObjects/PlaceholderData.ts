@@ -8,22 +8,26 @@ export class PlaceholderData {
 
   static create(data: Record<string, string>): PlaceholderData {
     const dataMap = new Map<string, string>();
-    
+
     for (const [key, value] of Object.entries(data)) {
       if (!key || key.trim().length === 0) {
-        throw new Error('Placeholder key cannot be empty');
+        throw new Error("Placeholder key cannot be empty");
       }
       if (value === null || value === undefined) {
-        throw new Error(`Placeholder value for key '${key}' cannot be null or undefined`);
+        throw new Error(
+          `Placeholder value for key '${key}' cannot be null or undefined`,
+        );
       }
-      
+
       const trimmedKey = key.trim();
       const trimmedValue = String(value).trim();
-      
+
       if (!this.isValidPlaceholderKey(trimmedKey)) {
-        throw new Error(`Invalid placeholder key '${trimmedKey}'. Must contain only letters, numbers, and underscores.`);
+        throw new Error(
+          `Invalid placeholder key '${trimmedKey}'. Must contain only letters, numbers, and underscores.`,
+        );
       }
-      
+
       dataMap.set(trimmedKey, trimmedValue);
     }
 
@@ -69,25 +73,27 @@ export class PlaceholderData {
 
   set(key: string, value: string): PlaceholderData {
     if (!key || key.trim().length === 0) {
-      throw new Error('Placeholder key cannot be empty');
+      throw new Error("Placeholder key cannot be empty");
     }
     if (!PlaceholderData.isValidPlaceholderKey(key.trim())) {
-      throw new Error(`Invalid placeholder key '${key.trim()}'. Must contain only letters, numbers, and underscores.`);
+      throw new Error(
+        `Invalid placeholder key '${key.trim()}'. Must contain only letters, numbers, and underscores.`,
+      );
     }
 
     const newData = new Map(this.#data);
     newData.set(key.trim(), String(value).trim());
-    
+
     return new PlaceholderData(newData);
   }
 
   merge(other: PlaceholderData): PlaceholderData {
     const newData = new Map(this.#data);
-    
+
     for (const [key, value] of other.#data) {
       newData.set(key, value);
     }
-    
+
     return new PlaceholderData(newData);
   }
 
@@ -108,8 +114,8 @@ export class PlaceholderData {
   toString(): string {
     const entries = Array.from(this.#data.entries())
       .map(([key, value]) => `${key}=${value}`)
-      .join(', ');
-    
+      .join(", ");
+
     return `{${entries}}`;
   }
 
@@ -127,12 +133,15 @@ export class PlaceholderData {
    */
   applyToTemplate(template: string): string {
     let result = template;
-    
+
     for (const [key, value] of this.#data) {
       const placeholder = `{{${key}}}`;
-      result = result.replace(new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g'), value);
+      result = result.replace(
+        new RegExp(placeholder.replace(/[{}]/g, "\\$&"), "g"),
+        value,
+      );
     }
-    
+
     return result;
   }
 
@@ -143,14 +152,14 @@ export class PlaceholderData {
     const placeholderRegex = /\{\{(\w+)\}\}/g;
     const keys: string[] = [];
     let match;
-    
+
     while ((match = placeholderRegex.exec(template)) !== null) {
       const key = match[1];
       if (!keys.includes(key)) {
         keys.push(key);
       }
     }
-    
+
     return keys;
   }
 
@@ -159,6 +168,6 @@ export class PlaceholderData {
    */
   getMissingKeysForTemplate(template: string): string[] {
     const requiredKeys = PlaceholderData.extractPlaceholderKeys(template);
-    return requiredKeys.filter(key => !this.has(key));
+    return requiredKeys.filter((key) => !this.has(key));
   }
 }

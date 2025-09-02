@@ -1,4 +1,4 @@
-import { AutoReplyRuleRepository } from '@/domain/repositories/AutoReplyRuleRepository';
+import type { AutoReplyRuleRepository } from "@/domain/repositories/AutoReplyRuleRepository";
 
 export interface GetAutoReplyRulesInput {
   readonly accountId: string;
@@ -25,15 +25,19 @@ export interface GetAutoReplyRulesOutput {
 
 export class GetAutoReplyRulesUsecase {
   constructor(
-    private readonly autoReplyRuleRepository: AutoReplyRuleRepository
+    private readonly autoReplyRuleRepository: AutoReplyRuleRepository,
   ) {}
 
-  async execute(input: GetAutoReplyRulesInput): Promise<GetAutoReplyRulesOutput> {
+  async execute(
+    input: GetAutoReplyRulesInput,
+  ): Promise<GetAutoReplyRulesOutput> {
     const rules = input.includeDisabled
       ? await this.autoReplyRuleRepository.findAllByAccountId(input.accountId)
-      : await this.autoReplyRuleRepository.findActiveByAccountId(input.accountId);
+      : await this.autoReplyRuleRepository.findActiveByAccountId(
+          input.accountId,
+        );
 
-    const ruleDtos: AutoReplyRuleDto[] = rules.map(rule => ({
+    const ruleDtos: AutoReplyRuleDto[] = rules.map((rule) => ({
       id: rule.id,
       name: rule.name,
       priority: rule.priority,

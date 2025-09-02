@@ -1,6 +1,6 @@
-import { Suspense } from 'react';
-import Link from 'next/link';
-import { getAutoReplyRules } from '@/ui/actions/autoReplyActions';
+import { Suspense } from "react";
+import Link from "next/link";
+import { getAutoReplyRules } from "@/ui/actions/autoReplyActions";
 
 export default async function AutoReplyPage() {
   return (
@@ -9,7 +9,7 @@ export default async function AutoReplyPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-4">
-              <Link 
+              <Link
                 href="/dashboard"
                 className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
               >
@@ -68,15 +68,17 @@ export default async function AutoReplyPage() {
 
 async function AutoReplyRulesList() {
   // TODO: Get account ID from session/context
-  const accountId = 'default-account';
-  
+  const accountId = "default-account";
+
   try {
     const result = await getAutoReplyRules(accountId);
-    
+
     if (!result.success) {
       return (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <p className="text-red-800">ルールの読み込みに失敗しました: {result.error}</p>
+          <p className="text-red-800">
+            ルールの読み込みに失敗しました: {result.error}
+          </p>
         </div>
       );
     }
@@ -114,12 +116,14 @@ function AutoReplyRuleCard({ rule }: { rule: any }) {
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
               {rule.name}
             </h3>
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              rule.enabled 
-                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-            }`}>
-              {rule.enabled ? '有効' : '無効'}
+            <span
+              className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                rule.enabled
+                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                  : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+              }`}
+            >
+              {rule.enabled ? "有効" : "無効"}
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400">
               優先度: {rule.priority}

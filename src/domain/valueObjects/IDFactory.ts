@@ -1,21 +1,21 @@
-import { z } from 'zod';
-import { 
-  UserID, 
-  AccountID, 
-  LineChannelID, 
-  LineUserID, 
-  CampaignID, 
-  TemplateID, 
-  SegmentID, 
-  RichMenuID, 
-  LineRichMenuID, 
-  AutoReplyRuleID, 
-  BatchID, 
+import { z } from "zod";
+import type {
+  UserID,
+  AccountID,
+  LineChannelID,
+  LineUserID,
+  CampaignID,
+  TemplateID,
+  SegmentID,
+  RichMenuID,
+  LineRichMenuID,
+  AutoReplyRuleID,
+  BatchID,
   DeliveryLogID,
   EmailAddress,
   PhoneNumber,
-  URL
-} from './BaseTypes';
+  URL,
+} from "./BaseTypes";
 
 /**
  * Zodスキーマ定義
@@ -189,5 +189,5 @@ export const TypeGuards = {
     } catch {
       return false;
     }
-  }
+  },
 };

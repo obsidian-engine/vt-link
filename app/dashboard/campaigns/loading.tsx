@@ -11,7 +11,7 @@ export default function Loading() {
         <p className="text-gray-600">
           データを取得しています。しばらくお待ちください。
         </p>
-        
+
         {/* スケルトンローダー */}
         <div className="mt-8 space-y-4">
           <div className="animate-pulse">

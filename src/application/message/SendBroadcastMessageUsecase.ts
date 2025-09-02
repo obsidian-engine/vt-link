@@ -1,8 +1,13 @@
-import { MessageCampaign, MessageContent } from '@/domain/entities/MessageCampaign';
-import { MessageCampaignRepository } from '@/domain/repositories/MessageCampaignRepository';
+import {
+  MessageCampaign,
+  MessageContent,
+} from "@/domain/entities/MessageCampaign";
+import { MessageCampaignRepository } from "@/domain/repositories/MessageCampaignRepository";
 
 export interface BroadcastPort {
-  sendBroadcast(content: ReadonlyArray<MessageContent>): Promise<{ sentCount: number }>;
+  sendBroadcast(
+    content: ReadonlyArray<MessageContent>,
+  ): Promise<{ sentCount: number }>;
 }
 
 export interface SendBroadcastMessageInput {
@@ -14,39 +19,41 @@ export interface SendBroadcastMessageInput {
 
 export interface SendBroadcastMessageOutput {
   readonly id: string;
-  readonly status: 'sent' | 'scheduled';
+  readonly status: "sent" | "scheduled";
   readonly sentCount?: number;
 }
 
 export class SendBroadcastMessageUsecase {
   constructor(
     private readonly messageCampaignRepository: MessageCampaignRepository,
-    private readonly broadcastPort: BroadcastPort
+    private readonly broadcastPort: BroadcastPort,
   ) {}
 
-  async execute(input: SendBroadcastMessageInput): Promise<SendBroadcastMessageOutput> {
+  async execute(
+    input: SendBroadcastMessageInput,
+  ): Promise<SendBroadcastMessageOutput> {
     const id = crypto.randomUUID();
-    
+
     let campaign = MessageCampaign.create(
       id,
       input.accountId,
       input.name,
-      'broadcast',
-      input.content
+      "broadcast",
+      input.content,
     );
 
     if (input.scheduledAt) {
       campaign = campaign.schedule(input.scheduledAt);
       await this.messageCampaignRepository.save(campaign);
-      
+
       return {
         id: campaign.id,
-        status: 'scheduled',
+        status: "scheduled",
       };
     }
 
     if (!campaign.canBeSent()) {
-      throw new Error('Campaign cannot be sent in current state');
+      throw new Error("Campaign cannot be sent in current state");
     }
 
     campaign = campaign.markAsSending();
@@ -54,20 +61,21 @@ export class SendBroadcastMessageUsecase {
 
     try {
       const result = await this.broadcastPort.sendBroadcast(campaign.content);
-      
+
       campaign = campaign.markAsSent(result.sentCount);
       await this.messageCampaignRepository.save(campaign);
 
       return {
         id: campaign.id,
-        status: 'sent',
+        status: "sent",
         sentCount: result.sentCount,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
       campaign = campaign.markAsFailed(errorMessage);
       await this.messageCampaignRepository.save(campaign);
-      
+
       throw error;
     }
   }

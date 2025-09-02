@@ -1,5 +1,6 @@
-import { Gender } from '@/domain/valueObjects/Gender';
-import { RegionCode } from '@/domain/valueObjects/Region';
+import { Gender } from "@/domain/valueObjects/Gender";
+import { RegionCode } from "@/domain/valueObjects/Region";
+import { Gender } from "@/domain/valueObjects/Gender";
 
 export class LineUser {
   constructor(
@@ -15,7 +16,7 @@ export class LineUser {
     public readonly region: RegionCode | null,
     public readonly isFriend: boolean,
     public readonly blockedAt: Date | undefined,
-    public readonly createdAt: Date
+    public readonly createdAt: Date,
   ) {}
 
   /**
@@ -34,7 +35,7 @@ export class LineUser {
     region: RegionCode | null,
     isFriend: boolean,
     blockedAt: Date | undefined,
-    createdAt: Date
+    createdAt: Date,
   ): LineUser {
     return new LineUser(
       id,
@@ -49,7 +50,7 @@ export class LineUser {
       region,
       isFriend,
       blockedAt,
-      createdAt
+      createdAt,
     );
   }
 
@@ -65,7 +66,7 @@ export class LineUser {
     language?: string | null,
     gender?: Gender | null,
     age?: number | null,
-    region?: Region | null
+    region?: RegionCode | null,
   ): LineUser {
     return new LineUser(
       crypto.randomUUID(),
@@ -80,7 +81,7 @@ export class LineUser {
       region ?? null,
       true, // 新規ユーザーは友達状態でスタート
       undefined, // ブロックされていない
-      new Date()
+      new Date(),
     );
   }
 
@@ -108,7 +109,7 @@ export class LineUser {
       this.region,
       isFriend,
       isFriend ? undefined : new Date(), // 友達解除時は現在時刻でブロック
-      this.createdAt
+      this.createdAt,
     );
   }
 
@@ -122,7 +123,7 @@ export class LineUser {
     language?: string | null,
     gender?: Gender | null,
     age?: number | null,
-    region?: Region | null
+    region?: RegionCode | null,
   ): LineUser {
     return new LineUser(
       this.id,
@@ -137,7 +138,7 @@ export class LineUser {
       region !== undefined ? region : this.region,
       this.isFriend,
       this.blockedAt,
-      this.createdAt
+      this.createdAt,
     );
   }
 
@@ -145,13 +146,13 @@ export class LineUser {
    * 年代を取得（統計用）
    */
   get ageGroup(): string {
-    if (!this.age) return 'unknown';
-    if (this.age < 20) return '10代';
-    if (this.age < 30) return '20代';
-    if (this.age < 40) return '30代';
-    if (this.age < 50) return '40代';
-    if (this.age < 60) return '50代';
-    return '60代以上';
+    if (!this.age) return "unknown";
+    if (this.age < 20) return "10代";
+    if (this.age < 30) return "20代";
+    if (this.age < 40) return "30代";
+    if (this.age < 50) return "40代";
+    if (this.age < 60) return "50代";
+    return "60代以上";
   }
 
   /**

@@ -1,6 +1,6 @@
 export enum DeliveryStatus {
-  Success = 'success',   // 配信成功
-  Failed = 'failed',     // 配信失敗
+  Success = "success", // 配信成功
+  Failed = "failed", // 配信失敗
 }
 
 export class DeliveryLog {
@@ -23,7 +23,7 @@ export class DeliveryLog {
     errorCode: string | null,
     errorMessage: string | null,
     deliveredAt: Date,
-    responseLatencyMs: number | null
+    responseLatencyMs: number | null,
   ) {
     this.#id = id;
     this.#batchId = batchId;
@@ -42,22 +42,22 @@ export class DeliveryLog {
     batchId: string,
     campaignId: string,
     lineUserId: string,
-    responseLatencyMs?: number
+    responseLatencyMs?: number,
   ): DeliveryLog {
     if (!id || id.trim().length === 0) {
-      throw new Error('Delivery log ID is required');
+      throw new Error("Delivery log ID is required");
     }
     if (!batchId || batchId.trim().length === 0) {
-      throw new Error('Batch ID is required');
+      throw new Error("Batch ID is required");
     }
     if (!campaignId || campaignId.trim().length === 0) {
-      throw new Error('Campaign ID is required');
+      throw new Error("Campaign ID is required");
     }
     if (!lineUserId || lineUserId.trim().length === 0) {
-      throw new Error('LINE user ID is required');
+      throw new Error("LINE user ID is required");
     }
     if (responseLatencyMs !== undefined && responseLatencyMs < 0) {
-      throw new Error('Response latency must be non-negative');
+      throw new Error("Response latency must be non-negative");
     }
 
     return new DeliveryLog(
@@ -69,7 +69,7 @@ export class DeliveryLog {
       null,
       null,
       new Date(),
-      responseLatencyMs || null
+      responseLatencyMs || null,
     );
   }
 
@@ -80,28 +80,28 @@ export class DeliveryLog {
     lineUserId: string,
     errorCode: string,
     errorMessage: string,
-    responseLatencyMs?: number
+    responseLatencyMs?: number,
   ): DeliveryLog {
     if (!id || id.trim().length === 0) {
-      throw new Error('Delivery log ID is required');
+      throw new Error("Delivery log ID is required");
     }
     if (!batchId || batchId.trim().length === 0) {
-      throw new Error('Batch ID is required');
+      throw new Error("Batch ID is required");
     }
     if (!campaignId || campaignId.trim().length === 0) {
-      throw new Error('Campaign ID is required');
+      throw new Error("Campaign ID is required");
     }
     if (!lineUserId || lineUserId.trim().length === 0) {
-      throw new Error('LINE user ID is required');
+      throw new Error("LINE user ID is required");
     }
     if (!errorCode || errorCode.trim().length === 0) {
-      throw new Error('Error code is required for failed delivery');
+      throw new Error("Error code is required for failed delivery");
     }
     if (!errorMessage || errorMessage.trim().length === 0) {
-      throw new Error('Error message is required for failed delivery');
+      throw new Error("Error message is required for failed delivery");
     }
     if (responseLatencyMs !== undefined && responseLatencyMs < 0) {
-      throw new Error('Response latency must be non-negative');
+      throw new Error("Response latency must be non-negative");
     }
 
     return new DeliveryLog(
@@ -113,7 +113,7 @@ export class DeliveryLog {
       errorCode.trim(),
       errorMessage.trim(),
       new Date(),
-      responseLatencyMs || null
+      responseLatencyMs || null,
     );
   }
 
@@ -126,7 +126,7 @@ export class DeliveryLog {
     errorCode: string | null,
     errorMessage: string | null,
     deliveredAt: Date,
-    responseLatencyMs: number | null
+    responseLatencyMs: number | null,
   ): DeliveryLog {
     return new DeliveryLog(
       id,
@@ -137,19 +137,37 @@ export class DeliveryLog {
       errorCode,
       errorMessage,
       deliveredAt,
-      responseLatencyMs
+      responseLatencyMs,
     );
   }
 
-  get id(): string { return this.#id; }
-  get batchId(): string { return this.#batchId; }
-  get campaignId(): string { return this.#campaignId; }
-  get lineUserId(): string { return this.#lineUserId; }
-  get status(): DeliveryStatus { return this.#status; }
-  get errorCode(): string | null { return this.#errorCode; }
-  get errorMessage(): string | null { return this.#errorMessage; }
-  get deliveredAt(): Date { return this.#deliveredAt; }
-  get responseLatencyMs(): number | null { return this.#responseLatencyMs; }
+  get id(): string {
+    return this.#id;
+  }
+  get batchId(): string {
+    return this.#batchId;
+  }
+  get campaignId(): string {
+    return this.#campaignId;
+  }
+  get lineUserId(): string {
+    return this.#lineUserId;
+  }
+  get status(): DeliveryStatus {
+    return this.#status;
+  }
+  get errorCode(): string | null {
+    return this.#errorCode;
+  }
+  get errorMessage(): string | null {
+    return this.#errorMessage;
+  }
+  get deliveredAt(): Date {
+    return this.#deliveredAt;
+  }
+  get responseLatencyMs(): number | null {
+    return this.#responseLatencyMs;
+  }
 
   /**
    * 配信が成功したかチェックします
@@ -173,8 +191,8 @@ export class DeliveryLog {
       return null;
     }
     return {
-      code: this.#errorCode || 'UNKNOWN_ERROR',
-      message: this.#errorMessage || 'Unknown error occurred',
+      code: this.#errorCode || "UNKNOWN_ERROR",
+      message: this.#errorMessage || "Unknown error occurred",
     };
   }
 
@@ -221,7 +239,7 @@ export class DeliveryLog {
       return false;
     }
 
-    if (typeof errorCodePattern === 'string') {
+    if (typeof errorCodePattern === "string") {
       return this.#errorCode === errorCodePattern;
     }
 
@@ -232,7 +250,9 @@ export class DeliveryLog {
    * 高応答時間（遅延）の配信かチェックします
    */
   isSlowDelivery(thresholdMs = 1000): boolean {
-    return this.#responseLatencyMs !== null && this.#responseLatencyMs > thresholdMs;
+    return (
+      this.#responseLatencyMs !== null && this.#responseLatencyMs > thresholdMs
+    );
   }
 
   equals(other: DeliveryLog): boolean {
@@ -266,7 +286,7 @@ export class DeliveryLog {
       status: this.#status,
       hasError: this.#status === DeliveryStatus.Failed,
       responseLatencyMs: this.#responseLatencyMs,
-      deliveryDate: this.#deliveredAt.toISOString().split('T')[0], // YYYY-MM-DD format
+      deliveryDate: this.#deliveredAt.toISOString().split("T")[0], // YYYY-MM-DD format
     };
   }
 }

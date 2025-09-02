@@ -1,36 +1,36 @@
-'use server';
+"use server";
 
-import { CreateCampaignUsecase } from '@/application/campaign/CreateCampaignUsecase';
-import { SendNowUsecase } from '@/application/campaign/SendNowUsecase';
-import { ListHistoryUsecase } from '@/application/campaign/ListHistoryUsecase';
-import { MessageCampaignRepositorySupabase } from '@/infrastructure/campaign/repositories/MessageCampaignRepositorySupabase';
-import { MessageTemplateRepositorySupabase } from '@/infrastructure/campaign/repositories/MessageTemplateRepositorySupabase';
-import { TargetSegmentRepositorySupabase } from '@/infrastructure/campaign/repositories/TargetSegmentRepositorySupabase';
-import { LineUserRepositorySupabase } from '@/infrastructure/campaign/repositories/LineUserRepositorySupabase';
-import { LineMessagingGateway } from '@/infrastructure/gateways/line/LineMessagingGateway';
-import { revalidatePath } from 'next/cache';
+import { CreateCampaignUsecase } from "@/application/campaign/CreateCampaignUsecase";
+import { SendNowUsecase } from "@/application/campaign/SendNowUsecase";
+import { ListHistoryUsecase } from "@/application/campaign/ListHistoryUsecase";
+import { MessageCampaignRepositorySupabase } from "@/infrastructure/campaign/repositories/MessageCampaignRepositorySupabase";
+import { MessageTemplateRepositorySupabase } from "@/infrastructure/campaign/repositories/MessageTemplateRepositorySupabase";
+import { TargetSegmentRepositorySupabase } from "@/infrastructure/campaign/repositories/TargetSegmentRepositorySupabase";
+import { LineUserRepositorySupabase } from "@/infrastructure/campaign/repositories/LineUserRepositorySupabase";
+import { LineMessagingGateway } from "@/infrastructure/gateways/line/LineMessagingGateway";
+import { revalidatePath } from "next/cache";
 
 export async function createCampaign(formData: FormData) {
   try {
-    const accountId = formData.get('accountId') as string;
-    const name = formData.get('name') as string;
-    const type = formData.get('type') as 'broadcast' | 'narrowcast';
-    const templateId = formData.get('templateId') as string || undefined;
-    const segmentId = formData.get('segmentId') as string || undefined;
-    const contentJson = formData.get('content') as string;
-    const placeholderDataJson = formData.get('placeholderData') as string;
-    const scheduledAtStr = formData.get('scheduledAt') as string;
+    const accountId = formData.get("accountId") as string;
+    const name = formData.get("name") as string;
+    const type = formData.get("type") as "broadcast" | "narrowcast";
+    const templateId = (formData.get("templateId") as string) || undefined;
+    const segmentId = (formData.get("segmentId") as string) || undefined;
+    const contentJson = formData.get("content") as string;
+    const placeholderDataJson = formData.get("placeholderData") as string;
+    const scheduledAtStr = formData.get("scheduledAt") as string;
 
     if (!accountId) {
-      throw new Error('Account ID is required');
+      throw new Error("Account ID is required");
     }
-    
+
     if (!name) {
-      throw new Error('Campaign name is required');
+      throw new Error("Campaign name is required");
     }
 
     if (!type) {
-      throw new Error('Campaign type is required');
+      throw new Error("Campaign type is required");
     }
 
     // コンテンツをパース
@@ -39,7 +39,7 @@ export async function createCampaign(formData: FormData) {
       try {
         content = JSON.parse(contentJson);
       } catch (parseError) {
-        throw new Error('Invalid content data');
+        throw new Error("Invalid content data");
       }
     }
 
@@ -49,7 +49,7 @@ export async function createCampaign(formData: FormData) {
       try {
         placeholderData = JSON.parse(placeholderDataJson);
       } catch (parseError) {
-        throw new Error('Invalid placeholder data');
+        throw new Error("Invalid placeholder data");
       }
     }
 
@@ -58,7 +58,7 @@ export async function createCampaign(formData: FormData) {
     if (scheduledAtStr) {
       scheduledAt = new Date(scheduledAtStr);
       if (isNaN(scheduledAt.getTime())) {
-        throw new Error('Invalid scheduled date');
+        throw new Error("Invalid scheduled date");
       }
     }
 
@@ -70,7 +70,7 @@ export async function createCampaign(formData: FormData) {
     const usecase = new CreateCampaignUsecase(
       campaignRepository,
       templateRepository,
-      segmentRepository
+      segmentRepository,
     );
 
     const result = await usecase.execute({
@@ -84,14 +84,15 @@ export async function createCampaign(formData: FormData) {
       scheduledAt,
     });
 
-    revalidatePath('/dashboard/campaigns');
-    
+    revalidatePath("/dashboard/campaigns");
+
     return {
       success: true,
       data: result,
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error occurred';
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return {
       success: false,
       error: message,
@@ -102,38 +103,39 @@ export async function createCampaign(formData: FormData) {
 export async function sendNowCampaign(campaignId: string) {
   try {
     if (!campaignId) {
-      throw new Error('Campaign ID is required');
+      throw new Error("Campaign ID is required");
     }
 
     // リポジトリとゲートウェイを初期化
     const campaignRepository = new MessageCampaignRepositorySupabase();
     const userRepository = new LineUserRepositorySupabase();
-    
-    const channelAccessToken = process.env['LINE_CHANNEL_ACCESS_TOKEN'];
+
+    const channelAccessToken = process.env["LINE_CHANNEL_ACCESS_TOKEN"];
     if (!channelAccessToken) {
-      throw new Error('LINE channel access token is not configured');
+      throw new Error("LINE channel access token is not configured");
     }
     const lineGateway = new LineMessagingGateway(channelAccessToken);
 
     const usecase = new SendNowUsecase(
       campaignRepository,
       userRepository,
-      lineGateway
+      lineGateway,
     );
 
     const result = await usecase.execute({
       campaignId,
     });
 
-    revalidatePath('/dashboard/campaigns');
+    revalidatePath("/dashboard/campaigns");
     revalidatePath(`/dashboard/campaigns/${campaignId}`);
-    
+
     return {
       success: true,
       data: result,
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error occurred';
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return {
       success: false,
       error: message,
@@ -144,7 +146,7 @@ export async function sendNowCampaign(campaignId: string) {
 export async function getCampaigns(accountId: string) {
   try {
     if (!accountId) {
-      throw new Error('Account ID is required');
+      throw new Error("Account ID is required");
     }
 
     const repository = new MessageCampaignRepositorySupabase();
@@ -152,7 +154,7 @@ export async function getCampaigns(accountId: string) {
 
     return {
       success: true,
-      data: campaigns.map(campaign => ({
+      data: campaigns.map((campaign) => ({
         id: campaign.id,
         name: campaign.name,
         type: campaign.type,
@@ -166,7 +168,8 @@ export async function getCampaigns(accountId: string) {
       })),
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error occurred';
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return {
       success: false,
       error: message,
@@ -177,14 +180,14 @@ export async function getCampaigns(accountId: string) {
 export async function getCampaignById(campaignId: string) {
   try {
     if (!campaignId) {
-      throw new Error('Campaign ID is required');
+      throw new Error("Campaign ID is required");
     }
 
     const repository = new MessageCampaignRepositorySupabase();
     const campaign = await repository.findById(campaignId);
 
     if (!campaign) {
-      throw new Error('Campaign not found');
+      throw new Error("Campaign not found");
     }
 
     return {
@@ -209,7 +212,8 @@ export async function getCampaignById(campaignId: string) {
       },
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error occurred';
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return {
       success: false,
       error: message,
@@ -217,10 +221,14 @@ export async function getCampaignById(campaignId: string) {
   }
 }
 
-export async function getCampaignHistory(accountId: string, page = 1, limit = 20) {
+export async function getCampaignHistory(
+  accountId: string,
+  page = 1,
+  limit = 20,
+) {
   try {
     if (!accountId) {
-      throw new Error('Account ID is required');
+      throw new Error("Account ID is required");
     }
 
     const campaignRepository = new MessageCampaignRepositorySupabase();
@@ -236,7 +244,7 @@ export async function getCampaignHistory(accountId: string, page = 1, limit = 20
     return {
       success: true,
       data: {
-        campaigns: result.campaigns.map(campaign => ({
+        campaigns: result.campaigns.map((campaign) => ({
           id: campaign.id,
           name: campaign.name,
           type: campaign.type,
@@ -251,7 +259,8 @@ export async function getCampaignHistory(accountId: string, page = 1, limit = 20
       },
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error occurred';
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return {
       success: false,
       error: message,
@@ -262,30 +271,33 @@ export async function getCampaignHistory(accountId: string, page = 1, limit = 20
 export async function deleteCampaign(campaignId: string) {
   try {
     if (!campaignId) {
-      throw new Error('Campaign ID is required');
+      throw new Error("Campaign ID is required");
     }
 
     const repository = new MessageCampaignRepositorySupabase();
     const campaign = await repository.findById(campaignId);
 
     if (!campaign) {
-      throw new Error('Campaign not found');
+      throw new Error("Campaign not found");
     }
 
     // 送信中または送信済みのキャンペーンは削除できない
-    if (campaign.status === 'sending' || campaign.status === 'sent') {
-      throw new Error('Cannot delete campaigns that are sending or have been sent');
+    if (campaign.status === "sending" || campaign.status === "sent") {
+      throw new Error(
+        "Cannot delete campaigns that are sending or have been sent",
+      );
     }
 
     await repository.delete(campaignId);
 
-    revalidatePath('/dashboard/campaigns');
-    
+    revalidatePath("/dashboard/campaigns");
+
     return {
       success: true,
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error occurred';
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return {
       success: false,
       error: message,
@@ -296,14 +308,14 @@ export async function deleteCampaign(campaignId: string) {
 export async function duplicateCampaign(campaignId: string) {
   try {
     if (!campaignId) {
-      throw new Error('Campaign ID is required');
+      throw new Error("Campaign ID is required");
     }
 
     const repository = new MessageCampaignRepositorySupabase();
     const originalCampaign = await repository.findById(campaignId);
 
     if (!originalCampaign) {
-      throw new Error('Campaign not found');
+      throw new Error("Campaign not found");
     }
 
     const templateRepository = new MessageTemplateRepositorySupabase();
@@ -312,7 +324,7 @@ export async function duplicateCampaign(campaignId: string) {
     const usecase = new CreateCampaignUsecase(
       repository,
       templateRepository,
-      segmentRepository
+      segmentRepository,
     );
 
     const result = await usecase.execute({
@@ -326,14 +338,15 @@ export async function duplicateCampaign(campaignId: string) {
       // スケジュールは複製しない
     });
 
-    revalidatePath('/dashboard/campaigns');
-    
+    revalidatePath("/dashboard/campaigns");
+
     return {
       success: true,
       data: result,
     };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error occurred';
+    const message =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return {
       success: false,
       error: message,

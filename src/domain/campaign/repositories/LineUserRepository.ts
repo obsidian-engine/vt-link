@@ -1,4 +1,4 @@
-import { LineUser } from '../entities/TargetSegment';
+import { LineUser } from "../entities/TargetSegment";
 
 export interface LineUserRepository {
   /**
@@ -19,7 +19,11 @@ export interface LineUserRepository {
   /**
    * アカウントIDでユーザーを検索します
    */
-  findByAccountId(accountId: string, limit?: number, offset?: number): Promise<LineUser[]>;
+  findByAccountId(
+    accountId: string,
+    limit?: number,
+    offset?: number,
+  ): Promise<LineUser[]>;
 
   /**
    * アカウント内の全ユーザーを取得します
@@ -38,7 +42,7 @@ export interface LineUserRepository {
       regions?: string[];
     },
     limit?: number,
-    offset?: number
+    offset?: number,
   ): Promise<LineUser[]>;
 
   /**
@@ -56,7 +60,7 @@ export interface LineUserRepository {
       minAge?: number;
       maxAge?: number;
       regions?: string[];
-    }
+    },
   ): Promise<number>;
 
   /**

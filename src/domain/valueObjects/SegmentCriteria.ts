@@ -1,6 +1,6 @@
-import { AgeRange } from './AgeRange';
-import { GenderSet, Gender } from './Gender';
-import { RegionSet, RegionCode } from './Region';
+import { AgeRange } from "./AgeRange";
+import { GenderSet, Gender } from "./Gender";
+import { RegionSet, RegionCode } from "./Region";
 
 export class SegmentCriteria {
   readonly #genders: GenderSet | null;
@@ -10,7 +10,7 @@ export class SegmentCriteria {
   private constructor(
     genders: GenderSet | null,
     ageRange: AgeRange | null,
-    regions: RegionSet | null
+    regions: RegionSet | null,
   ) {
     this.#genders = genders;
     this.#ageRange = ageRange;
@@ -24,13 +24,13 @@ export class SegmentCriteria {
     regions?: RegionCode[];
   }): SegmentCriteria {
     const genders = params.genders ? GenderSet.create(params.genders) : null;
-    const ageRange = params.ageRange 
-      ? AgeRange.create(params.ageRange.min, params.ageRange.max) 
+    const ageRange = params.ageRange
+      ? AgeRange.create(params.ageRange.min, params.ageRange.max)
       : null;
     const regions = params.regions ? RegionSet.create(params.regions) : null;
 
     if (!genders && !ageRange && !regions) {
-      throw new Error('At least one criterion must be specified');
+      throw new Error("At least one criterion must be specified");
     }
 
     return new SegmentCriteria(genders, ageRange, regions);
@@ -40,7 +40,7 @@ export class SegmentCriteria {
     return new SegmentCriteria(
       GenderSet.createAll(),
       AgeRange.create(0, 120),
-      RegionSet.createAll()
+      RegionSet.createAll(),
     );
   }
 
@@ -50,8 +50,8 @@ export class SegmentCriteria {
     regions?: RegionCode[];
   }): SegmentCriteria {
     const genders = data.genders ? GenderSet.reconstruct(data.genders) : null;
-    const ageRange = data.ageRange 
-      ? AgeRange.reconstruct(data.ageRange.min, data.ageRange.max) 
+    const ageRange = data.ageRange
+      ? AgeRange.reconstruct(data.ageRange.min, data.ageRange.max)
       : null;
     const regions = data.regions ? RegionSet.reconstruct(data.regions) : null;
 
@@ -70,11 +70,7 @@ export class SegmentCriteria {
     return this.#regions;
   }
 
-  matches(user: {
-    gender: Gender;
-    age: number;
-    region: RegionCode;
-  }): boolean {
+  matches(user: { gender: Gender; age: number; region: RegionCode }): boolean {
     if (this.#genders && !this.#genders.includes(user.gender)) {
       return false;
     }
@@ -95,16 +91,22 @@ export class SegmentCriteria {
   }
 
   equals(other: SegmentCriteria): boolean {
-    const gendersEqual = this.#genders 
-      ? (other.#genders ? this.#genders.equals(other.#genders) : false)
+    const gendersEqual = this.#genders
+      ? other.#genders
+        ? this.#genders.equals(other.#genders)
+        : false
       : !other.#genders;
 
     const ageRangeEqual = this.#ageRange
-      ? (other.#ageRange ? this.#ageRange.equals(other.#ageRange) : false)
+      ? other.#ageRange
+        ? this.#ageRange.equals(other.#ageRange)
+        : false
       : !other.#ageRange;
 
     const regionsEqual = this.#regions
-      ? (other.#regions ? this.#regions.equals(other.#regions) : false)
+      ? other.#regions
+        ? this.#regions.equals(other.#regions)
+        : false
       : !other.#regions;
 
     return gendersEqual && ageRangeEqual && regionsEqual;
@@ -125,7 +127,7 @@ export class SegmentCriteria {
       parts.push(`地域: ${this.#regions.toString()}`);
     }
 
-    return parts.join(', ');
+    return parts.join(", ");
   }
 
   toJSON(): any {

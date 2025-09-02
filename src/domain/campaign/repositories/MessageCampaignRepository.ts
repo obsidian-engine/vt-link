@@ -1,4 +1,8 @@
-import { MessageCampaign, CampaignStatus, CampaignType } from '../entities/MessageCampaign';
+import {
+  MessageCampaign,
+  CampaignStatus,
+  CampaignType,
+} from "../entities/MessageCampaign";
 
 export interface MessageCampaignRepository {
   /**
@@ -19,12 +23,18 @@ export interface MessageCampaignRepository {
   /**
    * アカウントIDで指定されたステータスのキャンペーンを検索します
    */
-  findByAccountIdAndStatus(accountId: string, status: CampaignStatus): Promise<MessageCampaign[]>;
+  findByAccountIdAndStatus(
+    accountId: string,
+    status: CampaignStatus,
+  ): Promise<MessageCampaign[]>;
 
   /**
    * アカウントIDで指定されたタイプのキャンペーンを検索します
    */
-  findByAccountIdAndType(accountId: string, type: CampaignType): Promise<MessageCampaign[]>;
+  findByAccountIdAndType(
+    accountId: string,
+    type: CampaignType,
+  ): Promise<MessageCampaign[]>;
 
   /**
    * 送信準備が整ったスケジュール済みキャンペーンを検索します
@@ -44,17 +54,28 @@ export interface MessageCampaignRepository {
   /**
    * キャンペーン名での部分一致検索
    */
-  findByNamePattern(accountId: string, namePattern: string): Promise<MessageCampaign[]>;
+  findByNamePattern(
+    accountId: string,
+    namePattern: string,
+  ): Promise<MessageCampaign[]>;
 
   /**
    * 指定期間内に作成されたキャンペーンを検索します
    */
-  findByCreatedDateRange(accountId: string, startDate: Date, endDate: Date): Promise<MessageCampaign[]>;
+  findByCreatedDateRange(
+    accountId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<MessageCampaign[]>;
 
   /**
    * 指定期間内に送信されたキャンペーンを検索します
    */
-  findBySentDateRange(accountId: string, startDate: Date, endDate: Date): Promise<MessageCampaign[]>;
+  findBySentDateRange(
+    accountId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<MessageCampaign[]>;
 
   /**
    * キャンペーンを削除します
@@ -69,7 +90,10 @@ export interface MessageCampaignRepository {
   /**
    * アカウント内の指定されたステータスのキャンペーン数を取得します
    */
-  countByAccountIdAndStatus(accountId: string, status: CampaignStatus): Promise<number>;
+  countByAccountIdAndStatus(
+    accountId: string,
+    status: CampaignStatus,
+  ): Promise<number>;
 
   /**
    * アカウントの送信統計を取得します

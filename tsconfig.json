@@ -1,29 +1,29 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es6"
-    ],
+    "baseUrl": ".",
+    "typeRoots": ["./node_modules/@types", "./types"],
+    "lib": ["dom", "dom.iterable", "es6"],
     "allowJs": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "noEmitOnError": true,
     "strict": true,
     "exactOptionalPropertyTypes": false,
     "noUncheckedIndexedAccess": false,
-    "verbatimModuleSyntax": false,
+    "verbatimModuleSyntax": true,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noPropertyAccessFromIndexSignature": false,
+    "noPropertyAccessFromIndexSignature": true,
     "useUnknownInCatchVariables": true,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
     "incremental": true,
     "plugins": [
       {
@@ -31,38 +31,28 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@/ui/*": [
-        "./src/ui/*"
-      ],
-      "@/presenter/*": [
-        "./src/presenter/*"
-      ],
-      "@/application/*": [
-        "./src/application/*"
-      ],
-      "@/domain/*": [
-        "./src/domain/*"
-      ],
-      "@/infrastructure/*": [
-        "./src/infrastructure/*"
-      ],
-      "@/shared/*": [
-        "./src/shared/*"
-      ]
+      "@/*": ["./*"],
+      "@/ui/*": ["./src/ui/*"],
+      "@/presenter/*": ["./src/presenter/*"],
+      "@/application/*": ["./src/application/*"],
+      "@/domain/*": ["./src/domain/*"],
+      "@/infrastructure/*": ["./src/infrastructure/*"],
+      "@/shared/*": ["./src/shared/*"]
     },
-    "target": "ES2017"
+    "target": "es2022",
+    "composite": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./.next/tsconfig.main.tsbuildinfo"
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
+  "references": [{ "path": "./tsconfig.test.json" }],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": [
     "node_modules",
-    "go-backend"
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "__tests__/**/*",
+    "src/domain/__tests__/**/*"
   ]
 }

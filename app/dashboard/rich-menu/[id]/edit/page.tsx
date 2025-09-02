@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { notFound } from 'next/navigation';
-import { RichMenuEditor } from '@/ui/components/rich-menu/RichMenuEditor';
-import { RichMenuPreview } from '@/ui/components/rich-menu/RichMenuPreview';
-import { RichMenuArea } from '@/ui/components/rich-menu/types';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { RichMenuEditor } from "@/ui/components/rich-menu/RichMenuEditor";
+import { RichMenuPreview } from "@/ui/components/rich-menu/RichMenuPreview";
+import type { RichMenuArea } from "@/ui/components/rich-menu/types";
 
 interface EditRichMenuPageProps {
   params: {
@@ -18,9 +18,9 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [richMenu, setRichMenu] = useState<any>(null);
-  const [name, setName] = useState('');
-  const [chatBarText, setChatBarText] = useState('');
-  const [menuSize, setMenuSize] = useState<'full' | 'half'>('full');
+  const [name, setName] = useState("");
+  const [chatBarText, setChatBarText] = useState("");
+  const [menuSize, setMenuSize] = useState<"full" | "half">("full");
   const [areas, setAreas] = useState<RichMenuArea[]>([]);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
       // if (!result.success) {
       //   return notFound();
       // }
-      // 
+      //
       // const menu = result.data;
       // setRichMenu(menu);
       // setName(menu.name);
@@ -46,32 +46,32 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
       // デモデータ
       const demoMenu = {
         id: params.id,
-        name: 'サンプルリッチメニュー',
-        size: 'full' as const,
-        chatBarText: 'メニュー',
+        name: "サンプルリッチメニュー",
+        size: "full" as const,
+        chatBarText: "メニュー",
         areas: [
           {
-            id: 'demo-1',
+            id: "demo-1",
             x: 100,
             y: 100,
             width: 400,
             height: 200,
             action: {
-              type: 'postback' as const,
-              data: 'menu_action_1',
-              displayText: 'メニュー1',
+              type: "postback" as const,
+              data: "menu_action_1",
+              displayText: "メニュー1",
             },
           },
         ],
       };
-      
+
       setRichMenu(demoMenu);
       setName(demoMenu.name);
       setChatBarText(demoMenu.chatBarText);
       setMenuSize(demoMenu.size);
       setAreas(demoMenu.areas);
     } catch (error) {
-      setError('リッチメニューの読み込みに失敗しました');
+      setError("リッチメニューの読み込みに失敗しました");
     } finally {
       setIsLoading(false);
     }
@@ -83,21 +83,21 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
 
     try {
       // エリア情報をFormDataに追加
-      formData.set('areas', JSON.stringify(areas));
-      formData.set('id', params.id);
+      formData.set("areas", JSON.stringify(areas));
+      formData.set("id", params.id);
 
       // TODO: 更新APIを実装
       // const result = await updateRichMenu(formData);
-      // 
+      //
       // if (!result.success) {
       //   setError(result.error);
       //   return;
       // }
 
       // 成功時はリッチメニュー一覧にリダイレクト
-      window.location.href = '/dashboard/rich-menu';
+      window.location.href = "/dashboard/rich-menu";
     } catch (error) {
-      setError('予期しないエラーが発生しました');
+      setError("予期しないエラーが発生しました");
     } finally {
       setIsSubmitting(false);
     }
@@ -164,7 +164,10 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
                 <div className="mt-5 md:mt-0 md:col-span-2">
                   <div className="grid grid-cols-6 gap-6">
                     <div className="col-span-6">
-                      <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label
+                        htmlFor="name"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >
                         メニュー名 *
                       </label>
                       <input
@@ -181,14 +184,19 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
                     </div>
 
                     <div className="col-span-6 sm:col-span-3">
-                      <label htmlFor="size" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label
+                        htmlFor="size"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >
                         サイズ *
                       </label>
                       <select
                         id="size"
                         name="size"
                         value={menuSize}
-                        onChange={(e) => setMenuSize(e.target.value as 'full' | 'half')}
+                        onChange={(e) =>
+                          setMenuSize(e.target.value as "full" | "half")
+                        }
                         required
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       >
@@ -198,7 +206,10 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
                     </div>
 
                     <div className="col-span-6 sm:col-span-3">
-                      <label htmlFor="chatBarText" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      <label
+                        htmlFor="chatBarText"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                      >
                         チャットバーテキスト
                       </label>
                       <input
@@ -250,10 +261,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
                   </p>
                 </div>
                 <div className="mt-5 md:mt-0 md:col-span-2">
-                  <RichMenuPreview
-                    size={menuSize}
-                    areas={areas}
-                  />
+                  <RichMenuPreview size={menuSize} areas={areas} />
                 </div>
               </div>
             </div>
@@ -271,7 +279,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
                 disabled={isSubmitting}
                 className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? '更新中...' : '更新'}
+                {isSubmitting ? "更新中..." : "更新"}
               </button>
             </div>
           </form>

@@ -1,4 +1,5 @@
-import { RateLimitPolicy, RateLimitScope } from './RateLimitPolicy';
+import type { RateLimitPolicy } from "./RateLimitPolicy";
+import { RateLimitScope } from "./RateLimitPolicy";
 
 /**
  * レート制限の履歴を管理するストレージインターフェース
@@ -22,40 +23,55 @@ export class SlidingWindowPolicy implements RateLimitPolicy {
     maxCount: number,
     windowSeconds: number,
     scope: RateLimitScope,
-    storage: RateLimitStorage
+    storage: RateLimitStorage,
   ) {
     if (maxCount <= 0) {
-      throw new Error('Max count must be positive');
+      throw new Error("Max count must be positive");
     }
     if (windowSeconds <= 0) {
-      throw new Error('Window seconds must be positive');
+      throw new Error("Window seconds must be positive");
     }
-    
+
     this.#maxCount = maxCount;
     this.#windowSeconds = windowSeconds;
     this.#scope = scope;
     this.#storage = storage;
   }
 
-  async canExecute(ruleId: string, userId: string, groupId?: string): Promise<boolean> {
+  async canExecute(
+    ruleId: string,
+    userId: string,
+    groupId?: string,
+  ): Promise<boolean> {
     const key = this.generateKey(ruleId, userId, groupId);
-    const currentCount = await this.#storage.getExecutionCount(key, this.#windowSeconds);
-    
+    const currentCount = await this.#storage.getExecutionCount(
+      key,
+      this.#windowSeconds,
+    );
+
     return currentCount < this.#maxCount;
   }
 
-  async recordExecution(ruleId: string, userId: string, groupId?: string): Promise<void> {
+  async recordExecution(
+    ruleId: string,
+    userId: string,
+    groupId?: string,
+  ): Promise<void> {
     const key = this.generateKey(ruleId, userId, groupId);
     await this.#storage.recordExecution(key);
   }
 
-  private generateKey(ruleId: string, userId: string, groupId?: string): string {
+  private generateKey(
+    ruleId: string,
+    userId: string,
+    groupId?: string,
+  ): string {
     switch (this.#scope) {
       case RateLimitScope.User:
         return `rate_limit:${ruleId}:user:${userId}`;
       case RateLimitScope.Group:
-        return groupId 
-          ? `rate_limit:${ruleId}:group:${groupId}` 
+        return groupId
+          ? `rate_limit:${ruleId}:group:${groupId}`
           : `rate_limit:${ruleId}:user:${userId}`;
       case RateLimitScope.Global:
         return `rate_limit:${ruleId}:global`;
