@@ -1,61 +1,50 @@
-export type ReplyRuleStatus = 'active' | 'inactive';
-
-export interface ReplyContent {
-  readonly type: 'text' | 'image' | 'sticker';
-  readonly text?: string;
-  readonly imageUrl?: string;
-  readonly packageId?: string;
-  readonly stickerId?: string;
-}
+import { Condition } from './Condition';
+import { Response } from './Response';
+import { RateLimit } from './RateLimit';
+import { TimeWindow } from './TimeWindow';
+import { IncomingMessage } from './IncomingMessage';
 
 export class AutoReplyRule {
   static readonly MAX_NAME_LENGTH = 100;
-  static readonly MAX_KEYWORDS_COUNT = 20;
-  static readonly MAX_KEYWORD_LENGTH = 50;
-  static readonly DEFAULT_PRIORITY = 0;
+  static readonly MAX_CONDITIONS = 10;
+  static readonly MAX_RESPONSES = 5;
 
   readonly #id: string;
   readonly #accountId: string;
   readonly #name: string;
-  readonly #keywords: ReadonlyArray<string>;
-  readonly #replyContent: ReplyContent;
   readonly #priority: number;
-  readonly #status: ReplyRuleStatus;
+  readonly #conditions: ReadonlyArray<Condition>;
+  readonly #responses: ReadonlyArray<Response>;
+  readonly #rateLimit: RateLimit | null;
+  readonly #timeWindow: TimeWindow | null;
+  readonly #enabled: boolean;
+  readonly #createdAt: Date;
+  readonly #updatedAt: Date;
 
   private constructor(
     id: string,
     accountId: string,
     name: string,
-    keywords: ReadonlyArray<string>,
-    replyContent: ReplyContent,
     priority: number,
-    status: ReplyRuleStatus
+    conditions: ReadonlyArray<Condition>,
+    responses: ReadonlyArray<Response>,
+    rateLimit: RateLimit | null,
+    timeWindow: TimeWindow | null,
+    enabled: boolean,
+    createdAt: Date,
+    updatedAt: Date
   ) {
-    if (name.length === 0 || name.length > AutoReplyRule.MAX_NAME_LENGTH) {
-      throw new Error('Name must be between 1 and 100 characters');
-    }
-    
-    if (keywords.length === 0 || keywords.length > AutoReplyRule.MAX_KEYWORDS_COUNT) {
-      throw new Error('Keywords count must be between 1 and 20');
-    }
-    
-    const invalidKeyword = keywords.find(k => k.length === 0 || k.length > AutoReplyRule.MAX_KEYWORD_LENGTH);
-    if (invalidKeyword !== undefined) {
-      throw new Error('Each keyword must be between 1 and 50 characters');
-    }
-
-    if (replyContent.type === 'text' && (!replyContent.text || replyContent.text.length === 0)) {
-      throw new Error('Text reply content cannot be empty');
-    }
-
     this.#id = id;
     this.#accountId = accountId;
     this.#name = name;
-    this.#keywords = keywords;
-    this.#replyContent = replyContent;
     this.#priority = priority;
-    this.#status = status;
-    
+    this.#conditions = conditions;
+    this.#responses = responses;
+    this.#rateLimit = rateLimit;
+    this.#timeWindow = timeWindow;
+    this.#enabled = enabled;
+    this.#createdAt = createdAt;
+    this.#updatedAt = updatedAt;
     Object.freeze(this);
   }
 
@@ -63,18 +52,54 @@ export class AutoReplyRule {
     id: string,
     accountId: string,
     name: string,
-    keywords: ReadonlyArray<string>,
-    replyContent: ReplyContent,
-    priority: number = AutoReplyRule.DEFAULT_PRIORITY
+    priority: number,
+    conditions: ReadonlyArray<Condition>,
+    responses: ReadonlyArray<Response>,
+    rateLimit: RateLimit | null = null,
+    timeWindow: TimeWindow | null = null,
+    enabled = true
   ): AutoReplyRule {
+    if (!id) {
+      throw new Error('Rule ID is required');
+    }
+    if (!accountId) {
+      throw new Error('Account ID is required');
+    }
+    if (!name || name.trim().length === 0) {
+      throw new Error('Rule name is required');
+    }
+    if (name.length > this.MAX_NAME_LENGTH) {
+      throw new Error(`Rule name cannot exceed ${this.MAX_NAME_LENGTH} characters`);
+    }
+    if (priority < 0) {
+      throw new Error('Priority must be non-negative');
+    }
+    if (!conditions || conditions.length === 0) {
+      throw new Error('At least one condition is required');
+    }
+    if (conditions.length > this.MAX_CONDITIONS) {
+      throw new Error(`Cannot exceed ${this.MAX_CONDITIONS} conditions`);
+    }
+    if (!responses || responses.length === 0) {
+      throw new Error('At least one response is required');
+    }
+    if (responses.length > this.MAX_RESPONSES) {
+      throw new Error(`Cannot exceed ${this.MAX_RESPONSES} responses`);
+    }
+
+    const now = new Date();
     return new AutoReplyRule(
       id,
       accountId,
-      name,
-      keywords,
-      replyContent,
+      name.trim(),
       priority,
-      'active'
+      conditions,
+      responses,
+      rateLimit,
+      timeWindow,
+      enabled,
+      now,
+      now
     );
   }
 
@@ -82,100 +107,280 @@ export class AutoReplyRule {
     id: string,
     accountId: string,
     name: string,
-    keywords: ReadonlyArray<string>,
-    replyContent: ReplyContent,
     priority: number,
-    status: ReplyRuleStatus
+    conditions: ReadonlyArray<Condition>,
+    responses: ReadonlyArray<Response>,
+    rateLimit: RateLimit | null,
+    timeWindow: TimeWindow | null,
+    enabled: boolean,
+    createdAt: Date,
+    updatedAt: Date
   ): AutoReplyRule {
     return new AutoReplyRule(
       id,
       accountId,
       name,
-      keywords,
-      replyContent,
       priority,
-      status
+      conditions,
+      responses,
+      rateLimit,
+      timeWindow,
+      enabled,
+      createdAt,
+      updatedAt
     );
   }
 
-  get id(): string { return this.#id; }
-  get accountId(): string { return this.#accountId; }
-  get name(): string { return this.#name; }
-  get keywords(): ReadonlyArray<string> { return this.#keywords; }
-  get replyContent(): ReplyContent { return this.#replyContent; }
-  get priority(): number { return this.#priority; }
-  get status(): ReplyRuleStatus { return this.#status; }
-
-  isActive(): boolean {
-    return this.#status === 'active';
+  get id(): string {
+    return this.#id;
   }
 
-  matchesKeyword(message: string): boolean {
-    if (!this.isActive()) return false;
+  get accountId(): string {
+    return this.#accountId;
+  }
+
+  get name(): string {
+    return this.#name;
+  }
+
+  get priority(): number {
+    return this.#priority;
+  }
+
+  get conditions(): ReadonlyArray<Condition> {
+    return this.#conditions;
+  }
+
+  get responses(): ReadonlyArray<Response> {
+    return this.#responses;
+  }
+
+  get rateLimit(): RateLimit | null {
+    return this.#rateLimit;
+  }
+
+  get timeWindow(): TimeWindow | null {
+    return this.#timeWindow;
+  }
+
+  get enabled(): boolean {
+    return this.#enabled;
+  }
+
+  get createdAt(): Date {
+    return this.#createdAt;
+  }
+
+  get updatedAt(): Date {
+    return this.#updatedAt;
+  }
+
+  matches(message: IncomingMessage, currentTime: Date = new Date()): boolean {
+    if (!this.#enabled) {
+      return false;
+    }
+
+    // Check time window
+    if (this.#timeWindow && !this.#timeWindow.contains(currentTime)) {
+      return false;
+    }
+
+    // All conditions must match (AND logic)
+    return this.#conditions.every(condition => condition.matches(message));
+  }
+
+  pickResponse(): Response | null {
+    if (this.#responses.length === 0) {
+      return null;
+    }
+
+    // Filter responses by probability
+    const availableResponses = this.#responses.filter(response => response.shouldExecute());
     
-    const normalizedMessage = message.toLowerCase().trim();
-    return this.#keywords.some(keyword => 
-      normalizedMessage.includes(keyword.toLowerCase())
+    if (availableResponses.length === 0) {
+      return null;
+    }
+
+    // Pick random response from available ones
+    const randomIndex = Math.floor(Math.random() * availableResponses.length);
+    return availableResponses[randomIndex];
+  }
+
+  getRateLimitKey(message: IncomingMessage): string | null {
+    if (!this.#rateLimit) {
+      return null;
+    }
+
+    return this.#rateLimit.generateKey(
+      message.userId,
+      message.groupId || undefined,
+      message.roomId || undefined
     );
   }
 
   updateName(name: string): AutoReplyRule {
+    if (!name || name.trim().length === 0) {
+      throw new Error('Rule name is required');
+    }
+    if (name.length > AutoReplyRule.MAX_NAME_LENGTH) {
+      throw new Error(`Rule name cannot exceed ${AutoReplyRule.MAX_NAME_LENGTH} characters`);
+    }
+
     return AutoReplyRule.reconstruct(
       this.#id,
       this.#accountId,
-      name,
-      this.#keywords,
-      this.#replyContent,
+      name.trim(),
       this.#priority,
-      this.#status
+      this.#conditions,
+      this.#responses,
+      this.#rateLimit,
+      this.#timeWindow,
+      this.#enabled,
+      this.#createdAt,
+      new Date()
     );
   }
 
-  updateKeywords(keywords: ReadonlyArray<string>): AutoReplyRule {
+  updatePriority(priority: number): AutoReplyRule {
+    if (priority < 0) {
+      throw new Error('Priority must be non-negative');
+    }
+
     return AutoReplyRule.reconstruct(
       this.#id,
       this.#accountId,
       this.#name,
-      keywords,
-      this.#replyContent,
-      this.#priority,
-      this.#status
+      priority,
+      this.#conditions,
+      this.#responses,
+      this.#rateLimit,
+      this.#timeWindow,
+      this.#enabled,
+      this.#createdAt,
+      new Date()
     );
   }
 
-  updateReplyContent(replyContent: ReplyContent): AutoReplyRule {
+  updateConditions(conditions: ReadonlyArray<Condition>): AutoReplyRule {
+    if (!conditions || conditions.length === 0) {
+      throw new Error('At least one condition is required');
+    }
+    if (conditions.length > AutoReplyRule.MAX_CONDITIONS) {
+      throw new Error(`Cannot exceed ${AutoReplyRule.MAX_CONDITIONS} conditions`);
+    }
+
     return AutoReplyRule.reconstruct(
       this.#id,
       this.#accountId,
       this.#name,
-      this.#keywords,
-      replyContent,
       this.#priority,
-      this.#status
+      conditions,
+      this.#responses,
+      this.#rateLimit,
+      this.#timeWindow,
+      this.#enabled,
+      this.#createdAt,
+      new Date()
     );
   }
 
-  activate(): AutoReplyRule {
+  updateResponses(responses: ReadonlyArray<Response>): AutoReplyRule {
+    if (!responses || responses.length === 0) {
+      throw new Error('At least one response is required');
+    }
+    if (responses.length > AutoReplyRule.MAX_RESPONSES) {
+      throw new Error(`Cannot exceed ${AutoReplyRule.MAX_RESPONSES} responses`);
+    }
+
     return AutoReplyRule.reconstruct(
       this.#id,
       this.#accountId,
       this.#name,
-      this.#keywords,
-      this.#replyContent,
       this.#priority,
-      'active'
+      this.#conditions,
+      responses,
+      this.#rateLimit,
+      this.#timeWindow,
+      this.#enabled,
+      this.#createdAt,
+      new Date()
     );
   }
 
-  deactivate(): AutoReplyRule {
+  updateRateLimit(rateLimit: RateLimit | null): AutoReplyRule {
     return AutoReplyRule.reconstruct(
       this.#id,
       this.#accountId,
       this.#name,
-      this.#keywords,
-      this.#replyContent,
       this.#priority,
-      'inactive'
+      this.#conditions,
+      this.#responses,
+      rateLimit,
+      this.#timeWindow,
+      this.#enabled,
+      this.#createdAt,
+      new Date()
     );
+  }
+
+  updateTimeWindow(timeWindow: TimeWindow | null): AutoReplyRule {
+    return AutoReplyRule.reconstruct(
+      this.#id,
+      this.#accountId,
+      this.#name,
+      this.#priority,
+      this.#conditions,
+      this.#responses,
+      this.#rateLimit,
+      timeWindow,
+      this.#enabled,
+      this.#createdAt,
+      new Date()
+    );
+  }
+
+  enable(): AutoReplyRule {
+    if (this.#enabled) {
+      return this;
+    }
+
+    return AutoReplyRule.reconstruct(
+      this.#id,
+      this.#accountId,
+      this.#name,
+      this.#priority,
+      this.#conditions,
+      this.#responses,
+      this.#rateLimit,
+      this.#timeWindow,
+      true,
+      this.#createdAt,
+      new Date()
+    );
+  }
+
+  disable(): AutoReplyRule {
+    if (!this.#enabled) {
+      return this;
+    }
+
+    return AutoReplyRule.reconstruct(
+      this.#id,
+      this.#accountId,
+      this.#name,
+      this.#priority,
+      this.#conditions,
+      this.#responses,
+      this.#rateLimit,
+      this.#timeWindow,
+      false,
+      this.#createdAt,
+      new Date()
+    );
+  }
+
+  canBeExecuted(currentTime: Date = new Date()): boolean {
+    return this.#enabled && 
+           (this.#timeWindow === null || this.#timeWindow.contains(currentTime));
   }
 }

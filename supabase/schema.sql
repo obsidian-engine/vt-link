@@ -49,18 +49,39 @@ CREATE TABLE rich_menus (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Auto Reply Rules
+-- Auto Reply Rules (Enhanced for Clean Architecture)
 CREATE TABLE auto_reply_rules (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     account_id UUID NOT NULL REFERENCES line_accounts(id) ON DELETE CASCADE,
     name VARCHAR(100) NOT NULL,
-    keywords TEXT[] NOT NULL,
-    reply_type VARCHAR(20) DEFAULT 'text',
-    reply_content JSONB NOT NULL,
+    conditions JSONB NOT NULL DEFAULT '[]',
+    responses JSONB NOT NULL DEFAULT '[]',
+    enabled BOOLEAN DEFAULT true,
     priority INTEGER DEFAULT 0,
-    status reply_rule_status DEFAULT 'active',
+    rate_limit JSONB,
+    time_window JSONB,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Reply Logs (for tracking bot responses)
+CREATE TABLE reply_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    account_id UUID NOT NULL REFERENCES line_accounts(id) ON DELETE CASCADE,
+    rule_id UUID NOT NULL REFERENCES auto_reply_rules(id) ON DELETE CASCADE,
+    message_id VARCHAR(50) NOT NULL,
+    user_id VARCHAR(50) NOT NULL,
+    source_type VARCHAR(10) NOT NULL,
+    source_id VARCHAR(50) NOT NULL,
+    response_content JSONB NOT NULL,
+    replied_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Rate Limit Entries (for rate limiting)
+CREATE TABLE rate_limit_entries (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    key VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Message Campaigns (Broadcast/Push messages)
@@ -99,6 +120,17 @@ CREATE INDEX idx_line_accounts_user_id ON line_accounts(user_id);
 CREATE INDEX idx_line_accounts_channel_id ON line_accounts(channel_id);
 CREATE INDEX idx_rich_menus_account_id ON rich_menus(account_id);
 CREATE INDEX idx_rich_menus_is_default ON rich_menus(account_id, is_default) WHERE is_default = true;
+CREATE INDEX idx_auto_reply_rules_account_id ON auto_reply_rules(account_id);
+CREATE INDEX idx_auto_reply_rules_enabled ON auto_reply_rules(account_id, enabled) WHERE enabled = true;
+CREATE INDEX idx_auto_reply_rules_priority ON auto_reply_rules(account_id, priority DESC);
+CREATE INDEX idx_reply_logs_account_id ON reply_logs(account_id);
+CREATE INDEX idx_reply_logs_rule_id ON reply_logs(rule_id);
+CREATE INDEX idx_reply_logs_replied_at ON reply_logs(replied_at DESC);
+CREATE INDEX idx_rate_limit_entries_key_created ON rate_limit_entries(key, created_at);
+
+-- Create GIN indexes for JSONB fields
+CREATE INDEX idx_auto_reply_rules_conditions ON auto_reply_rules USING GIN(conditions);
+CREATE INDEX idx_auto_reply_rules_responses ON auto_reply_rules USING GIN(responses);
 CREATE INDEX idx_auto_reply_rules_account_id ON auto_reply_rules(account_id);
 CREATE INDEX idx_auto_reply_rules_status ON auto_reply_rules(account_id, status) WHERE status = 'active';
 CREATE INDEX idx_auto_reply_keywords ON auto_reply_rules USING gin(keywords);
