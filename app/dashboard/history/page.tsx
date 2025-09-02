@@ -1,6 +1,7 @@
-import { Suspense } from "react";
-import Link from "next/link";
-import { getCampaignHistory } from "@/ui/actions/campaignActions";
+import type { DeliveryHistory } from '@/types/dashboard.types';
+import { getCampaignHistory } from '@/ui/actions/campaignActions';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function HistoryPage() {
   return (
@@ -36,15 +37,13 @@ export default function HistoryPage() {
 
 async function HistoryContent() {
   // 実際のアプリケーションでは認証からaccountIdを取得
-  const accountId = "demo-account-id";
+  const accountId = 'demo-account-id';
   const result = await getCampaignHistory(accountId);
 
   if (!result.success) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600 dark:text-red-400">
-          エラーが発生しました: {result.error}
-        </div>
+        <div className="text-red-600 dark:text-red-400">エラーが発生しました: {result.error}</div>
       </div>
     );
   }
@@ -91,10 +90,7 @@ async function HistoryContent() {
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {campaigns
-                      .reduce(
-                        (sum: number, c: any) => sum + (c.sentCount || 0),
-                        0,
-                      )
+                      .reduce((sum: number, c: any) => sum + (c.sentCount || 0), 0)
                       .toLocaleString()}
                   </dd>
                 </dl>
@@ -116,10 +112,7 @@ async function HistoryContent() {
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {campaigns
-                      .reduce(
-                        (sum: number, c: any) => sum + (c.failedCount || 0),
-                        0,
-                      )
+                      .reduce((sum: number, c: any) => sum + (c.failedCount || 0), 0)
                       .toLocaleString()}
                   </dd>
                 </dl>
@@ -143,15 +136,15 @@ async function HistoryContent() {
                     {campaigns.length > 0
                       ? Math.round(
                           (campaigns.reduce(
-                            (sum: number, c: any) => sum + (c.sentCount || 0),
-                            0,
+                            (sum: number, c: DeliveryHistory) => sum + (c.sentCount || 0),
+                            0
                           ) /
                             (campaigns.reduce(
                               (sum: number, c: any) =>
                                 sum + (c.sentCount || 0) + (c.failedCount || 0),
-                              0,
+                              0
                             ) || 1)) *
-                            100,
+                            100
                         )
                       : 0}
                     %
@@ -195,9 +188,7 @@ async function HistoryContent() {
 
       {campaigns.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-gray-500 dark:text-gray-400 mb-4">
-            まだ配信履歴がありません
-          </div>
+          <div className="text-gray-500 dark:text-gray-400 mb-4">まだ配信履歴がありません</div>
           <Link
             href="/dashboard/campaigns/new"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
@@ -208,9 +199,7 @@ async function HistoryContent() {
       ) : (
         <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-              配信履歴一覧
-            </h2>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white">配信履歴一覧</h2>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -255,13 +244,13 @@ async function HistoryContent() {
 function HistoryRow({ campaign }: { campaign: any }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "sent":
+      case 'sent':
         return (
           <span className="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300">
             送信完了
           </span>
         );
-      case "failed":
+      case 'failed':
         return (
           <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300">
             送信失敗
@@ -277,14 +266,11 @@ function HistoryRow({ campaign }: { campaign: any }) {
   };
 
   const getTypeIcon = (type: string) => {
-    return type === "broadcast" ? "📢" : "🎯";
+    return type === 'broadcast' ? '📢' : '🎯';
   };
 
   const totalSent = (campaign.sentCount || 0) + (campaign.failedCount || 0);
-  const successRate =
-    totalSent > 0
-      ? Math.round(((campaign.sentCount || 0) / totalSent) * 100)
-      : 0;
+  const successRate = totalSent > 0 ? Math.round(((campaign.sentCount || 0) / totalSent) * 100) : 0;
 
   return (
     <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
@@ -292,9 +278,7 @@ function HistoryRow({ campaign }: { campaign: any }) {
         <div className="flex items-center">
           <span className="text-lg mr-3">{getTypeIcon(campaign.type)}</span>
           <div>
-            <div className="text-sm font-medium text-gray-900 dark:text-white">
-              {campaign.name}
-            </div>
+            <div className="text-sm font-medium text-gray-900 dark:text-white">{campaign.name}</div>
             <div className="text-sm text-gray-500 dark:text-gray-400">
               ID: {campaign.id.slice(0, 8)}...
             </div>
@@ -303,14 +287,12 @@ function HistoryRow({ campaign }: { campaign: any }) {
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900 dark:text-white">
-          {campaign.sentAt
-            ? new Date(campaign.sentAt).toLocaleString("ja-JP")
-            : "-"}
+          {campaign.sentAt ? new Date(campaign.sentAt).toLocaleString('ja-JP') : '-'}
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="text-sm text-gray-900 dark:text-white">
-          {campaign.type === "broadcast" ? "一斉配信" : "セグメント配信"}
+          {campaign.type === 'broadcast' ? '一斉配信' : 'セグメント配信'}
         </div>
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
@@ -333,10 +315,10 @@ function HistoryRow({ campaign }: { campaign: any }) {
           <span
             className={`font-medium ${
               successRate >= 95
-                ? "text-green-600 dark:text-green-400"
+                ? 'text-green-600 dark:text-green-400'
                 : successRate >= 90
-                  ? "text-yellow-600 dark:text-yellow-400"
-                  : "text-red-600 dark:text-red-400"
+                  ? 'text-yellow-600 dark:text-yellow-400'
+                  : 'text-red-600 dark:text-red-400'
             }`}
           >
             {successRate}%
@@ -346,18 +328,16 @@ function HistoryRow({ campaign }: { campaign: any }) {
           <div
             className={`h-1.5 rounded-full ${
               successRate >= 95
-                ? "bg-green-500"
+                ? 'bg-green-500'
                 : successRate >= 90
-                  ? "bg-yellow-500"
-                  : "bg-red-500"
+                  ? 'bg-yellow-500'
+                  : 'bg-red-500'
             }`}
             style={{ width: `${successRate}%` }}
-          ></div>
+          />
         </div>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap">
-        {getStatusBadge(campaign.status)}
-      </td>
+      <td className="px-6 py-4 whitespace-nowrap">{getStatusBadge(campaign.status)}</td>
       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
         <Link
           href={`/dashboard/campaigns/${campaign.id}`}
@@ -376,18 +356,15 @@ function HistoryListSkeleton() {
       {/* 統計サマリーのスケルトン */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[1, 2, 3, 4].map((i) => (
-          <div
-            key={i}
-            className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg"
-          >
+          <div key={i} className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
                 </div>
                 <div className="ml-5 w-0 flex-1">
-                  <div className="h-4 w-16 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-2"></div>
-                  <div className="h-5 w-12 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                  <div className="h-4 w-16 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-2" />
+                  <div className="h-5 w-12 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
                 </div>
               </div>
             </div>
@@ -399,18 +376,18 @@ function HistoryListSkeleton() {
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div className="flex items-center space-x-4">
-            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
-            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
-            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
+            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
+            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
           </div>
-          <div className="h-8 w-64 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+          <div className="h-8 w-64 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
         </div>
       </div>
 
       {/* テーブルのスケルトン */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+          <div className="h-6 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -418,7 +395,7 @@ function HistoryListSkeleton() {
               <tr>
                 {[1, 2, 3, 4, 5, 6, 7].map((i) => (
                   <th key={i} className="px-6 py-3">
-                    <div className="h-4 w-16 bg-gray-200 dark:bg-gray-500 rounded animate-pulse"></div>
+                    <div className="h-4 w-16 bg-gray-200 dark:bg-gray-500 rounded animate-pulse" />
                   </th>
                 ))}
               </tr>
@@ -428,7 +405,7 @@ function HistoryListSkeleton() {
                 <tr key={i}>
                   {[1, 2, 3, 4, 5, 6, 7].map((j) => (
                     <td key={j} className="px-6 py-4 whitespace-nowrap">
-                      <div className="h-4 w-20 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                      <div className="h-4 w-20 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
                     </td>
                   ))}
                 </tr>

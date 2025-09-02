@@ -1,13 +1,5 @@
-import { SegmentCriteria } from "../../valueObjects/SegmentCriteria";
-import { Gender } from "../../valueObjects/Gender";
-import { RegionCode } from "../../valueObjects/Region";
-
-export interface LineUser {
-  readonly userId: string;
-  readonly gender: Gender;
-  readonly age: number;
-  readonly region: RegionCode;
-}
+import type { SegmentCriteria } from '../../valueObjects/SegmentCriteria';
+import type { LineUser } from './LineUser';
 
 export class TargetSegment {
   static readonly MAX_NAME_LENGTH = 100;
@@ -32,7 +24,7 @@ export class TargetSegment {
     isActive: boolean,
     estimatedSize: number,
     createdAt: Date,
-    updatedAt: Date,
+    updatedAt: Date
   ) {
     this.#id = id;
     this.#accountId = accountId;
@@ -51,29 +43,27 @@ export class TargetSegment {
     accountId: string,
     name: string,
     description: string,
-    criteria: SegmentCriteria,
+    criteria: SegmentCriteria
   ): TargetSegment {
     if (!id || id.trim().length === 0) {
-      throw new Error("Segment ID is required");
+      throw new Error('Segment ID is required');
     }
     if (!accountId || accountId.trim().length === 0) {
-      throw new Error("Account ID is required");
+      throw new Error('Account ID is required');
     }
     if (!name || name.trim().length === 0) {
-      throw new Error("Segment name is required");
+      throw new Error('Segment name is required');
     }
     if (name.length > this.MAX_NAME_LENGTH) {
-      throw new Error(
-        `Segment name cannot exceed ${this.MAX_NAME_LENGTH} characters`,
-      );
+      throw new Error(`Segment name cannot exceed ${this.MAX_NAME_LENGTH} characters`);
     }
     if (description && description.length > this.MAX_DESCRIPTION_LENGTH) {
       throw new Error(
-        `Segment description cannot exceed ${this.MAX_DESCRIPTION_LENGTH} characters`,
+        `Segment description cannot exceed ${this.MAX_DESCRIPTION_LENGTH} characters`
       );
     }
     if (criteria.isEmpty()) {
-      throw new Error("Segment criteria cannot be empty");
+      throw new Error('Segment criteria cannot be empty');
     }
 
     const now = new Date();
@@ -81,12 +71,12 @@ export class TargetSegment {
       id.trim(),
       accountId.trim(),
       name.trim(),
-      description?.trim() || "",
+      description?.trim() || '',
       criteria,
       true,
       0, // Initial estimate, will be updated later
       now,
-      now,
+      now
     );
   }
 
@@ -99,7 +89,7 @@ export class TargetSegment {
     isActive: boolean,
     estimatedSize: number,
     createdAt: Date,
-    updatedAt: Date,
+    updatedAt: Date
   ): TargetSegment {
     return new TargetSegment(
       id,
@@ -110,7 +100,7 @@ export class TargetSegment {
       isActive,
       estimatedSize,
       createdAt,
-      updatedAt,
+      updatedAt
     );
   }
 
@@ -153,33 +143,24 @@ export class TargetSegment {
   /**
    * セグメントを更新します
    */
-  update(
-    name?: string,
-    description?: string,
-    criteria?: SegmentCriteria,
-  ): TargetSegment {
+  update(name?: string, description?: string, criteria?: SegmentCriteria): TargetSegment {
     if (name !== undefined) {
       if (!name || name.trim().length === 0) {
-        throw new Error("Segment name is required");
+        throw new Error('Segment name is required');
       }
       if (name.length > TargetSegment.MAX_NAME_LENGTH) {
-        throw new Error(
-          `Segment name cannot exceed ${TargetSegment.MAX_NAME_LENGTH} characters`,
-        );
+        throw new Error(`Segment name cannot exceed ${TargetSegment.MAX_NAME_LENGTH} characters`);
       }
     }
 
-    if (
-      description !== undefined &&
-      description.length > TargetSegment.MAX_DESCRIPTION_LENGTH
-    ) {
+    if (description !== undefined && description.length > TargetSegment.MAX_DESCRIPTION_LENGTH) {
       throw new Error(
-        `Segment description cannot exceed ${TargetSegment.MAX_DESCRIPTION_LENGTH} characters`,
+        `Segment description cannot exceed ${TargetSegment.MAX_DESCRIPTION_LENGTH} characters`
       );
     }
 
     if (criteria !== undefined && criteria.isEmpty()) {
-      throw new Error("Segment criteria cannot be empty");
+      throw new Error('Segment criteria cannot be empty');
     }
 
     const newName = name?.trim() || this.#name;
@@ -195,7 +176,7 @@ export class TargetSegment {
       this.#isActive,
       this.#estimatedSize,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -216,7 +197,7 @@ export class TargetSegment {
       false,
       this.#estimatedSize,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -237,7 +218,7 @@ export class TargetSegment {
       true,
       this.#estimatedSize,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -246,7 +227,7 @@ export class TargetSegment {
    */
   updateEstimatedSize(size: number): TargetSegment {
     if (size < 0) {
-      throw new Error("Estimated size cannot be negative");
+      throw new Error('Estimated size cannot be negative');
     }
 
     return new TargetSegment(
@@ -258,7 +239,7 @@ export class TargetSegment {
       this.#isActive,
       size,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -266,10 +247,15 @@ export class TargetSegment {
    * ユーザーがこのセグメントの対象になるかをチェックします
    */
   matches(user: LineUser): boolean {
+    // null値を適切にハンドリング
+    if (!user.age || !user.gender || !user.region) {
+      return false;
+    }
+
     return this.#criteria.matches({
-      gender: user.gender,
+      gender: user.gender as any, // 型変換（一時的対応）
       age: user.age,
-      region: user.region,
+      region: user.region as any, // 型変換（一時的対応）
     });
   }
 
@@ -284,7 +270,7 @@ export class TargetSegment {
    * ユーザーリストからこのセグメントに一致するユーザーIDのみを抽出します
    */
   filterUserIds(users: LineUser[]): string[] {
-    return this.filterUsers(users).map((user) => user.userId);
+    return this.filterUsers(users).map((user) => user.id);
   }
 
   /**

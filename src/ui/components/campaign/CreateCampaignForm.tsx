@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { createCampaign } from "@/ui/actions/campaignActions";
+import { createCampaign } from '@/ui/actions/campaignActions';
+import { useRouter } from 'next/navigation';
+import { useRef, useState } from 'react';
 
 export function CreateCampaignForm() {
   const router = useRouter();
@@ -11,14 +11,10 @@ export function CreateCampaignForm() {
   const [error, setError] = useState<string | null>(null);
 
   // フォームの状態管理
-  const [campaignType, setCampaignType] = useState<"broadcast" | "narrowcast">(
-    "broadcast",
-  );
+  const [campaignType, setCampaignType] = useState<'broadcast' | 'narrowcast'>('broadcast');
   const [useTemplate, setUseTemplate] = useState(false);
-  const [scheduleType, setScheduleType] = useState<"now" | "scheduled">("now");
-  const [messageType, setMessageType] = useState<"text" | "image" | "sticker">(
-    "text",
-  );
+  const [scheduleType, setScheduleType] = useState<'now' | 'scheduled'>('now');
+  const [messageType, setMessageType] = useState<'text' | 'image' | 'sticker'>('text');
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -32,59 +28,59 @@ export function CreateCampaignForm() {
       const formData = new FormData(event.currentTarget);
 
       // 実際のアプリケーションでは認証からaccountIdを取得
-      formData.append("accountId", "demo-account-id");
+      formData.append('accountId', 'demo-account-id');
 
       // コンテンツデータを構築
       const content = [];
-      if (messageType === "text") {
-        const textContent = formData.get("textContent") as string;
+      if (messageType === 'text') {
+        const textContent = formData.get('textContent') as string;
         if (textContent) {
           content.push({
-            type: "text",
+            type: 'text',
             payload: { text: textContent },
           });
         }
-      } else if (messageType === "image") {
-        const imageUrl = formData.get("imageUrl") as string;
+      } else if (messageType === 'image') {
+        const imageUrl = formData.get('imageUrl') as string;
         if (imageUrl) {
           content.push({
-            type: "image",
+            type: 'image',
             payload: { imageUrl },
           });
         }
-      } else if (messageType === "sticker") {
-        const packageId = formData.get("packageId") as string;
-        const stickerId = formData.get("stickerId") as string;
+      } else if (messageType === 'sticker') {
+        const packageId = formData.get('packageId') as string;
+        const stickerId = formData.get('stickerId') as string;
         if (packageId && stickerId) {
           content.push({
-            type: "sticker",
+            type: 'sticker',
             payload: { packageId, stickerId },
           });
         }
       }
 
-      formData.append("content", JSON.stringify(content));
-      formData.append("type", campaignType);
+      formData.append('content', JSON.stringify(content));
+      formData.append('type', campaignType);
 
       // スケジュール設定
-      if (scheduleType === "scheduled") {
-        const scheduledDate = formData.get("scheduledDate") as string;
-        const scheduledTime = formData.get("scheduledTime") as string;
+      if (scheduleType === 'scheduled') {
+        const scheduledDate = formData.get('scheduledDate') as string;
+        const scheduledTime = formData.get('scheduledTime') as string;
         if (scheduledDate && scheduledTime) {
           const scheduledAt = new Date(`${scheduledDate}T${scheduledTime}`);
-          formData.append("scheduledAt", scheduledAt.toISOString());
+          formData.append('scheduledAt', scheduledAt.toISOString());
         }
       }
 
       const result = await createCampaign(formData);
 
       if (result.success) {
-        router.push("/dashboard/campaigns");
+        router.push('/dashboard/campaigns');
       } else {
-        setError(result.error);
+        setError(result.error || 'エラーが発生しました');
       }
     } catch (error) {
-      setError(error instanceof Error ? error.message : "エラーが発生しました");
+      setError(error instanceof Error ? error.message : 'エラーが発生しました');
     } finally {
       setIsSubmitting(false);
     }
@@ -125,9 +121,7 @@ export function CreateCampaignForm() {
 
       {/* 配信設定 */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
-          配信設定
-        </h2>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">配信設定</h2>
         <div className="space-y-6">
           {/* 配信タイプ */}
           <div>
@@ -140,10 +134,8 @@ export function CreateCampaignForm() {
                   type="radio"
                   name="campaignType"
                   value="broadcast"
-                  checked={campaignType === "broadcast"}
-                  onChange={(e) =>
-                    setCampaignType(e.target.value as "broadcast")
-                  }
+                  checked={campaignType === 'broadcast'}
+                  onChange={(e) => setCampaignType(e.target.value as 'broadcast')}
                   className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                 />
                 <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -155,10 +147,8 @@ export function CreateCampaignForm() {
                   type="radio"
                   name="campaignType"
                   value="narrowcast"
-                  checked={campaignType === "narrowcast"}
-                  onChange={(e) =>
-                    setCampaignType(e.target.value as "narrowcast")
-                  }
+                  checked={campaignType === 'narrowcast'}
+                  onChange={(e) => setCampaignType(e.target.value as 'narrowcast')}
                   className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                 />
                 <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -169,7 +159,7 @@ export function CreateCampaignForm() {
           </div>
 
           {/* セグメント選択（ナローキャストの場合のみ） */}
-          {campaignType === "narrowcast" && (
+          {campaignType === 'narrowcast' && (
             <div>
               <label
                 htmlFor="segmentId"
@@ -180,7 +170,7 @@ export function CreateCampaignForm() {
               <select
                 name="segmentId"
                 id="segmentId"
-                required={campaignType === "narrowcast"}
+                required={campaignType === 'narrowcast'}
                 className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               >
                 <option value="">セグメントを選択してください</option>
@@ -206,32 +196,26 @@ export function CreateCampaignForm() {
                   type="radio"
                   name="scheduleType"
                   value="now"
-                  checked={scheduleType === "now"}
-                  onChange={(e) => setScheduleType(e.target.value as "now")}
+                  checked={scheduleType === 'now'}
+                  onChange={(e) => setScheduleType(e.target.value as 'now')}
                   className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                  即座に配信
-                </span>
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">即座に配信</span>
               </label>
               <label className="flex items-center">
                 <input
                   type="radio"
                   name="scheduleType"
                   value="scheduled"
-                  checked={scheduleType === "scheduled"}
-                  onChange={(e) =>
-                    setScheduleType(e.target.value as "scheduled")
-                  }
+                  checked={scheduleType === 'scheduled'}
+                  onChange={(e) => setScheduleType(e.target.value as 'scheduled')}
                   className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                 />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                  日時指定配信
-                </span>
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">日時指定配信</span>
               </label>
             </div>
 
-            {scheduleType === "scheduled" && (
+            {scheduleType === 'scheduled' && (
               <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label
@@ -244,8 +228,8 @@ export function CreateCampaignForm() {
                     type="date"
                     name="scheduledDate"
                     id="scheduledDate"
-                    required={scheduleType === "scheduled"}
-                    min={new Date().toISOString().split("T")[0]}
+                    required={scheduleType === 'scheduled'}
+                    min={new Date().toISOString().split('T')[0]}
                     className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
@@ -260,7 +244,7 @@ export function CreateCampaignForm() {
                     type="time"
                     name="scheduledTime"
                     id="scheduledTime"
-                    required={scheduleType === "scheduled"}
+                    required={scheduleType === 'scheduled'}
                     className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                   />
                 </div>
@@ -272,9 +256,7 @@ export function CreateCampaignForm() {
 
       {/* メッセージ内容 */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">
-          メッセージ内容
-        </h2>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-6">メッセージ内容</h2>
         <div className="space-y-6">
           {/* テンプレート利用設定 */}
           <div>
@@ -325,8 +307,8 @@ export function CreateCampaignForm() {
                       type="radio"
                       name="messageType"
                       value="text"
-                      checked={messageType === "text"}
-                      onChange={(e) => setMessageType(e.target.value as "text")}
+                      checked={messageType === 'text'}
+                      onChange={(e) => setMessageType(e.target.value as 'text')}
                       className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                     />
                     <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -338,25 +320,19 @@ export function CreateCampaignForm() {
                       type="radio"
                       name="messageType"
                       value="image"
-                      checked={messageType === "image"}
-                      onChange={(e) =>
-                        setMessageType(e.target.value as "image")
-                      }
+                      checked={messageType === 'image'}
+                      onChange={(e) => setMessageType(e.target.value as 'image')}
                       className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                     />
-                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                      🖼️ 画像
-                    </span>
+                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">🖼️ 画像</span>
                   </label>
                   <label className="flex items-center">
                     <input
                       type="radio"
                       name="messageType"
                       value="sticker"
-                      checked={messageType === "sticker"}
-                      onChange={(e) =>
-                        setMessageType(e.target.value as "sticker")
-                      }
+                      checked={messageType === 'sticker'}
+                      onChange={(e) => setMessageType(e.target.value as 'sticker')}
                       className="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300"
                     />
                     <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
@@ -367,7 +343,7 @@ export function CreateCampaignForm() {
               </div>
 
               {/* メッセージ内容入力 */}
-              {messageType === "text" && (
+              {messageType === 'text' && (
                 <div>
                   <label
                     htmlFor="textContent"
@@ -379,7 +355,7 @@ export function CreateCampaignForm() {
                     name="textContent"
                     id="textContent"
                     rows={4}
-                    required={messageType === "text" && !useTemplate}
+                    required={messageType === 'text' && !useTemplate}
                     className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     placeholder="配信するメッセージを入力してください&#10;&#10;例:&#10;こんにちは！&#10;新商品のお知らせです✨"
                   />
@@ -389,7 +365,7 @@ export function CreateCampaignForm() {
                 </div>
               )}
 
-              {messageType === "image" && (
+              {messageType === 'image' && (
                 <div>
                   <label
                     htmlFor="imageUrl"
@@ -401,7 +377,7 @@ export function CreateCampaignForm() {
                     type="url"
                     name="imageUrl"
                     id="imageUrl"
-                    required={messageType === "image" && !useTemplate}
+                    required={messageType === 'image' && !useTemplate}
                     className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                     placeholder="https://example.com/image.jpg"
                   />
@@ -411,7 +387,7 @@ export function CreateCampaignForm() {
                 </div>
               )}
 
-              {messageType === "sticker" && (
+              {messageType === 'sticker' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label
@@ -424,7 +400,7 @@ export function CreateCampaignForm() {
                       type="text"
                       name="packageId"
                       id="packageId"
-                      required={messageType === "sticker" && !useTemplate}
+                      required={messageType === 'sticker' && !useTemplate}
                       className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       placeholder="446"
                     />
@@ -440,7 +416,7 @@ export function CreateCampaignForm() {
                       type="text"
                       name="stickerId"
                       id="stickerId"
-                      required={messageType === "sticker" && !useTemplate}
+                      required={messageType === 'sticker' && !useTemplate}
                       className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                       placeholder="1988"
                     />
@@ -480,17 +456,17 @@ export function CreateCampaignForm() {
                   r="10"
                   stroke="currentColor"
                   strokeWidth="4"
-                ></circle>
+                />
                 <path
                   className="opacity-75"
                   fill="currentColor"
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
+                />
               </svg>
               作成中...
             </>
           ) : (
-            "キャンペーンを作成"
+            'キャンペーンを作成'
           )}
         </button>
       </div>
@@ -499,4 +475,4 @@ export function CreateCampaignForm() {
 }
 
 // Next.js Link コンポーネントをインポート
-import Link from "next/link";
+import Link from 'next/link';

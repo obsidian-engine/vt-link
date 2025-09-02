@@ -1,6 +1,7 @@
-import { Suspense } from "react";
-import Link from "next/link";
-import { getSegments } from "@/ui/actions/segmentActions";
+import type { SegmentCriteria, TargetSegment } from '@/types/dashboard.types';
+import { getSegments } from '@/ui/actions/segmentActions';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function SegmentsPage() {
   return (
@@ -42,15 +43,13 @@ export default function SegmentsPage() {
 
 async function SegmentList() {
   // 実際のアプリケーションでは認証からaccountIdを取得
-  const accountId = "demo-account-id";
+  const accountId = 'demo-account-id';
   const result = await getSegments(accountId);
 
   if (!result.success) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600 dark:text-red-400">
-          エラーが発生しました: {result.error}
-        </div>
+        <div className="text-red-600 dark:text-red-400">エラーが発生しました: {result.error}</div>
       </div>
     );
   }
@@ -111,10 +110,8 @@ async function SegmentList() {
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {segments.length > 0
                       ? Math.round(
-                          segments.reduce(
-                            (sum, s) => sum + (s.estimatedCount || 0),
-                            0,
-                          ) / segments.length,
+                          segments.reduce((sum, s) => sum + (s.estimatedCount || 0), 0) /
+                            segments.length
                         ).toLocaleString()
                       : 0}
                     名
@@ -182,7 +179,7 @@ async function SegmentList() {
 }
 
 function SegmentCard({ segment }: { segment: any }) {
-  const getCriteriaText = (criteria: any) => {
+  const getCriteriaText = (criteria: SegmentCriteria) => {
     const parts = [];
 
     if (criteria.ageRange) {
@@ -192,47 +189,47 @@ function SegmentCard({ segment }: { segment: any }) {
     if (criteria.genders && criteria.genders.length > 0) {
       const genderLabels = criteria.genders.map((g: string) => {
         switch (g) {
-          case "male":
-            return "男性";
-          case "female":
-            return "女性";
+          case 'male':
+            return '男性';
+          case 'female':
+            return '女性';
           default:
             return g;
         }
       });
-      parts.push(genderLabels.join("・"));
+      parts.push(genderLabels.join('・'));
     }
 
     if (criteria.regions && criteria.regions.length > 0) {
       const regionLabels = criteria.regions.map((r: string) => {
         // 地域コードから日本語名への変換（簡略版）
         switch (r) {
-          case "JP-13":
-            return "東京都";
-          case "JP-27":
-            return "大阪府";
-          case "JP-14":
-            return "神奈川県";
+          case 'JP-13':
+            return '東京都';
+          case 'JP-27':
+            return '大阪府';
+          case 'JP-14':
+            return '神奈川県';
           default:
             return r;
         }
       });
-      parts.push(regionLabels.join("・"));
+      parts.push(regionLabels.join('・'));
     }
 
-    return parts.length > 0 ? parts.join(" / ") : "条件なし";
+    return parts.length > 0 ? parts.join(' / ') : '条件なし';
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "demographic":
-        return "👥";
-      case "behavioral":
-        return "📊";
-      case "custom":
-        return "🎯";
+      case 'demographic':
+        return '👥';
+      case 'behavioral':
+        return '📊';
+      case 'custom':
+        return '🎯';
       default:
-        return "📋";
+        return '📋';
     }
   };
 
@@ -248,17 +245,13 @@ function SegmentCard({ segment }: { segment: any }) {
                   {segment.name}
                 </h3>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                {segment.description}
-              </p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{segment.description}</p>
             </div>
           </div>
 
           {/* セグメント条件 */}
           <div className="mb-4">
-            <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-              対象条件:
-            </div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">対象条件:</div>
             <div className="text-sm text-gray-900 dark:text-white">
               {getCriteriaText(segment.criteria)}
             </div>
@@ -275,7 +268,7 @@ function SegmentCard({ segment }: { segment: any }) {
               </span>
             </div>
             <span className="text-gray-500 dark:text-gray-400">
-              {new Date(segment.updatedAt).toLocaleDateString("ja-JP")}
+              {new Date(segment.updatedAt).toLocaleDateString('ja-JP')}
             </span>
           </div>
         </div>
@@ -290,18 +283,15 @@ function SegmentListSkeleton() {
       {/* 統計情報のスケルトン */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[1, 2, 3].map((i) => (
-          <div
-            key={i}
-            className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg"
-          >
+          <div key={i} className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                  <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
                 </div>
                 <div className="ml-5 w-0 flex-1">
-                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-2"></div>
-                  <div className="h-5 w-16 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-2" />
+                  <div className="h-5 w-16 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
                 </div>
               </div>
             </div>
@@ -313,42 +303,39 @@ function SegmentListSkeleton() {
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div className="flex items-center space-x-4">
-            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
-            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
+            <div className="h-8 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
           </div>
-          <div className="h-8 w-64 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+          <div className="h-8 w-64 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
         </div>
       </div>
 
       {/* セグメント一覧のスケルトン */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div
-            key={i}
-            className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden"
-          >
+          <div key={i} className="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
             <div className="p-6">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-2">
-                    <div className="w-6 h-6 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
-                    <div className="h-5 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                    <div className="w-6 h-6 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
+                    <div className="h-5 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
                   </div>
-                  <div className="h-4 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-3"></div>
+                  <div className="h-4 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-3" />
                 </div>
               </div>
 
               <div className="mb-4">
-                <div className="h-3 w-16 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-1"></div>
-                <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                <div className="h-3 w-16 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-1" />
+                <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
               </div>
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="h-4 w-12 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
-                  <div className="h-4 w-16 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                  <div className="h-4 w-12 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
+                  <div className="h-4 w-16 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
                 </div>
-                <div className="h-4 w-20 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+                <div className="h-4 w-20 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
               </div>
             </div>
           </div>

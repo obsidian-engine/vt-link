@@ -1,18 +1,18 @@
-import { IncomingMessage, MessageType } from "./IncomingMessage";
+import type { IncomingMessage, MessageType } from './IncomingMessage';
 
 export enum ConditionType {
-  Keyword = "keyword",
-  Regex = "regex",
-  MessageType = "messageType",
-  Time = "time",
-  User = "user",
+  Keyword = 'keyword',
+  Regex = 'regex',
+  MessageType = 'messageType',
+  Time = 'time',
+  User = 'user',
 }
 
 export enum KeywordMatchMode {
-  Partial = "partial",
-  Exact = "exact",
-  StartsWith = "startsWith",
-  EndsWith = "endsWith",
+  Partial = 'partial',
+  Exact = 'exact',
+  StartsWith = 'startsWith',
+  EndsWith = 'endsWith',
 }
 
 export abstract class Condition {
@@ -41,12 +41,7 @@ export class KeywordCondition extends Condition {
   readonly #mode: KeywordMatchMode;
   readonly #caseSensitive: boolean;
 
-  private constructor(
-    id: string,
-    keyword: string,
-    mode: KeywordMatchMode,
-    caseSensitive: boolean,
-  ) {
+  private constructor(id: string, keyword: string, mode: KeywordMatchMode, caseSensitive: boolean) {
     super(id, ConditionType.Keyword);
     this.#keyword = keyword;
     this.#mode = mode;
@@ -58,10 +53,10 @@ export class KeywordCondition extends Condition {
     id: string,
     keyword: string,
     mode: KeywordMatchMode = KeywordMatchMode.Partial,
-    caseSensitive = false,
+    caseSensitive = false
   ): KeywordCondition {
     if (!keyword || keyword.trim().length === 0) {
-      throw new Error("Keyword cannot be empty");
+      throw new Error('Keyword cannot be empty');
     }
 
     return new KeywordCondition(id, keyword.trim(), mode, caseSensitive);
@@ -71,7 +66,7 @@ export class KeywordCondition extends Condition {
     id: string,
     keyword: string,
     mode: KeywordMatchMode,
-    caseSensitive: boolean,
+    caseSensitive: boolean
   ): KeywordCondition {
     return new KeywordCondition(id, keyword, mode, caseSensitive);
   }
@@ -93,22 +88,18 @@ export class KeywordCondition extends Condition {
       return false;
     }
 
-    const messageText = this.#caseSensitive
-      ? message.text!
-      : message.text!.toLowerCase();
-    const keyword = this.#caseSensitive
-      ? this.#keyword
-      : this.#keyword.toLowerCase();
+    const messageText = this.#caseSensitive ? message.text! : message.text?.toLowerCase();
+    const keyword = this.#caseSensitive ? this.#keyword : this.#keyword.toLowerCase();
 
     switch (this.#mode) {
       case KeywordMatchMode.Exact:
         return messageText === keyword;
       case KeywordMatchMode.Partial:
-        return messageText.includes(keyword);
+        return messageText?.includes(keyword) ?? false;
       case KeywordMatchMode.StartsWith:
-        return messageText.startsWith(keyword);
+        return messageText?.startsWith(keyword) ?? false;
       case KeywordMatchMode.EndsWith:
-        return messageText.endsWith(keyword);
+        return messageText?.endsWith(keyword) ?? false;
       default:
         return false;
     }
@@ -137,27 +128,23 @@ export class RegexCondition extends Condition {
     Object.freeze(this);
   }
 
-  static create(id: string, pattern: string, flags = "i"): RegexCondition {
+  static create(id: string, pattern: string, flags = 'i'): RegexCondition {
     if (!pattern || pattern.trim().length === 0) {
-      throw new Error("Regex pattern cannot be empty");
+      throw new Error('Regex pattern cannot be empty');
     }
 
     try {
       new RegExp(pattern, flags);
     } catch (error) {
       throw new Error(
-        `Invalid regex pattern: ${error instanceof Error ? error.message : "Unknown error"}`,
+        `Invalid regex pattern: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
 
     return new RegexCondition(id, pattern.trim(), flags);
   }
 
-  static reconstruct(
-    id: string,
-    pattern: string,
-    flags: string,
-  ): RegexCondition {
+  static reconstruct(id: string, pattern: string, flags: string): RegexCondition {
     return new RegexCondition(id, pattern, flags);
   }
 
@@ -197,16 +184,13 @@ export class MessageTypeCondition extends Condition {
 
   static create(id: string, allowedTypes: MessageType[]): MessageTypeCondition {
     if (!allowedTypes || allowedTypes.length === 0) {
-      throw new Error("At least one message type must be specified");
+      throw new Error('At least one message type must be specified');
     }
 
     return new MessageTypeCondition(id, allowedTypes);
   }
 
-  static reconstruct(
-    id: string,
-    allowedTypes: MessageType[],
-  ): MessageTypeCondition {
+  static reconstruct(id: string, allowedTypes: MessageType[]): MessageTypeCondition {
     return new MessageTypeCondition(id, allowedTypes);
   }
 
@@ -231,12 +215,7 @@ export class TimeCondition extends Condition {
   readonly #endTime: string; // HH:mm format
   readonly #timeZone: string;
 
-  private constructor(
-    id: string,
-    startTime: string,
-    endTime: string,
-    timeZone: string,
-  ) {
+  private constructor(id: string, startTime: string, endTime: string, timeZone: string) {
     super(id, ConditionType.Time);
     this.#startTime = startTime;
     this.#endTime = endTime;
@@ -248,13 +227,10 @@ export class TimeCondition extends Condition {
     id: string,
     startTime: string,
     endTime: string,
-    timeZone = "Asia/Tokyo",
+    timeZone = 'Asia/Tokyo'
   ): TimeCondition {
-    if (
-      !this.isValidTimeFormat(startTime) ||
-      !this.isValidTimeFormat(endTime)
-    ) {
-      throw new Error("Time must be in HH:mm format");
+    if (!TimeCondition.isValidTimeFormat(startTime) || !TimeCondition.isValidTimeFormat(endTime)) {
+      throw new Error('Time must be in HH:mm format');
     }
 
     return new TimeCondition(id, startTime, endTime, timeZone);
@@ -264,7 +240,7 @@ export class TimeCondition extends Condition {
     id: string,
     startTime: string,
     endTime: string,
-    timeZone: string,
+    timeZone: string
   ): TimeCondition {
     return new TimeCondition(id, startTime, endTime, timeZone);
   }
@@ -287,10 +263,10 @@ export class TimeCondition extends Condition {
 
   matches(message: IncomingMessage): boolean {
     const now = new Date();
-    const timeString = now.toLocaleTimeString("en-US", {
+    const timeString = now.toLocaleTimeString('en-US', {
       hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
+      hour: '2-digit',
+      minute: '2-digit',
       timeZone: this.#timeZone,
     });
 
@@ -305,14 +281,13 @@ export class TimeCondition extends Condition {
     if (startMinutes <= endMinutes) {
       // Same day range (e.g., 09:00-17:00)
       return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
-    } else {
-      // Overnight range (e.g., 22:00-06:00)
-      return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
     }
+    // Overnight range (e.g., 22:00-06:00)
+    return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
   }
 
   private timeToMinutes(time: string): number {
-    const [hours, minutes] = time.split(":").map(Number);
+    const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   }
 
@@ -337,23 +312,15 @@ export class UserCondition extends Condition {
     Object.freeze(this);
   }
 
-  static create(
-    id: string,
-    targetUsers: string[],
-    includeMode = true,
-  ): UserCondition {
+  static create(id: string, targetUsers: string[], includeMode = true): UserCondition {
     if (!targetUsers || targetUsers.length === 0) {
-      throw new Error("At least one user ID must be specified");
+      throw new Error('At least one user ID must be specified');
     }
 
     return new UserCondition(id, targetUsers, includeMode);
   }
 
-  static reconstruct(
-    id: string,
-    targetUsers: string[],
-    includeMode: boolean,
-  ): UserCondition {
+  static reconstruct(id: string, targetUsers: string[], includeMode: boolean): UserCondition {
     return new UserCondition(id, targetUsers, includeMode);
   }
 
@@ -387,32 +354,20 @@ export class UserCondition extends Condition {
           id,
           data.keyword,
           data.mode as KeywordMatchMode,
-          data.caseSensitive,
+          data.caseSensitive
         );
 
       case ConditionType.Regex:
         return RegexCondition.reconstruct(id, data.pattern, data.flags);
 
       case ConditionType.MessageType:
-        return MessageTypeCondition.reconstruct(
-          id,
-          data.targetTypes as MessageType[],
-        );
+        return MessageTypeCondition.reconstruct(id, data.targetTypes as MessageType[]);
 
       case ConditionType.Time:
-        return TimeCondition.reconstruct(
-          id,
-          data.startTime,
-          data.endTime,
-          data.timeZone,
-        );
+        return TimeCondition.reconstruct(id, data.startTime, data.endTime, data.timeZone);
 
       case ConditionType.User:
-        return UserCondition.reconstruct(
-          id,
-          data.targetUsers,
-          data.includeMode,
-        );
+        return UserCondition.reconstruct(id, data.targetUsers, data.includeMode);
 
       default:
         throw new Error(`Unsupported condition type: ${data.type}`);

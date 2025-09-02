@@ -1,5 +1,5 @@
 // Stub for @types/glob compatibility with minimatch
-declare module "glob" {
+declare module 'glob' {
   interface IOptions {
     cwd?: string;
     root?: string;
@@ -43,14 +43,11 @@ declare module "glob" {
     makeRe(): RegExp | false;
   }
 
-  function glob(
-    pattern: string,
-    callback: (err: Error | null, matches: string[]) => void,
-  ): void;
+  function glob(pattern: string, callback: (err: Error | null, matches: string[]) => void): void;
   function glob(
     pattern: string,
     options: IOptions,
-    callback: (err: Error | null, matches: string[]) => void,
+    callback: (err: Error | null, matches: string[]) => void
   ): void;
 
   namespace glob {

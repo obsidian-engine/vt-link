@@ -1,8 +1,8 @@
 export enum Gender {
-  Male = "male",
-  Female = "female",
-  Other = "other",
-  Unknown = "unknown",
+  Male = 'male',
+  Female = 'female',
+  Other = 'other',
+  Unknown = 'unknown',
 }
 
 export class GenderSet {
@@ -15,7 +15,7 @@ export class GenderSet {
 
   static create(genders: Gender[]): GenderSet {
     if (!genders || genders.length === 0) {
-      throw new Error("At least one gender must be specified");
+      throw new Error('At least one gender must be specified');
     }
 
     return new GenderSet(genders);
@@ -59,19 +59,19 @@ export class GenderSet {
     const genderNames = this.genders.map((gender) => {
       switch (gender) {
         case Gender.Male:
-          return "男性";
+          return '男性';
         case Gender.Female:
-          return "女性";
+          return '女性';
         case Gender.Other:
-          return "その他";
+          return 'その他';
         case Gender.Unknown:
-          return "不明";
+          return '不明';
         default:
           return gender;
       }
     });
 
-    return genderNames.join("、");
+    return genderNames.join('、');
   }
 
   toJSON(): any {

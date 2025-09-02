@@ -1,6 +1,6 @@
-import { Suspense } from "react";
-import Link from "next/link";
-import { getRichMenus } from "@/ui/actions/richMenuActions";
+import { getRichMenus } from '@/ui/actions/richMenuActions';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default async function RichMenuPage() {
   return (
@@ -42,16 +42,14 @@ export default async function RichMenuPage() {
 
 async function RichMenuList() {
   // TODO: アカウントIDの取得ロジックを後で実装
-  const accountId = "temp-account-id";
+  const accountId = 'temp-account-id';
 
   const result = await getRichMenus(accountId);
 
   if (!result.success) {
     return (
       <div className="text-center py-12">
-        <div className="text-red-600 dark:text-red-400">
-          エラー: {result.error}
-        </div>
+        <div className="text-red-600 dark:text-red-400">エラー: {result.error}</div>
       </div>
     );
   }
@@ -92,7 +90,7 @@ interface RichMenuCardProps {
   menu: {
     id: string;
     name: string;
-    size: "full" | "half";
+    size: 'full' | 'half';
     chatBarText: string | null;
     imageUrl: string | null;
     isDefault: boolean;
@@ -125,7 +123,7 @@ function RichMenuCard({ menu }: RichMenuCardProps) {
 
         <div className="mt-4">
           <div className="text-sm text-gray-600 dark:text-gray-300">
-            サイズ: {menu.size === "full" ? "フル" : "ハーフ"}
+            サイズ: {menu.size === 'full' ? 'フル' : 'ハーフ'}
           </div>
           {menu.chatBarText && (
             <div className="text-sm text-gray-600 dark:text-gray-300">
@@ -136,11 +134,7 @@ function RichMenuCard({ menu }: RichMenuCardProps) {
 
         {menu.imageUrl && (
           <div className="mt-4">
-            <img
-              src={menu.imageUrl}
-              alt={menu.name}
-              className="w-full h-32 object-cover rounded"
-            />
+            <img src={menu.imageUrl} alt={menu.name} className="w-full h-32 object-cover rounded" />
           </div>
         )}
 
@@ -172,17 +166,14 @@ function RichMenuListSkeleton() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {[1, 2, 3].map((i) => (
-        <div
-          key={i}
-          className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg"
-        >
+        <div key={i} className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div className="p-5">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-              <div className="mt-4 h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
+              <div className="mt-4 h-32 bg-gray-200 dark:bg-gray-700 rounded" />
               <div className="mt-4 space-y-2">
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
-                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3" />
               </div>
             </div>
           </div>

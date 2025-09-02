@@ -1,4 +1,4 @@
-import type { ReplyCommand, MessageContext } from "./ReplyCommand";
+import type { MessageContext, ReplyCommand } from './ReplyCommand';
 
 /**
  * 画像返信コマンド
@@ -8,19 +8,15 @@ export class ImageReplyCommand implements ReplyCommand {
   readonly #previewImageUrl: string;
   readonly #probability: number;
 
-  constructor(
-    originalContentUrl: string,
-    previewImageUrl: string,
-    probability: number = 1.0,
-  ) {
+  constructor(originalContentUrl: string, previewImageUrl: string, probability = 1.0) {
     if (!originalContentUrl || originalContentUrl.trim().length === 0) {
-      throw new Error("Original content URL cannot be empty");
+      throw new Error('Original content URL cannot be empty');
     }
     if (!previewImageUrl || previewImageUrl.trim().length === 0) {
-      throw new Error("Preview image URL cannot be empty");
+      throw new Error('Preview image URL cannot be empty');
     }
     if (probability < 0 || probability > 1) {
-      throw new Error("Probability must be between 0 and 1");
+      throw new Error('Probability must be between 0 and 1');
     }
 
     this.#originalContentUrl = originalContentUrl;
@@ -35,9 +31,7 @@ export class ImageReplyCommand implements ReplyCommand {
     }
 
     // TODO: ここで実際のLINE API呼び出しを行う
-    console.log(
-      `Sending image reply to ${context.userId}: ${this.#originalContentUrl}`,
-    );
+    console.log(`Sending image reply to ${context.userId}: ${this.#originalContentUrl}`);
 
     // 実際の実装では以下のような処理になる:
     // await this.lineApiClient.replyMessage(context.replyToken, {

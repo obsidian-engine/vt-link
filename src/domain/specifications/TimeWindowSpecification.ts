@@ -1,5 +1,5 @@
-import type { MessageSpecification } from "./MessageSpecification";
-import { IncomingMessage } from "../entities/IncomingMessage";
+import type { IncomingMessage } from '../entities/IncomingMessage';
+import type { MessageSpecification } from './MessageSpecification';
 
 /**
  * 時間範囲条件のSpecification
@@ -9,16 +9,12 @@ export class TimeWindowSpecification implements MessageSpecification {
   readonly #endTime: string; // "HH:MM" format
   readonly #timeZone: string;
 
-  constructor(
-    startTime: string,
-    endTime: string,
-    timeZone: string = "Asia/Tokyo",
-  ) {
+  constructor(startTime: string, endTime: string, timeZone = 'Asia/Tokyo') {
     if (!this.isValidTimeFormat(startTime)) {
-      throw new Error("Invalid start time format. Expected HH:MM");
+      throw new Error('Invalid start time format. Expected HH:MM');
     }
     if (!this.isValidTimeFormat(endTime)) {
-      throw new Error("Invalid end time format. Expected HH:MM");
+      throw new Error('Invalid end time format. Expected HH:MM');
     }
 
     this.#startTime = startTime;
@@ -39,19 +35,15 @@ export class TimeWindowSpecification implements MessageSpecification {
   }
 
   private formatTime(date: Date): string {
-    return date.toLocaleTimeString("en-GB", {
+    return date.toLocaleTimeString('en-GB', {
       hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
+      hour: '2-digit',
+      minute: '2-digit',
       timeZone: this.#timeZone,
     });
   }
 
-  private isTimeInRange(
-    currentTime: string,
-    startTime: string,
-    endTime: string,
-  ): boolean {
+  private isTimeInRange(currentTime: string, startTime: string, endTime: string): boolean {
     const current = this.timeToMinutes(currentTime);
     const start = this.timeToMinutes(startTime);
     const end = this.timeToMinutes(endTime);
@@ -59,14 +51,13 @@ export class TimeWindowSpecification implements MessageSpecification {
     if (start <= end) {
       // Same day range (e.g., 09:00-17:00)
       return current >= start && current <= end;
-    } else {
-      // Cross midnight range (e.g., 22:00-06:00)
-      return current >= start || current <= end;
     }
+    // Cross midnight range (e.g., 22:00-06:00)
+    return current >= start || current <= end;
   }
 
   private timeToMinutes(time: string): number {
-    const [hours, minutes] = time.split(":").map(Number);
+    const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   }
 

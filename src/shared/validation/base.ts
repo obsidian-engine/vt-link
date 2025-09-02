@@ -2,7 +2,7 @@
  * 基本的なZodスキーマパーツ
  * 他のスキーマから組み合わせて使用
  */
-import { z } from "zod";
+import { z } from 'zod';
 
 // ============================================================================
 // プリミティブ型のスキーマ
@@ -38,14 +38,11 @@ export const LongTextSchemaBase = z.string().min(1).max(5000);
 // ============================================================================
 // 配列制約
 // ============================================================================
-export const NonEmptyArraySchemaBase = <T extends z.ZodTypeAny>(
-  itemSchema: T,
-) => z.array(itemSchema).nonempty();
+export const NonEmptyArraySchemaBase = <T extends z.ZodTypeAny>(itemSchema: T) =>
+  z.array(itemSchema).nonempty();
 
-export const LimitedArraySchemaBase = <T extends z.ZodTypeAny>(
-  itemSchema: T,
-  maxLength: number,
-) => z.array(itemSchema).max(maxLength);
+export const LimitedArraySchemaBase = <T extends z.ZodTypeAny>(itemSchema: T, maxLength: number) =>
+  z.array(itemSchema).max(maxLength);
 
 // ============================================================================
 // 日時関連
@@ -54,14 +51,14 @@ export const FutureDateSchemaBase = z
   .string()
   .datetime()
   .refine((date) => new Date(date) > new Date(), {
-    message: "Date must be in the future",
+    message: 'Date must be in the future',
   });
 
 export const PastDateSchemaBase = z
   .string()
   .datetime()
   .refine((date) => new Date(date) < new Date(), {
-    message: "Date must be in the past",
+    message: 'Date must be in the past',
   });
 
 // ============================================================================
@@ -69,10 +66,10 @@ export const PastDateSchemaBase = z
 // ============================================================================
 export const ImageUrlSchemaBase = UrlSchemaBase.refine(
   (url) => {
-    const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp"];
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
     return imageExtensions.some((ext) => url.toLowerCase().includes(ext));
   },
-  { message: "URL must point to an image file" },
+  { message: 'URL must point to an image file' }
 );
 
 // ============================================================================
@@ -81,13 +78,11 @@ export const ImageUrlSchemaBase = UrlSchemaBase.refine(
 export const RequiredWhenSchemaBase = <T extends z.ZodTypeAny>(
   schema: T,
   condition: (data: any) => boolean,
-  message?: string,
+  message?: string
 ) =>
-  z
-    .union([schema, z.undefined()])
-    .refine((value) => !condition || value !== undefined, {
-      message: message || "Field is required",
-    });
+  z.union([schema, z.undefined()]).refine((value) => !condition || value !== undefined, {
+    message: message || 'Field is required',
+  });
 
 // ============================================================================
 // 複合バリデーション
@@ -118,9 +113,7 @@ export const ApiResponseSchemaBase = <T extends z.ZodTypeAny>(dataSchema: T) =>
     timestamp: TimestampSchemaBase,
   });
 
-export const PaginatedResponseSchemaBase = <T extends z.ZodTypeAny>(
-  itemSchema: T,
-) =>
+export const PaginatedResponseSchemaBase = <T extends z.ZodTypeAny>(itemSchema: T) =>
   z.object({
     items: z.array(itemSchema),
     total: NonNegativeIntSchemaBase,
@@ -133,17 +126,13 @@ export const PaginatedResponseSchemaBase = <T extends z.ZodTypeAny>(
 // ============================================================================
 // カスタムバリデーション関数
 // ============================================================================
-export const createEnumSchema = <T extends readonly [string, ...string[]]>(
-  values: T,
-) => z.enum(values);
+export const createEnumSchema = <T extends readonly [string, ...string[]]>(values: T) =>
+  z.enum(values);
 
-export const createConditionalSchema = <
-  T extends z.ZodTypeAny,
-  U extends z.ZodTypeAny,
->(
+export const createConditionalSchema = <T extends z.ZodTypeAny, U extends z.ZodTypeAny>(
   condition: z.ZodTypeAny,
   trueSchema: T,
-  falseSchema: U,
+  falseSchema: U
 ) =>
   z.union([
     z.object({ condition: z.literal(true), value: trueSchema }),

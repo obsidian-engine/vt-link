@@ -1,27 +1,27 @@
-"use server";
+'use server';
 
-import { CreateAutoReplyRuleUsecase } from "@/application/autoReply/CreateAutoReplyRuleUsecase";
-import { GetAutoReplyRulesUsecase } from "@/application/autoReply/GetAutoReplyRulesUsecase";
-import { AutoReplyRuleRepositorySupabase } from "@/infrastructure/repositories/supabase/AutoReplyRuleRepositorySupabase";
-import { revalidatePath } from "next/cache";
+import { CreateAutoReplyRuleUsecase } from '@/application/autoReply/CreateAutoReplyRuleUsecase';
+import { GetAutoReplyRulesUsecase } from '@/application/autoReply/GetAutoReplyRulesUsecase';
+import { AutoReplyRuleRepositorySupabase } from '@/infrastructure/repositories/supabase/AutoReplyRuleRepositorySupabase';
+import { revalidatePath } from 'next/cache';
 
 export async function createAutoReplyRule(formData: FormData) {
   try {
-    const accountId = formData.get("accountId") as string;
-    const name = formData.get("name") as string;
-    const conditionsJson = formData.get("conditions") as string;
-    const responsesJson = formData.get("responses") as string;
-    const enabled = formData.get("enabled") === "true";
-    const priority = parseInt(formData.get("priority") as string) || 0;
-    const rateLimitJson = formData.get("rateLimit") as string;
-    const timeWindowJson = formData.get("timeWindow") as string;
+    const accountId = formData.get('accountId') as string;
+    const name = formData.get('name') as string;
+    const conditionsJson = formData.get('conditions') as string;
+    const responsesJson = formData.get('responses') as string;
+    const enabled = formData.get('enabled') === 'true';
+    const priority = Number.parseInt(formData.get('priority') as string) || 0;
+    const rateLimitJson = formData.get('rateLimit') as string;
+    const timeWindowJson = formData.get('timeWindow') as string;
 
     if (!accountId) {
-      throw new Error("Account ID is required");
+      throw new Error('Account ID is required');
     }
 
     if (!name) {
-      throw new Error("Name is required");
+      throw new Error('Name is required');
     }
 
     // Parse conditions
@@ -30,7 +30,7 @@ export async function createAutoReplyRule(formData: FormData) {
       try {
         conditions = JSON.parse(conditionsJson);
       } catch (parseError) {
-        throw new Error("Invalid conditions data");
+        throw new Error('Invalid conditions data');
       }
     }
 
@@ -40,7 +40,7 @@ export async function createAutoReplyRule(formData: FormData) {
       try {
         responses = JSON.parse(responsesJson);
       } catch (parseError) {
-        throw new Error("Invalid responses data");
+        throw new Error('Invalid responses data');
       }
     }
 
@@ -50,7 +50,7 @@ export async function createAutoReplyRule(formData: FormData) {
       try {
         rateLimit = JSON.parse(rateLimitJson);
       } catch (parseError) {
-        throw new Error("Invalid rate limit data");
+        throw new Error('Invalid rate limit data');
       }
     }
 
@@ -60,7 +60,7 @@ export async function createAutoReplyRule(formData: FormData) {
       try {
         timeWindow = JSON.parse(timeWindowJson);
       } catch (parseError) {
-        throw new Error("Invalid time window data");
+        throw new Error('Invalid time window data');
       }
     }
 
@@ -78,15 +78,14 @@ export async function createAutoReplyRule(formData: FormData) {
       timeWindow,
     });
 
-    revalidatePath("/dashboard/auto-reply");
+    revalidatePath('/dashboard/auto-reply');
 
     return {
       success: true,
       data: result,
     };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown error occurred";
+    const message = error instanceof Error ? error.message : 'Unknown error occurred';
     return {
       success: false,
       error: message,
@@ -97,7 +96,7 @@ export async function createAutoReplyRule(formData: FormData) {
 export async function getAutoReplyRules(accountId: string) {
   try {
     if (!accountId) {
-      throw new Error("Account ID is required");
+      throw new Error('Account ID is required');
     }
 
     const repository = new AutoReplyRuleRepositorySupabase();
@@ -112,14 +111,13 @@ export async function getAutoReplyRules(accountId: string) {
         name: rule.name,
         enabled: rule.enabled,
         priority: rule.priority,
-        conditionsCount: rule.conditions.length,
-        responsesCount: rule.responses.length,
+        conditionsCount: (rule as any).conditions?.length || 0,
+        responsesCount: (rule as any).responses?.length || 0,
         createdAt: rule.createdAt,
       })),
     };
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "Unknown error occurred";
+    const message = error instanceof Error ? error.message : 'Unknown error occurred';
     return {
       success: false,
       error: message,

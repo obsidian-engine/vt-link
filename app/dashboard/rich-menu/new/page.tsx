@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { createRichMenu } from "@/ui/actions/richMenuActions";
-import { RichMenuEditor } from "@/ui/components/rich-menu/RichMenuEditor";
-import { RichMenuPreview } from "@/ui/components/rich-menu/RichMenuPreview";
-import type { RichMenuArea } from "@/ui/components/rich-menu/types";
+import { createRichMenu } from '@/ui/actions/richMenuActions';
+import { RichMenuEditor } from '@/ui/components/rich-menu/RichMenuEditor';
+import { RichMenuPreview } from '@/ui/components/rich-menu/RichMenuPreview';
+import type { RichMenuArea } from '@/ui/components/rich-menu/types';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export default function NewRichMenuPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [areas, setAreas] = useState<RichMenuArea[]>([]);
-  const [menuSize, setMenuSize] = useState<"full" | "half">("full");
+  const [menuSize, setMenuSize] = useState<'full' | 'half'>('full');
 
   async function handleSubmit(formData: FormData) {
     setIsSubmitting(true);
@@ -19,19 +19,19 @@ export default function NewRichMenuPage() {
 
     try {
       // エリア情報をFormDataに追加
-      formData.set("areas", JSON.stringify(areas));
+      formData.set('areas', JSON.stringify(areas));
 
       const result = await createRichMenu(formData);
 
       if (!result.success) {
-        setError(result.error);
+        setError(result.error || 'エラーが発生しました');
         return;
       }
 
       // 成功時はリッチメニュー一覧にリダイレクト
-      window.location.href = "/dashboard/rich-menu";
+      window.location.href = '/dashboard/rich-menu';
     } catch (error) {
-      setError("予期しないエラーが発生しました");
+      setError('予期しないエラーが発生しました');
     } finally {
       setIsSubmitting(false);
     }
@@ -64,9 +64,7 @@ export default function NewRichMenuPage() {
             {/* エラー表示 */}
             {error && (
               <div className="rounded-md bg-red-50 dark:bg-red-900/50 p-4">
-                <div className="text-sm text-red-700 dark:text-red-200">
-                  {error}
-                </div>
+                <div className="text-sm text-red-700 dark:text-red-200">{error}</div>
               </div>
             )}
 
@@ -112,9 +110,7 @@ export default function NewRichMenuPage() {
                         id="size"
                         name="size"
                         value={menuSize}
-                        onChange={(e) =>
-                          setMenuSize(e.target.value as "full" | "half")
-                        }
+                        onChange={(e) => setMenuSize(e.target.value as 'full' | 'half')}
                         required
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       >
@@ -191,7 +187,7 @@ export default function NewRichMenuPage() {
                 disabled={isSubmitting}
                 className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "作成中..." : "作成"}
+                {isSubmitting ? '作成中...' : '作成'}
               </button>
             </div>
           </form>

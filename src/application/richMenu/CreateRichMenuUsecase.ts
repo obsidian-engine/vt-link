@@ -1,10 +1,11 @@
-import { RichMenu, RichMenuArea } from "@/domain/entities/RichMenu";
-import { RichMenuRepository } from "@/domain/repositories/RichMenuRepository";
+import { RichMenu } from '@/domain/entities/RichMenu';
+import type { RichMenuArea } from '@/domain/entities/RichMenu';
+import type { RichMenuRepository } from '@/domain/repositories/RichMenuRepository';
 
 export interface CreateRichMenuInput {
   readonly accountId: string;
   readonly name: string;
-  readonly size: "full" | "half";
+  readonly size: 'full' | 'half';
   readonly chatBarText?: string;
   readonly areas?: ReadonlyArray<RichMenuArea>;
   readonly imageUrl?: string;
@@ -29,7 +30,7 @@ export class CreateRichMenuUsecase {
       input.size,
       input.chatBarText ?? null,
       input.areas ?? [],
-      input.imageUrl ?? null,
+      input.imageUrl ?? null
     );
 
     await this.richMenuRepository.save(richMenu);

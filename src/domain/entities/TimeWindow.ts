@@ -4,12 +4,7 @@ export class TimeWindow {
   readonly #timeZone: string;
   readonly #daysOfWeek: Set<number>; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
 
-  private constructor(
-    startTime: string,
-    endTime: string,
-    timeZone: string,
-    daysOfWeek: number[],
-  ) {
+  private constructor(startTime: string, endTime: string, timeZone: string, daysOfWeek: number[]) {
     this.#startTime = startTime;
     this.#endTime = endTime;
     this.#timeZone = timeZone;
@@ -20,25 +15,20 @@ export class TimeWindow {
   static create(
     startTime: string,
     endTime: string,
-    timeZone = "Asia/Tokyo",
-    daysOfWeek: number[] = [0, 1, 2, 3, 4, 5, 6], // All days by default
+    timeZone = 'Asia/Tokyo',
+    daysOfWeek: number[] = [0, 1, 2, 3, 4, 5, 6] // All days by default
   ): TimeWindow {
-    if (
-      !this.isValidTimeFormat(startTime) ||
-      !this.isValidTimeFormat(endTime)
-    ) {
-      throw new Error("Time must be in HH:mm format");
+    if (!TimeWindow.isValidTimeFormat(startTime) || !TimeWindow.isValidTimeFormat(endTime)) {
+      throw new Error('Time must be in HH:mm format');
     }
 
     if (!daysOfWeek || daysOfWeek.length === 0) {
-      throw new Error("At least one day of week must be specified");
+      throw new Error('At least one day of week must be specified');
     }
 
     const invalidDays = daysOfWeek.filter((day) => day < 0 || day > 6);
     if (invalidDays.length > 0) {
-      throw new Error(
-        "Days of week must be between 0 (Sunday) and 6 (Saturday)",
-      );
+      throw new Error('Days of week must be between 0 (Sunday) and 6 (Saturday)');
     }
 
     return new TimeWindow(startTime, endTime, timeZone, daysOfWeek);
@@ -48,7 +38,7 @@ export class TimeWindow {
     startTime: string,
     endTime: string,
     timeZone: string,
-    daysOfWeek: number[],
+    daysOfWeek: number[]
   ): TimeWindow {
     return new TimeWindow(startTime, endTime, timeZone, daysOfWeek);
   }
@@ -81,10 +71,10 @@ export class TimeWindow {
     }
 
     // Check time range
-    const timeString = date.toLocaleTimeString("en-US", {
+    const timeString = date.toLocaleTimeString('en-US', {
       hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
+      hour: '2-digit',
+      minute: '2-digit',
       timeZone: this.#timeZone,
     });
 
@@ -99,14 +89,13 @@ export class TimeWindow {
     if (startMinutes <= endMinutes) {
       // Same day range (e.g., 09:00-17:00)
       return currentMinutes >= startMinutes && currentMinutes <= endMinutes;
-    } else {
-      // Overnight range (e.g., 22:00-06:00)
-      return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
     }
+    // Overnight range (e.g., 22:00-06:00)
+    return currentMinutes >= startMinutes || currentMinutes <= endMinutes;
   }
 
   private timeToMinutes(time: string): number {
-    const [hours, minutes] = time.split(":").map(Number);
+    const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   }
 
@@ -125,7 +114,7 @@ export class TimeWindow {
 
       const dayOfWeek = checkDate.getUTCDay();
       if (this.#daysOfWeek.has(dayOfWeek)) {
-        const [startHour, startMinute] = this.#startTime.split(":").map(Number);
+        const [startHour, startMinute] = this.#startTime.split(':').map(Number);
         const activeTime = new Date(checkDate);
         activeTime.setHours(startHour, startMinute, 0, 0);
 
@@ -138,7 +127,7 @@ export class TimeWindow {
     // Fallback: return start of next week
     const nextWeek = new Date(from);
     nextWeek.setDate(nextWeek.getDate() + 7);
-    const [startHour, startMinute] = this.#startTime.split(":").map(Number);
+    const [startHour, startMinute] = this.#startTime.split(':').map(Number);
     nextWeek.setHours(startHour, startMinute, 0, 0);
     return nextWeek;
   }

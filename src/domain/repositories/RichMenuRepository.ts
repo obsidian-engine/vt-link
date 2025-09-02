@@ -1,4 +1,4 @@
-import { RichMenu } from "../entities/RichMenu";
+import type { RichMenu } from '../entities/RichMenu';
 
 export interface RichMenuRepository {
   save(richMenu: RichMenu): Promise<void>;

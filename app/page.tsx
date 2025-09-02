@@ -16,16 +16,8 @@ export default function HomePage() {
               title="リッチメニュー"
               description="ドラッグ&ドロップで簡単作成"
             />
-            <FeatureCard
-              icon="🤖"
-              title="自動返信Bot"
-              description="キーワード自動応答設定"
-            />
-            <FeatureCard
-              icon="📤"
-              title="メッセージ配信"
-              description="予約配信・一斉配信対応"
-            />
+            <FeatureCard icon="🤖" title="自動返信Bot" description="キーワード自動応答設定" />
+            <FeatureCard icon="📤" title="メッセージ配信" description="予約配信・一斉配信対応" />
           </div>
 
           <div className="mt-12">
@@ -51,9 +43,7 @@ function FeatureCard({
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
       <div className="text-4xl mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-        {title}
-      </h3>
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
       <p className="text-gray-600 dark:text-gray-300">{description}</p>
     </div>
   );

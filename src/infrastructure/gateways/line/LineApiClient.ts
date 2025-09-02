@@ -1,26 +1,26 @@
+import type {
+  LineChannelID,
+  LineRichMenuID,
+  LineUserID,
+  URL,
+} from '@/domain/valueObjects/BaseTypes';
+import { IDFactory } from '@/domain/valueObjects/IDFactory';
 /**
  * 型安全なLINE Bot API クライアント
  * 公式APIの型定義を厳密に実装し、ランタイム検証も行う
  */
-import { z } from "zod";
+import { z } from 'zod';
 import type {
-  LineMessage,
+  LineApiResponse,
   LineBroadcastRequest,
+  LineErrorResponse,
+  LineMessage,
   LineNarrowcastRequest,
-  LineReplyRequest,
   LinePushRequest,
+  LineReplyRequest,
   LineRichMenuRequest,
   LineRichMenuResponse,
-  LineApiResponse,
-  LineErrorResponse,
-} from "./types";
-import type {
-  LineChannelID,
-  LineUserID,
-  LineRichMenuID,
-  URL,
-} from "@/domain/valueObjects/BaseTypes";
-import { IDFactory } from "@/domain/valueObjects/IDFactory";
+} from './types';
 
 // ============================================================================
 // エラークラス定義
@@ -29,29 +29,29 @@ export class LineApiError extends Error {
   constructor(
     message: string,
     public readonly statusCode: number,
-    public readonly response?: LineErrorResponse,
+    public readonly response?: LineErrorResponse
   ) {
     super(message);
-    this.name = "LineApiError";
+    this.name = 'LineApiError';
   }
 }
 
 export class LineApiValidationError extends Error {
   constructor(
     message: string,
-    public readonly validationErrors: z.ZodError,
+    public readonly validationErrors: z.ZodError
   ) {
     super(message);
-    this.name = "LineApiValidationError";
+    this.name = 'LineApiValidationError';
   }
 }
 
 // ============================================================================
 // Zodスキーマ定義
 // ============================================================================
-const LineMessageSchema: z.ZodType<LineMessage> = z.discriminatedUnion("type", [
+const LineMessageSchema = z.discriminatedUnion('type', [
   z.object({
-    type: z.literal("text"),
+    type: z.literal('text'),
     text: z.string().min(1).max(5000),
     emojis: z.array(z.any()).optional(),
     mention: z.any().optional(),
@@ -59,24 +59,30 @@ const LineMessageSchema: z.ZodType<LineMessage> = z.discriminatedUnion("type", [
     quoteToken: z.string().optional(),
   }),
   z.object({
-    type: z.literal("image"),
-    originalContentUrl: z.string().url(),
-    previewImageUrl: z.string().url(),
+    type: z.literal('image'),
+    originalContentUrl: z
+      .string()
+      .url()
+      .transform((url) => url as URL),
+    previewImageUrl: z
+      .string()
+      .url()
+      .transform((url) => url as URL),
   }),
   z.object({
-    type: z.literal("sticker"),
+    type: z.literal('sticker'),
     packageId: z.string(),
     stickerId: z.string(),
     stickerResourceType: z
       .enum([
-        "STATIC",
-        "ANIMATION",
-        "SOUND",
-        "ANIMATION_SOUND",
-        "POPUP",
-        "POPUP_SOUND",
-        "CUSTOM",
-        "MESSAGE",
+        'STATIC',
+        'ANIMATION',
+        'SOUND',
+        'ANIMATION_SOUND',
+        'POPUP',
+        'POPUP_SOUND',
+        'CUSTOM',
+        'MESSAGE',
       ])
       .optional(),
     keywords: z.array(z.string()).optional(),
@@ -92,7 +98,7 @@ const LineBroadcastRequestSchema = z.object({
 const LineNarrowcastRequestSchema = z.object({
   messages: z.array(LineMessageSchema).min(1).max(5),
   recipient: z.object({
-    type: z.enum(["user", "audience"]),
+    type: z.enum(['user', 'audience']),
     userIds: z.array(z.string()).optional(),
     audienceGroupId: z.number().optional(),
   }),
@@ -135,8 +141,10 @@ const LineRichMenuRequestSchema = z.object({
           width: z.number().int().min(1),
           height: z.number().int().min(1),
         }),
-        action: z.any(), // アクションの詳細なスキーマは省略
-      }),
+        action: z.any().refine((val) => val !== undefined, {
+          message: 'Action is required',
+        }), // アクションの詳細なスキーマは省略
+      })
     )
     .max(20),
 });
@@ -145,13 +153,13 @@ const LineRichMenuRequestSchema = z.object({
 // APIクライアント実装
 // ============================================================================
 export class LineApiClient {
-  readonly #baseUrl = "https://api.line.me/v2/bot";
+  readonly #baseUrl = 'https://api.line.me/v2/bot';
   readonly #channelAccessToken: string;
   readonly #channelId: LineChannelID;
 
   constructor(channelAccessToken: string, channelId: string) {
     if (!channelAccessToken) {
-      throw new Error("LINE channel access token is required");
+      throw new Error('LINE channel access token is required');
     }
 
     this.#channelAccessToken = channelAccessToken;
@@ -169,15 +177,15 @@ export class LineApiClient {
     try {
       const validatedRequest = LineBroadcastRequestSchema.parse(request);
 
-      const response = await this.#makeRequest("/message/broadcast", {
-        method: "POST",
+      const response = await this.#makeRequest('/message/broadcast', {
+        method: 'POST',
         body: validatedRequest,
       });
 
       return response as LineApiResponse;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new LineApiValidationError("Invalid broadcast request", error);
+        throw new LineApiValidationError('Invalid broadcast request', error);
       }
       throw error;
     }
@@ -186,21 +194,19 @@ export class LineApiClient {
   /**
    * ナローキャストメッセージ送信
    */
-  async sendNarrowcast(
-    request: LineNarrowcastRequest,
-  ): Promise<LineApiResponse> {
+  async sendNarrowcast(request: LineNarrowcastRequest): Promise<LineApiResponse> {
     try {
       const validatedRequest = LineNarrowcastRequestSchema.parse(request);
 
-      const response = await this.#makeRequest("/message/narrowcast", {
-        method: "POST",
+      const response = await this.#makeRequest('/message/narrowcast', {
+        method: 'POST',
         body: validatedRequest,
       });
 
       return response as LineApiResponse;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new LineApiValidationError("Invalid narrowcast request", error);
+        throw new LineApiValidationError('Invalid narrowcast request', error);
       }
       throw error;
     }
@@ -213,15 +219,15 @@ export class LineApiClient {
     try {
       const validatedRequest = LineReplyRequestSchema.parse(request);
 
-      const response = await this.#makeRequest("/message/reply", {
-        method: "POST",
+      const response = await this.#makeRequest('/message/reply', {
+        method: 'POST',
         body: validatedRequest,
       });
 
       return response as LineApiResponse;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new LineApiValidationError("Invalid reply request", error);
+        throw new LineApiValidationError('Invalid reply request', error);
       }
       throw error;
     }
@@ -234,15 +240,15 @@ export class LineApiClient {
     try {
       const validatedRequest = LinePushRequestSchema.parse(request);
 
-      const response = await this.#makeRequest("/message/push", {
-        method: "POST",
+      const response = await this.#makeRequest('/message/push', {
+        method: 'POST',
         body: validatedRequest,
       });
 
       return response as LineApiResponse;
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new LineApiValidationError("Invalid push request", error);
+        throw new LineApiValidationError('Invalid push request', error);
       }
       throw error;
     }
@@ -255,14 +261,12 @@ export class LineApiClient {
   /**
    * リッチメニュー作成
    */
-  async createRichMenu(
-    request: LineRichMenuRequest,
-  ): Promise<LineRichMenuResponse> {
+  async createRichMenu(request: LineRichMenuRequest): Promise<LineRichMenuResponse> {
     try {
       const validatedRequest = LineRichMenuRequestSchema.parse(request);
 
-      const response = await this.#makeRequest("/richmenu", {
-        method: "POST",
+      const response = await this.#makeRequest('/richmenu', {
+        method: 'POST',
         body: validatedRequest,
       });
 
@@ -270,10 +274,14 @@ export class LineApiClient {
       return {
         ...validatedRequest,
         richMenuId,
+        areas: validatedRequest.areas.map((area) => ({
+          ...area,
+          action: area.action!, // 必須プロパティとしてアサーション
+        })),
       };
     } catch (error) {
       if (error instanceof z.ZodError) {
-        throw new LineApiValidationError("Invalid rich menu request", error);
+        throw new LineApiValidationError('Invalid rich menu request', error);
       }
       throw error;
     }
@@ -285,19 +293,16 @@ export class LineApiClient {
   async uploadRichMenuImage(
     richMenuId: LineRichMenuID,
     imageBuffer: Buffer,
-    contentType: "image/jpeg" | "image/png" = "image/png",
+    contentType: 'image/jpeg' | 'image/png' = 'image/png'
   ): Promise<void> {
-    const response = await fetch(
-      `${this.#baseUrl}/richmenu/${richMenuId}/content`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${this.#channelAccessToken}`,
-          "Content-Type": contentType,
-        },
-        body: imageBuffer,
+    const response = await fetch(`${this.#baseUrl}/richmenu/${richMenuId}/content`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.#channelAccessToken}`,
+        'Content-Type': contentType,
       },
-    );
+      body: imageBuffer,
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -312,7 +317,7 @@ export class LineApiClient {
       throw new LineApiError(
         `LINE API error: ${response.status} ${errorText}`,
         response.status,
-        errorResponse,
+        errorResponse
       );
     }
   }
@@ -322,7 +327,7 @@ export class LineApiClient {
    */
   async setDefaultRichMenu(richMenuId: LineRichMenuID): Promise<void> {
     await this.#makeRequest(`/user/all/richmenu/${richMenuId}`, {
-      method: "POST",
+      method: 'POST',
     });
   }
 
@@ -331,7 +336,7 @@ export class LineApiClient {
    */
   async deleteRichMenu(richMenuId: LineRichMenuID): Promise<void> {
     await this.#makeRequest(`/richmenu/${richMenuId}`, {
-      method: "DELETE",
+      method: 'DELETE',
     });
   }
 
@@ -348,14 +353,12 @@ export class LineApiClient {
     language?: string;
   }> {
     const response = await this.#makeRequest(`/profile/${userId}`, {
-      method: "GET",
+      method: 'GET',
     });
 
     return {
       displayName: response.displayName,
-      pictureUrl: response.pictureUrl
-        ? (response.pictureUrl as URL)
-        : undefined,
+      pictureUrl: response.pictureUrl ? (response.pictureUrl as URL) : undefined,
       language: response.language,
     };
   }
@@ -364,13 +367,13 @@ export class LineApiClient {
   // プライベートメソッド
   // ============================================================================
 
-  private async #makeRequest(
+  async #makeRequest(
     endpoint: string,
     options: {
-      method: "GET" | "POST" | "PUT" | "DELETE";
+      method: 'GET' | 'POST' | 'PUT' | 'DELETE';
       body?: any;
       headers?: Record<string, string>;
-    },
+    }
   ): Promise<any> {
     const url = `${this.#baseUrl}${endpoint}`;
 
@@ -379,8 +382,8 @@ export class LineApiClient {
       ...options.headers,
     };
 
-    if (options.body && options.method !== "GET") {
-      headers["Content-Type"] = "application/json";
+    if (options.body && options.method !== 'GET') {
+      headers['Content-Type'] = 'application/json';
     }
 
     const response = await fetch(url, {
@@ -402,12 +405,12 @@ export class LineApiClient {
       throw new LineApiError(
         `LINE API error: ${response.status} ${errorText}`,
         response.status,
-        errorResponse,
+        errorResponse
       );
     }
 
     // DELETEリクエストは通常レスポンスボディがない
-    if (options.method === "DELETE") {
+    if (options.method === 'DELETE') {
       return {};
     }
 
@@ -428,7 +431,7 @@ export class LineApiClient {
   async healthCheck(): Promise<boolean> {
     try {
       // ボット情報を取得してAPIの正常性を確認
-      await this.#makeRequest("/info", { method: "GET" });
+      await this.#makeRequest('/info', { method: 'GET' });
       return true;
     } catch {
       return false;
@@ -445,7 +448,7 @@ export class LineApiClient {
  */
 export const createLineApiClient = (
   channelAccessToken: string,
-  channelId: string,
+  channelId: string
 ): LineApiClient => {
   return new LineApiClient(channelAccessToken, channelId);
 };

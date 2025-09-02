@@ -1,7 +1,7 @@
 export enum MessageType {
-  Text = "text",
-  Image = "image",
-  Sticker = "sticker",
+  Text = 'text',
+  Image = 'image',
+  Sticker = 'sticker',
 }
 
 export interface TextContent {
@@ -32,30 +32,27 @@ export class MessageContent {
 
   static createText(text: string): MessageContent {
     if (!text || text.trim().length === 0) {
-      throw new Error("Text content cannot be empty");
+      throw new Error('Text content cannot be empty');
     }
     if (text.length > 5000) {
-      throw new Error("Text content cannot exceed 5000 characters");
+      throw new Error('Text content cannot exceed 5000 characters');
     }
 
     const payload: TextContent = { text: text.trim() };
     return new MessageContent(MessageType.Text, payload);
   }
 
-  static createImage(
-    originalContentUrl: string,
-    previewImageUrl?: string,
-  ): MessageContent {
+  static createImage(originalContentUrl: string, previewImageUrl?: string): MessageContent {
     if (!originalContentUrl || originalContentUrl.trim().length === 0) {
-      throw new Error("Original content URL is required");
+      throw new Error('Original content URL is required');
     }
-    if (!this.isValidUrl(originalContentUrl)) {
-      throw new Error("Invalid original content URL");
+    if (!MessageContent.isValidUrl(originalContentUrl)) {
+      throw new Error('Invalid original content URL');
     }
 
     const preview = previewImageUrl || originalContentUrl;
-    if (!this.isValidUrl(preview)) {
-      throw new Error("Invalid preview image URL");
+    if (!MessageContent.isValidUrl(preview)) {
+      throw new Error('Invalid preview image URL');
     }
 
     const payload: ImageContent = {
@@ -67,10 +64,10 @@ export class MessageContent {
 
   static createSticker(packageId: string, stickerId: string): MessageContent {
     if (!packageId || packageId.trim().length === 0) {
-      throw new Error("Package ID is required");
+      throw new Error('Package ID is required');
     }
     if (!stickerId || stickerId.trim().length === 0) {
-      throw new Error("Sticker ID is required");
+      throw new Error('Sticker ID is required');
     }
 
     const payload: StickerContent = {
@@ -80,10 +77,7 @@ export class MessageContent {
     return new MessageContent(MessageType.Sticker, payload);
   }
 
-  static reconstruct(
-    type: MessageType,
-    payload: MessagePayload,
-  ): MessageContent {
+  static reconstruct(type: MessageType, payload: MessagePayload): MessageContent {
     return new MessageContent(type, payload);
   }
 
@@ -105,9 +99,7 @@ export class MessageContent {
   }
 
   get text(): string | null {
-    return this.#type === MessageType.Text
-      ? (this.#payload as TextContent).text
-      : null;
+    return this.#type === MessageType.Text ? (this.#payload as TextContent).text : null;
   }
 
   get originalContentUrl(): string | null {
@@ -123,15 +115,11 @@ export class MessageContent {
   }
 
   get packageId(): string | null {
-    return this.#type === MessageType.Sticker
-      ? (this.#payload as StickerContent).packageId
-      : null;
+    return this.#type === MessageType.Sticker ? (this.#payload as StickerContent).packageId : null;
   }
 
   get stickerId(): string | null {
-    return this.#type === MessageType.Sticker
-      ? (this.#payload as StickerContent).stickerId
-      : null;
+    return this.#type === MessageType.Sticker ? (this.#payload as StickerContent).stickerId : null;
   }
 
   equals(other: MessageContent): boolean {
@@ -141,24 +129,23 @@ export class MessageContent {
 
     switch (this.#type) {
       case MessageType.Text:
-        return (
-          (this.#payload as TextContent).text ===
-          (other.#payload as TextContent).text
-        );
-      case MessageType.Image:
+        return (this.#payload as TextContent).text === (other.#payload as TextContent).text;
+      case MessageType.Image: {
         const thisImage = this.#payload as ImageContent;
         const otherImage = other.#payload as ImageContent;
         return (
           thisImage.originalContentUrl === otherImage.originalContentUrl &&
           thisImage.previewImageUrl === otherImage.previewImageUrl
         );
-      case MessageType.Sticker:
+      }
+      case MessageType.Sticker: {
         const thisSticker = this.#payload as StickerContent;
         const otherSticker = other.#payload as StickerContent;
         return (
           thisSticker.packageId === otherSticker.packageId &&
           thisSticker.stickerId === otherSticker.stickerId
         );
+      }
       default:
         return false;
     }
@@ -168,23 +155,25 @@ export class MessageContent {
     switch (this.#type) {
       case MessageType.Text:
         return {
-          type: "text",
+          type: 'text',
           text: (this.#payload as TextContent).text,
         };
-      case MessageType.Image:
+      case MessageType.Image: {
         const imagePayload = this.#payload as ImageContent;
         return {
-          type: "image",
+          type: 'image',
           originalContentUrl: imagePayload.originalContentUrl,
           previewImageUrl: imagePayload.previewImageUrl,
         };
-      case MessageType.Sticker:
+      }
+      case MessageType.Sticker: {
         const stickerPayload = this.#payload as StickerContent;
         return {
-          type: "sticker",
+          type: 'sticker',
           packageId: stickerPayload.packageId,
           stickerId: stickerPayload.stickerId,
         };
+      }
       default:
         throw new Error(`Unsupported message type: ${this.#type}`);
     }

@@ -1,21 +1,15 @@
-import { MessageTemplate } from "@/domain/campaign/entities/MessageTemplate";
-import type { MessageTemplateRepository } from "@/domain/campaign/repositories/MessageTemplateRepository";
-import { MessageTemplate } from "@/domain/campaign/entities/MessageTemplate";
-import {
-  MessageContent,
-  MessageType,
-} from "@/domain/valueObjects/MessageContent";
-import { supabaseAdmin } from "@/infrastructure/clients/supabaseClient";
+import { MessageTemplate } from '@/domain/campaign/entities/MessageTemplate';
+import type { MessageTemplateRepository } from '@/domain/campaign/repositories/MessageTemplateRepository';
+import { MessageContent, type MessageType } from '@/domain/valueObjects/MessageContent';
+import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';
 
-export class MessageTemplateRepositorySupabase
-  implements MessageTemplateRepository
-{
+export class MessageTemplateRepositorySupabase implements MessageTemplateRepository {
   async save(template: MessageTemplate): Promise<void> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin.from("message_templates").upsert({
+    const { error } = await supabaseAdmin.from('message_templates').upsert({
       id: template.id,
       account_id: template.accountId,
       title: template.title,
@@ -34,17 +28,17 @@ export class MessageTemplateRepositorySupabase
 
   async findById(id: string): Promise<MessageTemplate | null> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("message_templates")
-      .select("*")
-      .eq("id", id)
+      .from('message_templates')
+      .select('*')
+      .eq('id', id)
       .single();
 
     if (error) {
-      if (error.code === "PGRST116") return null;
+      if (error.code === 'PGRST116') return null;
       throw new Error(`Failed to find message template: ${error.message}`);
     }
 
@@ -53,14 +47,14 @@ export class MessageTemplateRepositorySupabase
 
   async findByAccountId(accountId: string): Promise<MessageTemplate[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("message_templates")
-      .select("*")
-      .eq("account_id", accountId)
-      .order("created_at", { ascending: false });
+      .from('message_templates')
+      .select('*')
+      .eq('account_id', accountId)
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to find message templates: ${error.message}`);
@@ -71,39 +65,34 @@ export class MessageTemplateRepositorySupabase
 
   async findActiveByAccountId(accountId: string): Promise<MessageTemplate[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("message_templates")
-      .select("*")
-      .eq("account_id", accountId)
-      .eq("is_active", true)
-      .order("created_at", { ascending: false });
+      .from('message_templates')
+      .select('*')
+      .eq('account_id', accountId)
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
 
     if (error) {
-      throw new Error(
-        `Failed to find active message templates: ${error.message}`,
-      );
+      throw new Error(`Failed to find active message templates: ${error.message}`);
     }
 
     return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
-  async findByNamePattern(
-    accountId: string,
-    namePattern: string,
-  ): Promise<MessageTemplate[]> {
+  async findByNamePattern(accountId: string, namePattern: string): Promise<MessageTemplate[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("message_templates")
-      .select("*")
-      .eq("account_id", accountId)
-      .ilike("title", `%${namePattern}%`)
-      .order("created_at", { ascending: false });
+      .from('message_templates')
+      .select('*')
+      .eq('account_id', accountId)
+      .ilike('title', `%${namePattern}%`)
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to search message templates: ${error.message}`);
@@ -114,23 +103,21 @@ export class MessageTemplateRepositorySupabase
 
   async findByPlaceholderKey(
     accountId: string,
-    placeholderKey: string,
+    placeholderKey: string
   ): Promise<MessageTemplate[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("message_templates")
-      .select("*")
-      .eq("account_id", accountId)
-      .contains("placeholder_keys", [placeholderKey])
-      .order("created_at", { ascending: false });
+      .from('message_templates')
+      .select('*')
+      .eq('account_id', accountId)
+      .contains('placeholder_keys', [placeholderKey])
+      .order('created_at', { ascending: false });
 
     if (error) {
-      throw new Error(
-        `Failed to find message templates by placeholder: ${error.message}`,
-      );
+      throw new Error(`Failed to find message templates by placeholder: ${error.message}`);
     }
 
     return (data ?? []).map((item) => this.mapToEntity(item));
@@ -138,13 +125,10 @@ export class MessageTemplateRepositorySupabase
 
   async delete(id: string): Promise<void> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from("message_templates")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabaseAdmin.from('message_templates').delete().eq('id', id);
 
     if (error) {
       throw new Error(`Failed to delete message template: ${error.message}`);
@@ -153,13 +137,13 @@ export class MessageTemplateRepositorySupabase
 
   async countByAccountId(accountId: string): Promise<number> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { count, error } = await supabaseAdmin
-      .from("message_templates")
-      .select("*", { count: "exact", head: true })
-      .eq("account_id", accountId);
+      .from('message_templates')
+      .select('*', { count: 'exact', head: true })
+      .eq('account_id', accountId);
 
     if (error) {
       throw new Error(`Failed to count message templates: ${error.message}`);
@@ -170,19 +154,17 @@ export class MessageTemplateRepositorySupabase
 
   async countActiveByAccountId(accountId: string): Promise<number> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { count, error } = await supabaseAdmin
-      .from("message_templates")
-      .select("*", { count: "exact", head: true })
-      .eq("account_id", accountId)
-      .eq("is_active", true);
+      .from('message_templates')
+      .select('*', { count: 'exact', head: true })
+      .eq('account_id', accountId)
+      .eq('is_active', true);
 
     if (error) {
-      throw new Error(
-        `Failed to count active message templates: ${error.message}`,
-      );
+      throw new Error(`Failed to count active message templates: ${error.message}`);
     }
 
     return count ?? 0;
@@ -191,7 +173,7 @@ export class MessageTemplateRepositorySupabase
   private mapToEntity(data: any): MessageTemplate {
     const content = MessageContent.reconstruct(
       data.content.type as MessageType,
-      data.content.payload,
+      data.content.payload
     );
 
     return MessageTemplate.reconstruct(
@@ -203,7 +185,7 @@ export class MessageTemplateRepositorySupabase
       data.placeholder_keys || [],
       data.is_active,
       new Date(data.created_at),
-      new Date(data.updated_at),
+      new Date(data.updated_at)
     );
   }
 }

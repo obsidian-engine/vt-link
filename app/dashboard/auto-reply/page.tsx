@@ -1,6 +1,18 @@
-import { Suspense } from "react";
-import Link from "next/link";
-import { getAutoReplyRules } from "@/ui/actions/autoReplyActions";
+import { getAutoReplyRules } from '@/ui/actions/autoReplyActions';
+import { getAutoReplyRules } from '@/ui/actions/autoReplyActions';
+import Link from 'next/link';
+import { Suspense } from 'react';
+
+// 自動返信ルールの型定義
+interface AutoReplyRule {
+  id: string;
+  name: string;
+  enabled: boolean;
+  priority: number;
+  conditionsCount: number;
+  responsesCount: number;
+  createdAt: string; // APIから文字列として返される
+}
 
 export default async function AutoReplyPage() {
   return (
@@ -15,9 +27,7 @@ export default async function AutoReplyPage() {
               >
                 ← ダッシュボード
               </Link>
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                🤖 自動返信Bot
-              </h1>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">🤖 自動返信Bot</h1>
             </div>
             <Link
               href="/dashboard/auto-reply/new"
@@ -68,7 +78,7 @@ export default async function AutoReplyPage() {
 
 async function AutoReplyRulesList() {
   // TODO: Get account ID from session/context
-  const accountId = "default-account";
+  const accountId = 'default-account';
 
   try {
     const result = await getAutoReplyRules(accountId);
@@ -76,9 +86,7 @@ async function AutoReplyRulesList() {
     if (!result.success) {
       return (
         <div className="bg-red-50 border border-red-200 rounded-md p-4">
-          <p className="text-red-800">
-            ルールの読み込みに失敗しました: {result.error}
-          </p>
+          <p className="text-red-800">ルールの読み込みに失敗しました: {result.error}</p>
         </div>
       );
     }
@@ -107,23 +115,21 @@ async function AutoReplyRulesList() {
   }
 }
 
-function AutoReplyRuleCard({ rule }: { rule: any }) {
+function AutoReplyRuleCard({ rule }: { rule: AutoReplyRule }) {
   return (
     <div className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <div className="flex items-center space-x-3">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              {rule.name}
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">{rule.name}</h3>
             <span
               className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                 rule.enabled
-                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                  : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                  : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
               }`}
             >
-              {rule.enabled ? "有効" : "無効"}
+              {rule.enabled ? '有効' : '無効'}
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400">
               優先度: {rule.priority}
@@ -179,8 +185,8 @@ function AutoReplyRulesSkeleton() {
         {[...Array(3)].map((_, i) => (
           <div key={i} className="p-6">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/4 mb-2"></div>
-              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+              <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/4 mb-2" />
+              <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
             </div>
           </div>
         ))}
@@ -209,16 +215,12 @@ function StatsCard({ title, value, description, icon }: StatsCardProps) {
               <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                 {title}
               </dt>
-              <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                {value}
-              </dd>
+              <dd className="text-lg font-medium text-gray-900 dark:text-white">{value}</dd>
             </dl>
           </div>
         </div>
         <div className="mt-4">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            {description}
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
         </div>
       </div>
     </div>

@@ -1,15 +1,20 @@
 pre-push:
-  jobs:
-    - run: pnpm turbo check:fix
+  parallel: true
+  fail_fast: true
+  commands:
+    biome:
+      glob: "*.{js,ts,jsx,tsx,cts,mts,d.cts,d.mts,json,jsonc}"
+      run: "npm exec biome -- check --no-errors-on-unmatched --files-ignore-unknown \"{all_files}\""
+    types:
       glob: "*.{js,ts,jsx,tsx}"
-    - run: pnpm turbo test
-      glob: "*.{js,ts,jsx,tsx}"
-    - run: pnpm turbo tsc
-      glob: "*.{js,ts,jsx,tsx}"
+      run: "npm run type-check"
 
 pre-commit:
   commands:
-    check:
+    biome-check:
       glob: "*.{js,ts,jsx,tsx,cts,mts,d.cts,d.mts,json,jsonc}"
-      run: pnpm dlx @biomejs/biome@1.9.4 check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      run: npx @biomejs/biome@1.9.4 check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
       stage_fixed: true
+    type-check:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: npm run type-check

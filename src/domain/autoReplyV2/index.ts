@@ -8,7 +8,7 @@
  */
 
 // ===== ENTITIES =====
-export { AutoReplyRuleV2 } from "../entities/AutoReplyRuleV2";
+export { AutoReplyRuleV2 } from '../entities/AutoReplyRuleV2';
 
 // ===== SPECIFICATIONS (いつ発火するか) =====
 export {
@@ -23,7 +23,7 @@ export {
   MessageTypeSpecification,
   type KeywordMatchMode,
   type MessageType,
-} from "../specifications";
+} from '../specifications';
 
 // ===== COMMANDS (何をするか) =====
 export {
@@ -33,7 +33,7 @@ export {
   StickerReplyCommand,
   ImageReplyCommand,
   CompositeReplyCommand,
-} from "../commands";
+} from '../commands';
 
 // ===== POLICIES (いくつまで・制限) =====
 export {
@@ -42,7 +42,7 @@ export {
   SlidingWindowPolicy,
   NoRateLimitPolicy,
   type RateLimitStorage,
-} from "../policies";
+} from '../policies';
 
 // ===== BUILDERS (組み立て支援) =====
 export {
@@ -50,14 +50,16 @@ export {
   SpecificationBuilder,
   CommandBuilder,
   PresetBuilder,
-} from "../builders";
+} from '../builders';
 
 // ===== EXAMPLES & DEMOS =====
-export {
-  VTuberAutoReplyDemo,
-  runVTuberDemo,
-  createCustomRule,
-} from "../examples/AutoReplyDemo";
+// デモ機能は一時的にコメントアウト（TypeScriptエラー対応）
+// export {
+//   VTuberAutoReplyDemo,
+//   runVTuberDemo,
+//   createCustomRule,
+// } from '../examples/AutoReplyDemo';
 
 // 既存エンティティとの互換性
-export { IncomingMessage, MessageSource } from "../entities/IncomingMessage";
+export type { MessageSource } from '../entities/IncomingMessage';
+export { IncomingMessage } from '../entities/IncomingMessage';

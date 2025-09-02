@@ -1,15 +1,15 @@
 export enum DeliveryBatchStatus {
-  Pending = "pending", // 送信待ち
-  Sending = "sending", // 送信中
-  Completed = "completed", // 送信完了
-  Failed = "failed", // 送信失敗
+  Pending = 'pending', // 送信待ち
+  Sending = 'sending', // 送信中
+  Completed = 'completed', // 送信完了
+  Failed = 'failed', // 送信失敗
 }
 
 export class DeliveryBatch {
   readonly #id: string;
   readonly #campaignId: string;
   readonly #lineBroadcastId: string | null;
-  readonly #targetUserIds: ReadonlyArray<string>;
+  readonly #targetUserIds: readonly string[];
   readonly #status: DeliveryBatchStatus;
   readonly #sentCount: number;
   readonly #failCount: number;
@@ -23,7 +23,7 @@ export class DeliveryBatch {
     id: string,
     campaignId: string,
     lineBroadcastId: string | null,
-    targetUserIds: ReadonlyArray<string>,
+    targetUserIds: readonly string[],
     status: DeliveryBatchStatus,
     sentCount: number,
     failCount: number,
@@ -31,7 +31,7 @@ export class DeliveryBatch {
     errorMessage: string | null,
     sentAt: Date | null,
     createdAt: Date,
-    updatedAt: Date,
+    updatedAt: Date
   ) {
     this.#id = id;
     this.#campaignId = campaignId;
@@ -48,28 +48,22 @@ export class DeliveryBatch {
     Object.freeze(this);
   }
 
-  static create(
-    id: string,
-    campaignId: string,
-    targetUserIds: string[],
-  ): DeliveryBatch {
+  static create(id: string, campaignId: string, targetUserIds: string[]): DeliveryBatch {
     if (!id || id.trim().length === 0) {
-      throw new Error("Delivery batch ID is required");
+      throw new Error('Delivery batch ID is required');
     }
     if (!campaignId || campaignId.trim().length === 0) {
-      throw new Error("Campaign ID is required");
+      throw new Error('Campaign ID is required');
     }
     if (!targetUserIds || targetUserIds.length === 0) {
-      throw new Error("Target user IDs are required");
+      throw new Error('Target user IDs are required');
     }
 
     // Remove duplicates and filter out empty IDs
-    const uniqueUserIds = [
-      ...new Set(targetUserIds.filter((id) => id && id.trim().length > 0)),
-    ];
+    const uniqueUserIds = [...new Set(targetUserIds.filter((id) => id && id.trim().length > 0))];
 
     if (uniqueUserIds.length === 0) {
-      throw new Error("At least one valid target user ID is required");
+      throw new Error('At least one valid target user ID is required');
     }
 
     const now = new Date();
@@ -85,7 +79,7 @@ export class DeliveryBatch {
       null,
       null,
       now,
-      now,
+      now
     );
   }
 
@@ -93,7 +87,7 @@ export class DeliveryBatch {
     id: string,
     campaignId: string,
     lineBroadcastId: string | null,
-    targetUserIds: ReadonlyArray<string>,
+    targetUserIds: readonly string[],
     status: DeliveryBatchStatus,
     sentCount: number,
     failCount: number,
@@ -101,7 +95,7 @@ export class DeliveryBatch {
     errorMessage: string | null,
     sentAt: Date | null,
     createdAt: Date,
-    updatedAt: Date,
+    updatedAt: Date
   ): DeliveryBatch {
     return new DeliveryBatch(
       id,
@@ -115,7 +109,7 @@ export class DeliveryBatch {
       errorMessage,
       sentAt,
       createdAt,
-      updatedAt,
+      updatedAt
     );
   }
 
@@ -128,7 +122,7 @@ export class DeliveryBatch {
   get lineBroadcastId(): string | null {
     return this.#lineBroadcastId;
   }
-  get targetUserIds(): ReadonlyArray<string> {
+  get targetUserIds(): readonly string[] {
     return this.#targetUserIds;
   }
   get status(): DeliveryBatchStatus {
@@ -179,8 +173,7 @@ export class DeliveryBatch {
    */
   get isCompleted(): boolean {
     return (
-      this.#status === DeliveryBatchStatus.Completed ||
-      this.#status === DeliveryBatchStatus.Failed
+      this.#status === DeliveryBatchStatus.Completed || this.#status === DeliveryBatchStatus.Failed
     );
   }
 
@@ -189,7 +182,7 @@ export class DeliveryBatch {
    */
   markAsSending(): DeliveryBatch {
     if (this.#status !== DeliveryBatchStatus.Pending) {
-      throw new Error("Only pending batches can be marked as sending");
+      throw new Error('Only pending batches can be marked as sending');
     }
 
     return new DeliveryBatch(
@@ -204,7 +197,7 @@ export class DeliveryBatch {
       this.#errorMessage,
       this.#sentAt,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -213,7 +206,7 @@ export class DeliveryBatch {
    */
   setLineBroadcastId(lineBroadcastId: string): DeliveryBatch {
     if (!lineBroadcastId || lineBroadcastId.trim().length === 0) {
-      throw new Error("LINE broadcast ID is required");
+      throw new Error('LINE broadcast ID is required');
     }
 
     return new DeliveryBatch(
@@ -228,7 +221,7 @@ export class DeliveryBatch {
       this.#errorMessage,
       this.#sentAt,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -237,15 +230,15 @@ export class DeliveryBatch {
    */
   markAsCompleted(sentCount: number, failCount: number): DeliveryBatch {
     if (this.#status !== DeliveryBatchStatus.Sending) {
-      throw new Error("Only sending batches can be marked as completed");
+      throw new Error('Only sending batches can be marked as completed');
     }
 
     if (sentCount < 0 || failCount < 0) {
-      throw new Error("Sent count and fail count must be non-negative");
+      throw new Error('Sent count and fail count must be non-negative');
     }
 
     if (sentCount + failCount > this.#targetUserIds.length) {
-      throw new Error("Total processed count cannot exceed target count");
+      throw new Error('Total processed count cannot exceed target count');
     }
 
     return new DeliveryBatch(
@@ -260,7 +253,7 @@ export class DeliveryBatch {
       this.#errorMessage,
       new Date(),
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -272,16 +265,14 @@ export class DeliveryBatch {
       this.#status !== DeliveryBatchStatus.Pending &&
       this.#status !== DeliveryBatchStatus.Sending
     ) {
-      throw new Error(
-        "Only pending or sending batches can be marked as failed",
-      );
+      throw new Error('Only pending or sending batches can be marked as failed');
     }
 
     if (!errorCode || errorCode.trim().length === 0) {
-      throw new Error("Error code is required");
+      throw new Error('Error code is required');
     }
     if (!errorMessage || errorMessage.trim().length === 0) {
-      throw new Error("Error message is required");
+      throw new Error('Error message is required');
     }
 
     return new DeliveryBatch(
@@ -296,7 +287,7 @@ export class DeliveryBatch {
       errorMessage.trim(),
       this.#sentAt,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -305,15 +296,15 @@ export class DeliveryBatch {
    */
   updateDeliveryResults(sentCount: number, failCount: number): DeliveryBatch {
     if (this.#status !== DeliveryBatchStatus.Sending) {
-      throw new Error("Only sending batches can have delivery results updated");
+      throw new Error('Only sending batches can have delivery results updated');
     }
 
     if (sentCount < 0 || failCount < 0) {
-      throw new Error("Sent count and fail count must be non-negative");
+      throw new Error('Sent count and fail count must be non-negative');
     }
 
     if (sentCount + failCount > this.#targetUserIds.length) {
-      throw new Error("Total processed count cannot exceed target count");
+      throw new Error('Total processed count cannot exceed target count');
     }
 
     return new DeliveryBatch(
@@ -328,7 +319,7 @@ export class DeliveryBatch {
       this.#errorMessage,
       this.#sentAt,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 

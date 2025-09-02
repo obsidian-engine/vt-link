@@ -1,51 +1,117 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { createAutoReplyRule } from "@/ui/actions/autoReplyActions";
+import { createAutoReplyRule } from '@/ui/actions/autoReplyActions';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-interface Condition {
-  type: "keyword" | "regex" | "messageType" | "time" | "user";
-  [key: string]: any;
+// 基本条件インターフェース
+interface BaseCondition {
+  type: 'keyword' | 'regex' | 'messageType' | 'time' | 'user';
 }
 
-interface Response {
-  type: "text" | "image" | "sticker";
-  [key: string]: any;
+// キーワード条件の型定義
+interface KeywordCondition extends BaseCondition {
+  type: 'keyword';
+  keyword: string;
+  mode: 'partial' | 'exact' | 'startsWith' | 'endsWith';
+  caseSensitive: boolean;
 }
+
+// 正規表現条件の型定義
+interface RegexCondition extends BaseCondition {
+  type: 'regex';
+  pattern: string;
+}
+
+// メッセージタイプ条件の型定義
+interface MessageTypeCondition extends BaseCondition {
+  type: 'messageType';
+  messageType: string;
+}
+
+// 時間条件の型定義
+interface TimeCondition extends BaseCondition {
+  type: 'time';
+  startTime: string;
+  endTime: string;
+  weekdays: number[];
+}
+
+// ユーザー条件の型定義
+interface UserCondition extends BaseCondition {
+  type: 'user';
+  userIds: string[];
+}
+
+// 統合条件型
+type Condition =
+  | KeywordCondition
+  | RegexCondition
+  | MessageTypeCondition
+  | TimeCondition
+  | UserCondition;
+
+// 基本返信インターフェース
+interface BaseResponse {
+  type: 'text' | 'image' | 'sticker';
+  probability?: number;
+}
+
+// テキスト返信の型定義
+interface TextResponse extends BaseResponse {
+  type: 'text';
+  text: string;
+}
+
+// 画像返信の型定義
+interface ImageResponse extends BaseResponse {
+  type: 'image';
+  originalContentUrl: string;
+  previewImageUrl: string;
+}
+
+// スタンプ返信の型定義
+interface StickerResponse extends BaseResponse {
+  type: 'sticker';
+  packageId: string;
+  stickerId: string;
+}
+
+// 統合返信型
+type Response = TextResponse | ImageResponse | StickerResponse;
 
 export default function NewAutoReplyPage() {
   const router = useRouter();
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
   const [enabled, setEnabled] = useState(true);
   const [priority, setPriority] = useState(0);
   const [conditions, setConditions] = useState<Condition[]>([]);
   const [responses, setResponses] = useState<Response[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
+    setError('');
 
     try {
       if (conditions.length === 0) {
-        throw new Error("少なくとも1つの条件が必要です");
+        throw new Error('少なくとも1つの条件が必要です');
       }
 
       if (responses.length === 0) {
-        throw new Error("少なくとも1つの返信が必要です");
+        throw new Error('少なくとも1つの返信が必要です');
       }
 
       const formData = new FormData();
-      formData.append("accountId", "default-account"); // TODO: Get from session
-      formData.append("name", name);
-      formData.append("conditions", JSON.stringify(conditions));
-      formData.append("responses", JSON.stringify(responses));
-      formData.append("enabled", enabled.toString());
-      formData.append("priority", priority.toString());
+      formData.append('accountId', 'default-account'); // TODO: Get from session
+      formData.append('name', name);
+      formData.append('conditions', JSON.stringify(conditions));
+      formData.append('responses', JSON.stringify(responses));
+      formData.append('enabled', enabled.toString());
+      formData.append('priority', priority.toString());
 
       const result = await createAutoReplyRule(formData);
 
@@ -53,9 +119,9 @@ export default function NewAutoReplyPage() {
         throw new Error(result.error);
       }
 
-      router.push("/dashboard/auto-reply");
+      router.push('/dashboard/auto-reply');
     } catch (err) {
-      setError(err instanceof Error ? err.message : "作成に失敗しました");
+      setError(err instanceof Error ? err.message : '作成に失敗しました');
     } finally {
       setIsLoading(false);
     }
@@ -64,13 +130,13 @@ export default function NewAutoReplyPage() {
   const addCondition = () => {
     setConditions([
       ...conditions,
-      { type: "keyword", keyword: "", mode: "partial", caseSensitive: false },
+      { type: 'keyword', keyword: '', mode: 'partial', caseSensitive: false },
     ]);
   };
 
   const updateCondition = (index: number, updates: Partial<Condition>) => {
     const newConditions = [...conditions];
-    newConditions[index] = { ...newConditions[index], ...updates };
+    newConditions[index] = { ...newConditions[index], ...updates } as Condition;
     setConditions(newConditions);
   };
 
@@ -79,12 +145,12 @@ export default function NewAutoReplyPage() {
   };
 
   const addResponse = () => {
-    setResponses([...responses, { type: "text", text: "", probability: 1.0 }]);
+    setResponses([...responses, { type: 'text', text: '', probability: 1.0 }]);
   };
 
   const updateResponse = (index: number, updates: Partial<Response>) => {
     const newResponses = [...responses];
-    newResponses[index] = { ...newResponses[index], ...updates };
+    newResponses[index] = { ...newResponses[index], ...updates } as Response;
     setResponses(newResponses);
   };
 
@@ -122,9 +188,7 @@ export default function NewAutoReplyPage() {
 
           {/* 基本設定 */}
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              基本設定
-            </h2>
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">基本設定</h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -146,13 +210,11 @@ export default function NewAutoReplyPage() {
                 <input
                   type="number"
                   value={priority}
-                  onChange={(e) => setPriority(parseInt(e.target.value) || 0)}
+                  onChange={(e) => setPriority(Number.parseInt(e.target.value) || 0)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   placeholder="0"
                 />
-                <p className="text-sm text-gray-500 mt-1">
-                  数値が大きいほど優先度が高くなります
-                </p>
+                <p className="text-sm text-gray-500 mt-1">数値が大きいほど優先度が高くなります</p>
               </div>
               <div className="flex items-center">
                 <input
@@ -171,9 +233,7 @@ export default function NewAutoReplyPage() {
           {/* 条件設定 */}
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-                反応条件
-              </h2>
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">反応条件</h2>
               <button
                 type="button"
                 onClick={addCondition}
@@ -183,9 +243,7 @@ export default function NewAutoReplyPage() {
               </button>
             </div>
             {conditions.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">
-                条件を追加してください
-              </p>
+              <p className="text-gray-500 text-center py-4">条件を追加してください</p>
             ) : (
               <div className="space-y-4">
                 {conditions.map((condition, index) => (
@@ -203,9 +261,7 @@ export default function NewAutoReplyPage() {
           {/* 返信設定 */}
           <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-                自動返信内容
-              </h2>
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">自動返信内容</h2>
               <button
                 type="button"
                 onClick={addResponse}
@@ -215,9 +271,7 @@ export default function NewAutoReplyPage() {
               </button>
             </div>
             {responses.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">
-                返信内容を追加してください
-              </p>
+              <p className="text-gray-500 text-center py-4">返信内容を追加してください</p>
             ) : (
               <div className="space-y-4">
                 {responses.map((response, index) => (
@@ -245,7 +299,7 @@ export default function NewAutoReplyPage() {
               disabled={isLoading}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             >
-              {isLoading ? "作成中..." : "ルールを作成"}
+              {isLoading ? '作成中...' : 'ルールを作成'}
             </button>
           </div>
         </form>
@@ -268,7 +322,7 @@ function ConditionEditor({
       <div className="flex justify-between items-start mb-3">
         <select
           value={condition.type}
-          onChange={(e) => onChange({ type: e.target.value as any })}
+          onChange={(e) => onChange({ type: e.target.value as Condition['type'] })}
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
         >
           <option value="keyword">キーワード</option>
@@ -286,19 +340,19 @@ function ConditionEditor({
         </button>
       </div>
 
-      {condition.type === "keyword" && (
+      {condition.type === 'keyword' && (
         <div className="space-y-3">
           <input
             type="text"
-            value={condition.keyword || ""}
+            value={condition['keyword'] || ''}
             onChange={(e) => onChange({ keyword: e.target.value })}
             placeholder="キーワードを入力"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <div className="flex space-x-4">
             <select
-              value={condition.mode || "partial"}
-              onChange={(e) => onChange({ mode: e.target.value })}
+              value={condition['mode'] || 'partial'}
+              onChange={(e) => onChange({ mode: e.target.value as KeywordCondition['mode'] })}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               <option value="partial">部分一致</option>
@@ -309,7 +363,7 @@ function ConditionEditor({
             <label className="flex items-center">
               <input
                 type="checkbox"
-                checked={condition.caseSensitive || false}
+                checked={condition['caseSensitive'] || false}
                 onChange={(e) => onChange({ caseSensitive: e.target.checked })}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
@@ -321,10 +375,10 @@ function ConditionEditor({
         </div>
       )}
 
-      {condition.type === "regex" && (
+      {condition.type === 'regex' && (
         <input
           type="text"
-          value={condition.pattern || ""}
+          value={condition['pattern'] || ''}
           onChange={(e) => onChange({ pattern: e.target.value })}
           placeholder="正規表現パターン"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -348,7 +402,7 @@ function ResponseEditor({
       <div className="flex justify-between items-start mb-3">
         <select
           value={response.type}
-          onChange={(e) => onChange({ type: e.target.value as any })}
+          onChange={(e) => onChange({ type: e.target.value as Response['type'] })}
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
         >
           <option value="text">テキスト</option>
@@ -364,9 +418,9 @@ function ResponseEditor({
         </button>
       </div>
 
-      {response.type === "text" && (
+      {response.type === 'text' && (
         <textarea
-          value={response.text || ""}
+          value={response['text'] || ''}
           onChange={(e) => onChange({ text: e.target.value })}
           placeholder="返信メッセージを入力"
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -374,18 +428,18 @@ function ResponseEditor({
         />
       )}
 
-      {response.type === "image" && (
+      {response.type === 'image' && (
         <div className="space-y-3">
           <input
             type="url"
-            value={response.originalContentUrl || ""}
+            value={response['originalContentUrl'] || ''}
             onChange={(e) => onChange({ originalContentUrl: e.target.value })}
             placeholder="画像URL"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <input
             type="url"
-            value={response.previewImageUrl || ""}
+            value={response['previewImageUrl'] || ''}
             onChange={(e) => onChange({ previewImageUrl: e.target.value })}
             placeholder="プレビュー画像URL"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -393,18 +447,18 @@ function ResponseEditor({
         </div>
       )}
 
-      {response.type === "sticker" && (
+      {response.type === 'sticker' && (
         <div className="space-y-3">
           <input
             type="text"
-            value={response.packageId || ""}
+            value={response['packageId'] || ''}
             onChange={(e) => onChange({ packageId: e.target.value })}
             placeholder="パッケージID"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <input
             type="text"
-            value={response.stickerId || ""}
+            value={response['stickerId'] || ''}
             onChange={(e) => onChange({ stickerId: e.target.value })}
             placeholder="スティッカーID"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -414,17 +468,15 @@ function ResponseEditor({
 
       <div className="mt-3">
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-          実行確率: {Math.round((response.probability || 1) * 100)}%
+          実行確率: {Math.round((response['probability'] || 1) * 100)}%
         </label>
         <input
           type="range"
           min="0.1"
           max="1"
           step="0.1"
-          value={response.probability || 1}
-          onChange={(e) =>
-            onChange({ probability: parseFloat(e.target.value) })
-          }
+          value={response['probability'] || 1}
+          onChange={(e) => onChange({ probability: Number.parseFloat(e.target.value) })}
           className="w-full"
         />
       </div>

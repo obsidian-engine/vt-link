@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 export default function Error({
   error,
@@ -11,16 +11,14 @@ export default function Error({
 }) {
   useEffect(() => {
     // エラーをログに記録（本番環境では適切なログサービスに送信）
-    console.error("Campaign page error:", error);
+    console.error('Campaign page error:', error);
   }, [error]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 text-center">
         <div className="text-red-500 text-6xl mb-4">🚨</div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
-          エラーが発生しました
-        </h2>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">エラーが発生しました</h2>
         <p className="text-gray-600 mb-6">
           キャンペーンページの読み込み中に問題が発生しました。
           しばらく待ってから再度お試しください。
@@ -39,7 +37,7 @@ export default function Error({
             ダッシュボードに戻る
           </a>
         </div>
-        {process.env.NODE_ENV === "development" && (
+        {process.env.NODE_ENV === 'development' && (
           <details className="mt-6 text-left">
             <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
               技術的な詳細（開発モードのみ）

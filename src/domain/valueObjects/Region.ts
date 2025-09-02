@@ -1,14 +1,14 @@
 export enum RegionCode {
-  Hokkaido = "hokkaido",
-  Tohoku = "tohoku",
-  Kanto = "kanto",
-  Chubu = "chubu",
-  Kansai = "kansai",
-  Chugoku = "chugoku",
-  Shikoku = "shikoku",
-  Kyushu = "kyushu",
-  Okinawa = "okinawa",
-  Unknown = "unknown",
+  Hokkaido = 'hokkaido',
+  Tohoku = 'tohoku',
+  Kanto = 'kanto',
+  Chubu = 'chubu',
+  Kansai = 'kansai',
+  Chugoku = 'chugoku',
+  Shikoku = 'shikoku',
+  Kyushu = 'kyushu',
+  Okinawa = 'okinawa',
+  Unknown = 'unknown',
 }
 
 export class RegionSet {
@@ -21,7 +21,7 @@ export class RegionSet {
 
   static create(regions: RegionCode[]): RegionSet {
     if (!regions || regions.length === 0) {
-      throw new Error("At least one region must be specified");
+      throw new Error('At least one region must be specified');
     }
 
     return new RegionSet(regions);
@@ -65,31 +65,31 @@ export class RegionSet {
     const regionNames = this.regions.map((region) => {
       switch (region) {
         case RegionCode.Hokkaido:
-          return "北海道";
+          return '北海道';
         case RegionCode.Tohoku:
-          return "東北";
+          return '東北';
         case RegionCode.Kanto:
-          return "関東";
+          return '関東';
         case RegionCode.Chubu:
-          return "中部";
+          return '中部';
         case RegionCode.Kansai:
-          return "関西";
+          return '関西';
         case RegionCode.Chugoku:
-          return "中国";
+          return '中国';
         case RegionCode.Shikoku:
-          return "四国";
+          return '四国';
         case RegionCode.Kyushu:
-          return "九州";
+          return '九州';
         case RegionCode.Okinawa:
-          return "沖縄";
+          return '沖縄';
         case RegionCode.Unknown:
-          return "不明";
+          return '不明';
         default:
           return region;
       }
     });
 
-    return regionNames.join("、");
+    return regionNames.join('、');
   }
 
   toJSON(): any {
