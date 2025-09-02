@@ -15,6 +15,31 @@ import { TimeWindow } from '@/domain/entities/TimeWindow';
 import { MessageType } from '@/domain/entities/IncomingMessage';
 import { AutoReplyRuleRepository } from '@/domain/repositories/AutoReplyRuleRepository';
 
+interface ConditionInputData {
+  readonly type: ConditionType;
+  readonly keyword?: string;
+  readonly mode?: KeywordMatchMode;
+  readonly caseSensitive?: boolean;
+  readonly pattern?: string;
+  readonly flags?: string;
+  readonly allowedTypes?: MessageType[];
+  readonly startTime?: string;
+  readonly endTime?: string;
+  readonly timeZone?: string;
+  readonly targetUsers?: string[];
+  readonly includeMode?: boolean;
+}
+
+interface ResponseInputData {
+  readonly type: ResponseType;
+  readonly text?: string;
+  readonly originalContentUrl?: string;
+  readonly previewImageUrl?: string;
+  readonly packageId?: string;
+  readonly stickerId?: string;
+  readonly probability?: number;
+}
+
 export interface CreateAutoReplyRuleInput {
   readonly accountId: string;
   readonly name: string;
@@ -135,41 +160,56 @@ export class CreateAutoReplyRuleUsecase {
     return maxPriority + 1;
   }
 
-  private buildCondition(id: string, data: any): Condition {
+  private buildCondition(id: string, data: ConditionInputData): Condition {
     switch (data.type) {
       case ConditionType.Keyword:
+        if (!data.keyword || data.keyword.trim().length === 0) {
+          throw new Error('Keyword is required for keyword condition');
+        }
         return KeywordCondition.create(
           id,
-          data.keyword!,
+          data.keyword,
           data.mode ?? KeywordMatchMode.Partial,
           data.caseSensitive ?? false
         );
       
       case ConditionType.Regex:
+        if (!data.pattern || data.pattern.trim().length === 0) {
+          throw new Error('Pattern is required for regex condition');
+        }
         return RegexCondition.create(
           id,
-          data.pattern!,
+          data.pattern,
           data.flags ?? 'i'
         );
       
       case ConditionType.MessageType:
+        if (!data.allowedTypes || data.allowedTypes.length === 0) {
+          throw new Error('Allowed types are required for message type condition');
+        }
         return MessageTypeCondition.create(
           id,
-          data.allowedTypes!
+          data.allowedTypes
         );
       
       case ConditionType.Time:
+        if (!data.startTime || !data.endTime) {
+          throw new Error('Start time and end time are required for time condition');
+        }
         return TimeCondition.create(
           id,
-          data.startTime!,
-          data.endTime!,
+          data.startTime,
+          data.endTime,
           data.timeZone ?? 'Asia/Tokyo'
         );
       
       case ConditionType.User:
+        if (!data.targetUsers || data.targetUsers.length === 0) {
+          throw new Error('Target users are required for user condition');
+        }
         return UserCondition.create(
           id,
-          data.targetUsers!,
+          data.targetUsers,
           data.includeMode ?? true
         );
       
@@ -178,28 +218,37 @@ export class CreateAutoReplyRuleUsecase {
     }
   }
 
-  private buildResponse(id: string, data: any): Response {
+  private buildResponse(id: string, data: ResponseInputData): Response {
     switch (data.type) {
       case ResponseType.Text:
+        if (!data.text || data.text.trim().length === 0) {
+          throw new Error('Text is required for text response');
+        }
         return Response.createText(
           id,
-          data.text!,
+          data.text,
           data.probability ?? 1.0
         );
       
       case ResponseType.Image:
+        if (!data.originalContentUrl || !data.previewImageUrl) {
+          throw new Error('Original content URL and preview image URL are required for image response');
+        }
         return Response.createImage(
           id,
-          data.originalContentUrl!,
-          data.previewImageUrl!,
+          data.originalContentUrl,
+          data.previewImageUrl,
           data.probability ?? 1.0
         );
       
       case ResponseType.Sticker:
+        if (!data.packageId || !data.stickerId) {
+          throw new Error('Package ID and sticker ID are required for sticker response');
+        }
         return Response.createSticker(
           id,
-          data.packageId!,
-          data.stickerId!,
+          data.packageId,
+          data.stickerId,
           data.probability ?? 1.0
         );
       

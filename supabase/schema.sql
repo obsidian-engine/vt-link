@@ -131,9 +131,9 @@ CREATE INDEX idx_rate_limit_entries_key_created ON rate_limit_entries(key, creat
 -- Create GIN indexes for JSONB fields
 CREATE INDEX idx_auto_reply_rules_conditions ON auto_reply_rules USING GIN(conditions);
 CREATE INDEX idx_auto_reply_rules_responses ON auto_reply_rules USING GIN(responses);
-CREATE INDEX idx_auto_reply_rules_account_id ON auto_reply_rules(account_id);
-CREATE INDEX idx_auto_reply_rules_status ON auto_reply_rules(account_id, status) WHERE status = 'active';
-CREATE INDEX idx_auto_reply_keywords ON auto_reply_rules USING gin(keywords);
+-- Account ID index already exists above, removing duplicate
+-- Status column no longer exists, removing obsolete index  
+-- Keywords column no longer exists, removing obsolete index
 CREATE INDEX idx_message_campaigns_account_id ON message_campaigns(account_id);
 CREATE INDEX idx_message_campaigns_status ON message_campaigns(status);
 CREATE INDEX idx_message_campaigns_scheduled ON message_campaigns(scheduled_at) WHERE status = 'scheduled';
