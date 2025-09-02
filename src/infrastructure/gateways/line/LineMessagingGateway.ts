@@ -1,5 +1,7 @@
 import { BroadcastPort } from '@/application/message/SendBroadcastMessageUsecase';
 import { MessageContent } from '@/domain/entities/MessageCampaign';
+import { NarrowcastPort } from '@/application/campaign/SendNowUsecase';
+import { MessageContent as CampaignMessageContent } from '@/domain/valueObjects/MessageContent';
 
 export interface LineRichMenuCreateRequest {
   size: {
@@ -35,7 +37,7 @@ export interface LineMessage {
   stickerId?: string;
 }
 
-export class LineMessagingGateway implements BroadcastPort {
+export class LineMessagingGateway implements BroadcastPort, NarrowcastPort {
   readonly #baseUrl = 'https://api.line.me/v2/bot';
   readonly #channelAccessToken: string;
 
@@ -66,6 +68,42 @@ export class LineMessagingGateway implements BroadcastPort {
     }
 
     return { sentCount: 0 };
+  }
+
+  async sendNarrowcast(content: ReadonlyArray<CampaignMessageContent>, userIds: ReadonlyArray<string>): Promise<{ sentCount: number }> {
+    const messages = this.convertCampaignToLineMessages(content);
+    
+    // LINE APIは最大500件のユーザーIDまで一度に送信可能
+    const BATCH_SIZE = 500;
+    let totalSent = 0;
+    
+    for (let i = 0; i < userIds.length; i += BATCH_SIZE) {
+      const batch = userIds.slice(i, i + BATCH_SIZE);
+      
+      const response = await fetch(`${this.#baseUrl}/message/narrowcast`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.#channelAccessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages,
+          recipient: {
+            type: 'user',
+            userIds: batch,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`LINE API error: ${response.status} ${errorText}`);
+      }
+      
+      totalSent += batch.length;
+    }
+
+    return { sentCount: totalSent };
   }
 
   async createRichMenu(request: LineRichMenuCreateRequest): Promise<{ richMenuId: string }> {
@@ -149,6 +187,13 @@ export class LineMessagingGateway implements BroadcastPort {
         default:
           throw new Error(`Unsupported message type: ${item.type}`);
       }
+    });
+  }
+
+  private convertCampaignToLineMessages(content: ReadonlyArray<CampaignMessageContent>): LineMessage[] {
+    return content.map(item => {
+      const lineMessage = item.toLineMessageObject();
+      return lineMessage;
     });
   }
 }
