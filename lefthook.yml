@@ -1,14 +1,13 @@
 pre-push:
+  parallel: true
+  fail_fast: true
   commands:
-    type-check:
+    biome:
+      glob: "*.{js,ts,jsx,tsx,cts,mts,d.cts,d.mts,json,jsonc}"
+      run: "npm exec biome -- check --no-errors-on-unmatched --files-ignore-unknown \"{all_files}\""
+    types:
       glob: "*.{js,ts,jsx,tsx}"
-      run: npm run type-check
-    lint:
-      glob: "*.{js,ts,jsx,tsx}"
-      run: npm run lint
-    build:
-      glob: "*.{js,ts,jsx,tsx,json}"
-      run: npm run build
+      run: "npm run type-check"
 
 pre-commit:
   commands:
