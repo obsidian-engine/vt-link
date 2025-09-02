@@ -1,6 +1,7 @@
 'use client';
 
-import { memo, useDraggable } from 'react';
+import { memo } from 'react';
+import { useDraggable } from '@dnd-kit/core';
 import { RichMenuArea, RichMenuSize, EDITOR_SCALE, LineActionType } from './types';
 
 interface RichMenuCanvasProps {
@@ -59,7 +60,7 @@ export const RichMenuCanvas = memo(function RichMenuCanvas({ size, areas, select
       </div>
     </div>
   );
-}
+});
 
 interface DraggableAreaProps {
   area: RichMenuArea;

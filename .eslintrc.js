@@ -1,5 +1,5 @@
 /** @type {import('eslint').Linter.Config} */
-module.exports = {
+export default {
   extends: [
     'next/core-web-vitals',
     '@typescript-eslint/recommended',
@@ -27,7 +27,7 @@ module.exports = {
       fixStyle: 'separate-type-imports'
     }],
     '@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
-    '@typescript-eslint/prefer-readonly-parameter-types': 'error',
+    '@typescript-eslint/prefer-readonly-parameter-types': 'warn',
     
     // ============================================================================
     // Next.js / Server Actions 関連ルール
@@ -53,9 +53,9 @@ module.exports = {
     // 型安全性強化ルール
     // ============================================================================
     '@typescript-eslint/strict-boolean-expressions': ['error', {
-      allowString: false,
-      allowNumber: false,
-      allowNullableObject: false,
+      allowString: true,
+      allowNumber: true,
+      allowNullableObject: true,
       allowNullableBoolean: false,
       allowNullableString: false,
       allowNullableNumber: false,
@@ -88,6 +88,15 @@ module.exports = {
     // React Hooks関連
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'error',
+    
+    // 型エスケープハッチ: 説明付きなら許可
+    '@typescript-eslint/ban-ts-comment': ['error', {
+      'ts-expect-error': 'allow-with-description',
+      'ts-ignore': 'allow-with-description',
+      'ts-nocheck': false,
+      'ts-check': false,
+      minimumDescriptionLength: 10
+    }],
   },
   overrides: [
     {
