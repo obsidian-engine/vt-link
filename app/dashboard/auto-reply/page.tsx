@@ -11,7 +11,7 @@ interface AutoReplyRule {
   priority: number;
   conditionsCount: number;
   responsesCount: number;
-  createdAt: Date;
+  createdAt: string; // APIから文字列として返される
 }
 
 export default async function AutoReplyPage() {

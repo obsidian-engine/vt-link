@@ -136,7 +136,7 @@ export default function NewAutoReplyPage() {
 
   const updateCondition = (index: number, updates: Partial<Condition>) => {
     const newConditions = [...conditions];
-    newConditions[index] = { ...newConditions[index], ...updates };
+    newConditions[index] = { ...newConditions[index], ...updates } as Condition;
     setConditions(newConditions);
   };
 
@@ -150,7 +150,7 @@ export default function NewAutoReplyPage() {
 
   const updateResponse = (index: number, updates: Partial<Response>) => {
     const newResponses = [...responses];
-    newResponses[index] = { ...newResponses[index], ...updates };
+    newResponses[index] = { ...newResponses[index], ...updates } as Response;
     setResponses(newResponses);
   };
 
@@ -352,7 +352,7 @@ function ConditionEditor({
           <div className="flex space-x-4">
             <select
               value={condition['mode'] || 'partial'}
-              onChange={(e) => onChange({ mode: e.target.value })}
+              onChange={(e) => onChange({ mode: e.target.value as KeywordCondition['mode'] })}
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               <option value="partial">部分一致</option>

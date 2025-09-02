@@ -178,7 +178,7 @@ async function SegmentList() {
   );
 }
 
-function SegmentCard({ segment }: { segment: TargetSegment }) {
+function SegmentCard({ segment }: { segment: any }) {
   const getCriteriaText = (criteria: SegmentCriteria) => {
     const parts = [];
 

@@ -90,7 +90,7 @@ async function HistoryContent() {
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {campaigns
-                      .reduce((sum: number, c: DeliveryHistory) => sum + (c.sentCount || 0), 0)
+                      .reduce((sum: number, c: any) => sum + (c.sentCount || 0), 0)
                       .toLocaleString()}
                   </dd>
                 </dl>
@@ -112,7 +112,7 @@ async function HistoryContent() {
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {campaigns
-                      .reduce((sum: number, c: DeliveryHistory) => sum + (c.failedCount || 0), 0)
+                      .reduce((sum: number, c: any) => sum + (c.failedCount || 0), 0)
                       .toLocaleString()}
                   </dd>
                 </dl>
@@ -140,7 +140,7 @@ async function HistoryContent() {
                             0
                           ) /
                             (campaigns.reduce(
-                              (sum: number, c: DeliveryHistory) =>
+                              (sum: number, c: any) =>
                                 sum + (c.sentCount || 0) + (c.failedCount || 0),
                               0
                             ) || 1)) *
@@ -229,7 +229,7 @@ async function HistoryContent() {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {campaigns.map((campaign: DeliveryHistory) => (
+                {campaigns.map((campaign: any) => (
                   <HistoryRow key={campaign.id} campaign={campaign} />
                 ))}
               </tbody>
@@ -241,7 +241,7 @@ async function HistoryContent() {
   );
 }
 
-function HistoryRow({ campaign }: { campaign: DeliveryHistory }) {
+function HistoryRow({ campaign }: { campaign: any }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'sent':

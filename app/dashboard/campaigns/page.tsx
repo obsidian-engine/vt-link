@@ -134,7 +134,7 @@ async function CampaignList() {
   );
 }
 
-function CampaignCard({ campaign }: { campaign: Campaign }) {
+function CampaignCard({ campaign }: { campaign: any }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'draft':

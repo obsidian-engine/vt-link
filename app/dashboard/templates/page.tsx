@@ -110,7 +110,7 @@ async function TemplateList() {
   );
 }
 
-function TemplateCard({ template }: { template: MessageTemplate }) {
+function TemplateCard({ template }: { template: any }) {
   const getTypeIcon = (contentType: string) => {
     switch (contentType) {
       case 'text':
@@ -153,7 +153,7 @@ function TemplateCard({ template }: { template: MessageTemplate }) {
     }
   };
 
-  const getPreviewText = (content: TemplateContent) => {
+  const getPreviewText = (content: any) => {
     if (!content || content.length === 0) return 'コンテンツがありません';
 
     const firstContent = content[0];
