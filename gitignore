@@ -1,0 +1,65 @@
+.claude/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Go
+/vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+go.work.sum
+
+# Build
+/bin/
+/dist/
+/build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Generated files
+internal/ent/
+internal/graph/generated/
+internal/graph/model/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+migrations/*.sql
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage.out
+coverage.html
+*.cover
+
+# Docker
+docker-compose.override.yml
+
+# Temporary
+tmp/
+temp/
+
+# Serena
+.serena/cache/
+.serena/memories/
