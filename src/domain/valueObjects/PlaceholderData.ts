@@ -11,20 +11,18 @@ export class PlaceholderData {
 
     for (const [key, value] of Object.entries(data)) {
       if (!key || key.trim().length === 0) {
-        throw new Error("Placeholder key cannot be empty");
+        throw new Error('Placeholder key cannot be empty');
       }
       if (value === null || value === undefined) {
-        throw new Error(
-          `Placeholder value for key '${key}' cannot be null or undefined`,
-        );
+        throw new Error(`Placeholder value for key '${key}' cannot be null or undefined`);
       }
 
       const trimmedKey = key.trim();
       const trimmedValue = String(value).trim();
 
-      if (!this.isValidPlaceholderKey(trimmedKey)) {
+      if (!PlaceholderData.isValidPlaceholderKey(trimmedKey)) {
         throw new Error(
-          `Invalid placeholder key '${trimmedKey}'. Must contain only letters, numbers, and underscores.`,
+          `Invalid placeholder key '${trimmedKey}'. Must contain only letters, numbers, and underscores.`
         );
       }
 
@@ -73,11 +71,11 @@ export class PlaceholderData {
 
   set(key: string, value: string): PlaceholderData {
     if (!key || key.trim().length === 0) {
-      throw new Error("Placeholder key cannot be empty");
+      throw new Error('Placeholder key cannot be empty');
     }
     if (!PlaceholderData.isValidPlaceholderKey(key.trim())) {
       throw new Error(
-        `Invalid placeholder key '${key.trim()}'. Must contain only letters, numbers, and underscores.`,
+        `Invalid placeholder key '${key.trim()}'. Must contain only letters, numbers, and underscores.`
       );
     }
 
@@ -114,7 +112,7 @@ export class PlaceholderData {
   toString(): string {
     const entries = Array.from(this.#data.entries())
       .map(([key, value]) => `${key}=${value}`)
-      .join(", ");
+      .join(', ');
 
     return `{${entries}}`;
   }
@@ -136,10 +134,7 @@ export class PlaceholderData {
 
     for (const [key, value] of this.#data) {
       const placeholder = `{{${key}}}`;
-      result = result.replace(
-        new RegExp(placeholder.replace(/[{}]/g, "\\$&"), "g"),
-        value,
-      );
+      result = result.replace(new RegExp(placeholder.replace(/[{}]/g, '\\$&'), 'g'), value);
     }
 
     return result;

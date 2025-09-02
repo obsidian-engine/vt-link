@@ -1,20 +1,20 @@
 import {
-  type MessageSpecification,
+  KeywordMatchMode,
   KeywordSpecification,
+  type MessageSpecification,
+  MessageType,
+  MessageTypeSpecification,
   RegexSpecification,
   TimeWindowSpecification,
-  MessageTypeSpecification,
-  KeywordMatchMode,
-  MessageType,
-} from "../specifications";
+} from '../specifications';
 
 import {
-  type ReplyCommand,
-  TextReplyCommand,
-  StickerReplyCommand,
-  ImageReplyCommand,
   CompositeReplyCommand,
-} from "../commands";
+  ImageReplyCommand,
+  type ReplyCommand,
+  StickerReplyCommand,
+  TextReplyCommand,
+} from '../commands';
 
 /**
  * Specification作成のヘルパー関数
@@ -26,7 +26,7 @@ export class SpecificationBuilder {
   static keyword(
     keyword: string,
     mode: KeywordMatchMode = KeywordMatchMode.Partial,
-    caseSensitive: boolean = false,
+    caseSensitive = false
   ): MessageSpecification {
     return new KeywordSpecification(keyword, mode, caseSensitive);
   }
@@ -34,7 +34,7 @@ export class SpecificationBuilder {
   /**
    * 正規表現条件
    */
-  static regex(pattern: string, flags: string = "i"): MessageSpecification {
+  static regex(pattern: string, flags = 'i'): MessageSpecification {
     return new RegexSpecification(pattern, flags);
   }
 
@@ -44,7 +44,7 @@ export class SpecificationBuilder {
   static timeWindow(
     startTime: string,
     endTime: string,
-    timeZone: string = "Asia/Tokyo",
+    timeZone = 'Asia/Tokyo'
   ): MessageSpecification {
     return new TimeWindowSpecification(startTime, endTime, timeZone);
   }
@@ -85,29 +85,21 @@ export class CommandBuilder {
   /**
    * テキスト返信
    */
-  static text(text: string, probability: number = 1.0): ReplyCommand {
+  static text(text: string, probability = 1.0): ReplyCommand {
     return new TextReplyCommand(text, probability);
   }
 
   /**
    * スタンプ返信
    */
-  static sticker(
-    packageId: string,
-    stickerId: string,
-    probability: number = 1.0,
-  ): ReplyCommand {
+  static sticker(packageId: string, stickerId: string, probability = 1.0): ReplyCommand {
     return new StickerReplyCommand(packageId, stickerId, probability);
   }
 
   /**
    * 画像返信
    */
-  static image(
-    originalUrl: string,
-    previewUrl: string,
-    probability: number = 1.0,
-  ): ReplyCommand {
+  static image(originalUrl: string, previewUrl: string, probability = 1.0): ReplyCommand {
     return new ImageReplyCommand(originalUrl, previewUrl, probability);
   }
 
@@ -133,11 +125,11 @@ export class PresetBuilder {
   /**
    * 挨拶ルール
    */
-  static greeting(accountId: string, greeting: string = "こんにちは"): any {
+  static greeting(accountId: string, greeting = 'こんにちは'): any {
     return {
       accountId,
-      name: "挨拶ルール",
-      trigger: SpecificationBuilder.keyword("こんにちは"),
+      name: '挨拶ルール',
+      trigger: SpecificationBuilder.keyword('こんにちは'),
       response: CommandBuilder.text(greeting),
     };
   }
@@ -147,13 +139,13 @@ export class PresetBuilder {
    */
   static businessHours(
     accountId: string,
-    startTime: string = "09:00",
-    endTime: string = "18:00",
-    message: string = "営業時間内です",
+    startTime = '09:00',
+    endTime = '18:00',
+    message = '営業時間内です'
   ): any {
     return {
       accountId,
-      name: "営業時間ルール",
+      name: '営業時間ルール',
       trigger: SpecificationBuilder.timeWindow(startTime, endTime),
       response: CommandBuilder.text(message),
     };
@@ -162,14 +154,10 @@ export class PresetBuilder {
   /**
    * スタンプ反応ルール
    */
-  static stickerReaction(
-    accountId: string,
-    packageId: string = "446",
-    stickerId: string = "1988",
-  ): any {
+  static stickerReaction(accountId: string, packageId = '446', stickerId = '1988'): any {
     return {
       accountId,
-      name: "スタンプ反応ルール",
+      name: 'スタンプ反応ルール',
       trigger: SpecificationBuilder.stickerOnly(),
       response: CommandBuilder.sticker(packageId, stickerId),
     };

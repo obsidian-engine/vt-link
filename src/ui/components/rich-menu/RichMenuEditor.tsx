@@ -1,37 +1,28 @@
-"use client";
+'use client';
 
-import { useState, useCallback, useEffect } from "react";
 import {
   DndContext,
-  DragEndEvent,
   DragOverlay,
-  DragStartEvent,
   PointerSensor,
   TouchSensor,
   useSensor,
   useSensors,
-} from "@dnd-kit/core";
-import { createSnapModifier } from "@dnd-kit/modifiers";
-import { RichMenuCanvas } from "./RichMenuCanvas";
-import { RichMenuAreaPanel } from "./RichMenuAreaPanel";
-import {
-  RichMenuArea,
-  RICH_MENU_SIZES,
-  EDITOR_SCALE,
-  GRID_SIZE,
-} from "./types";
+} from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
+import { createSnapModifier } from '@dnd-kit/modifiers';
+import { useCallback, useEffect, useState } from 'react';
+import { RichMenuAreaPanel } from './RichMenuAreaPanel';
+import { RichMenuCanvas } from './RichMenuCanvas';
+import type { RichMenuArea } from './types';
+import { EDITOR_SCALE, GRID_SIZE, RICH_MENU_SIZES } from './types';
 
 interface RichMenuEditorProps {
-  size: "full" | "half";
+  size: 'full' | 'half';
   onAreasChange: (areas: RichMenuArea[]) => void;
   initialAreas?: RichMenuArea[];
 }
 
-export function RichMenuEditor({
-  size,
-  onAreasChange,
-  initialAreas = [],
-}: RichMenuEditorProps) {
+export function RichMenuEditor({ size, onAreasChange, initialAreas = [] }: RichMenuEditorProps) {
   const [areas, setAreas] = useState<RichMenuArea[]>(initialAreas);
   const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null);
   const [activeAreaId, setActiveAreaId] = useState<string | null>(null);
@@ -53,7 +44,7 @@ export function RichMenuEditor({
         delay: 250,
         tolerance: 5,
       },
-    }),
+    })
   );
 
   const snapToGridModifier = createSnapModifier(GRID_SIZE * EDITOR_SCALE);
@@ -79,17 +70,11 @@ export function RichMenuEditor({
 
           const newX = Math.max(
             0,
-            Math.min(
-              area.x + delta.x / EDITOR_SCALE,
-              menuSize.width - area.width,
-            ),
+            Math.min(area.x + delta.x / EDITOR_SCALE, menuSize.width - area.width)
           );
           const newY = Math.max(
             0,
-            Math.min(
-              area.y + delta.y / EDITOR_SCALE,
-              menuSize.height - area.height,
-            ),
+            Math.min(area.y + delta.y / EDITOR_SCALE, menuSize.height - area.height)
           );
 
           return {
@@ -105,7 +90,7 @@ export function RichMenuEditor({
 
       setActiveAreaId(null);
     },
-    [menuSize, onAreasChange],
+    [menuSize, onAreasChange]
   );
 
   const handleAreaAdd = useCallback(() => {
@@ -116,9 +101,9 @@ export function RichMenuEditor({
       width: 400,
       height: 200,
       action: {
-        type: "postback",
-        data: "",
-        displayText: "",
+        type: 'postback',
+        data: '',
+        displayText: '',
       },
     };
 
@@ -133,14 +118,12 @@ export function RichMenuEditor({
   const handleAreaUpdate = useCallback(
     (areaId: string, updates: Partial<RichMenuArea>) => {
       setAreas((prev) => {
-        const newAreas = prev.map((area) =>
-          area.id === areaId ? { ...area, ...updates } : area,
-        );
+        const newAreas = prev.map((area) => (area.id === areaId ? { ...area, ...updates } : area));
         onAreasChange(newAreas);
         return newAreas;
       });
     },
-    [onAreasChange],
+    [onAreasChange]
   );
 
   const handleAreaDelete = useCallback(
@@ -154,12 +137,10 @@ export function RichMenuEditor({
         setSelectedAreaId(null);
       }
     },
-    [onAreasChange, selectedAreaId],
+    [onAreasChange, selectedAreaId]
   );
 
-  const selectedArea = selectedAreaId
-    ? areas.find((area) => area.id === selectedAreaId)
-    : null;
+  const selectedArea = selectedAreaId ? areas.find((area) => area.id === selectedAreaId) : null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -168,7 +149,7 @@ export function RichMenuEditor({
         <div className="bg-white dark:bg-gray-800 rounded-lg border p-4">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              キャンバス ({size === "full" ? "フル" : "ハーフ"})
+              キャンバス ({size === 'full' ? 'フル' : 'ハーフ'})
             </h3>
             <button
               type="button"

@@ -7,7 +7,7 @@ export interface CreateTemplateInput {
   name: string;
   category: string;
   content: {
-    type: "text" | "image" | "sticker";
+    type: 'text' | 'image' | 'sticker';
     text?: string;
     originalContentUrl?: string;
     previewImageUrl?: string;
@@ -32,7 +32,7 @@ export interface CreateTemplateOutput {
 export class CreateTemplateUsecase {
   async execute(input: CreateTemplateInput): Promise<CreateTemplateOutput> {
     // TODO: 実装
-    throw new Error("CreateTemplateUsecase: Method not implemented");
+    throw new Error('CreateTemplateUsecase: Method not implemented');
   }
 }
 

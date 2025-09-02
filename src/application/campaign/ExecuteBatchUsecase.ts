@@ -12,7 +12,7 @@ export interface ExecuteBatchOutput {
   processedCount: number;
   sentCount: number;
   failedCount: number;
-  status: "completed" | "failed" | "partial";
+  status: 'completed' | 'failed' | 'partial';
 }
 
 /**
@@ -22,7 +22,7 @@ export interface ExecuteBatchOutput {
 export class ExecuteBatchUsecase {
   async execute(input: ExecuteBatchInput): Promise<ExecuteBatchOutput> {
     // TODO: 実装
-    throw new Error("ExecuteBatchUsecase: Method not implemented");
+    throw new Error('ExecuteBatchUsecase: Method not implemented');
   }
 }
 

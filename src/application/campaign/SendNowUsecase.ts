@@ -1,17 +1,15 @@
-import { MessageCampaignRepository } from "@/domain/campaign/repositories/MessageCampaignRepository";
-import { DeliveryBatchRepository } from "@/domain/campaign/repositories/DeliveryBatchRepository";
-import { TargetSegmentRepository } from "@/domain/campaign/repositories/TargetSegmentRepository";
-import { LineUserRepository } from "@/domain/campaign/repositories/LineUserRepository";
-import { DeliveryBatch } from "@/domain/campaign/entities/DeliveryBatch";
-import { CampaignType } from "@/domain/campaign/entities/MessageCampaign";
+import { DeliveryBatch } from '@/domain/campaign/entities/DeliveryBatch';
+import { CampaignType } from '@/domain/campaign/entities/MessageCampaign';
+import type { DeliveryBatchRepository } from '@/domain/campaign/repositories/DeliveryBatchRepository';
+import type { LineUserRepository } from '@/domain/campaign/repositories/LineUserRepository';
+import type { MessageCampaignRepository } from '@/domain/campaign/repositories/MessageCampaignRepository';
+import type { TargetSegmentRepository } from '@/domain/campaign/repositories/TargetSegmentRepository';
 
 export interface LineBroadcastService {
-  sendBroadcast(
-    content: any,
-  ): Promise<{ broadcastId: string; sentCount: number }>;
+  sendBroadcast(content: any): Promise<{ broadcastId: string; sentCount: number }>;
   sendNarrowcast(
     content: any,
-    userIds: string[],
+    userIds: string[]
   ): Promise<{ broadcastId: string; sentCount: number }>;
 }
 
@@ -40,7 +38,7 @@ export class SendNowUsecase {
     batchRepository: DeliveryBatchRepository,
     segmentRepository: TargetSegmentRepository,
     userRepository: LineUserRepository,
-    broadcastService: LineBroadcastService,
+    broadcastService: LineBroadcastService
   ) {
     this.#campaignRepository = campaignRepository;
     this.#batchRepository = batchRepository;
@@ -52,7 +50,7 @@ export class SendNowUsecase {
   async execute(input: SendNowInput): Promise<SendNowOutput> {
     // Input validation
     if (!input.campaignId || input.campaignId.trim().length === 0) {
-      throw new Error("Campaign ID is required");
+      throw new Error('Campaign ID is required');
     }
 
     // Find campaign
@@ -63,7 +61,7 @@ export class SendNowUsecase {
 
     // Check if campaign can be sent
     if (!campaign.canBeSent()) {
-      throw new Error("Campaign cannot be sent in its current state");
+      throw new Error('Campaign cannot be sent in its current state');
     }
 
     // Mark campaign as sending
@@ -76,34 +74,28 @@ export class SendNowUsecase {
 
       if (campaign.type === CampaignType.Broadcast) {
         // Get all users for the account
-        const allUsers = await this.#userRepository.findAllByAccountId(
-          campaign.accountId,
-        );
+        const allUsers = await this.#userRepository.findAllByAccountId(campaign.accountId);
         targetUserIds = allUsers.map((user) => user.userId);
       } else if (campaign.type === CampaignType.Segment) {
         if (!campaign.segmentId) {
-          throw new Error("Segment ID is required for segment campaigns");
+          throw new Error('Segment ID is required for segment campaigns');
         }
 
         // Get segment
-        const segment = await this.#segmentRepository.findById(
-          campaign.segmentId,
-        );
+        const segment = await this.#segmentRepository.findById(campaign.segmentId);
         if (!segment) {
           throw new Error(`Segment not found: ${campaign.segmentId}`);
         }
 
         // Get all users and filter by segment
-        const allUsers = await this.#userRepository.findAllByAccountId(
-          campaign.accountId,
-        );
+        const allUsers = await this.#userRepository.findAllByAccountId(campaign.accountId);
         targetUserIds = segment.filterUserIds(allUsers);
       } else {
         throw new Error(`Unsupported campaign type: ${campaign.type}`);
       }
 
       if (targetUserIds.length === 0) {
-        throw new Error("No target users found for this campaign");
+        throw new Error('No target users found for this campaign');
       }
 
       // Create delivery batch
@@ -119,12 +111,11 @@ export class SendNowUsecase {
       let broadcastResult: { broadcastId: string; sentCount: number };
 
       if (campaign.type === CampaignType.Broadcast) {
-        broadcastResult =
-          await this.#broadcastService.sendBroadcast(messageContent);
+        broadcastResult = await this.#broadcastService.sendBroadcast(messageContent);
       } else {
         broadcastResult = await this.#broadcastService.sendNarrowcast(
           messageContent,
-          targetUserIds,
+          targetUserIds
         );
       }
 
@@ -133,7 +124,7 @@ export class SendNowUsecase {
         .setLineBroadcastId(broadcastResult.broadcastId)
         .markAsCompleted(
           broadcastResult.sentCount,
-          targetUserIds.length - broadcastResult.sentCount,
+          targetUserIds.length - broadcastResult.sentCount
         );
 
       await this.#batchRepository.save(completedBatch);
@@ -141,7 +132,7 @@ export class SendNowUsecase {
       // Mark campaign as sent
       const sentCampaign = sendingCampaign.markAsSent(
         broadcastResult.sentCount,
-        targetUserIds.length - broadcastResult.sentCount,
+        targetUserIds.length - broadcastResult.sentCount
       );
       await this.#campaignRepository.save(sentCampaign);
 
@@ -155,8 +146,7 @@ export class SendNowUsecase {
       };
     } catch (error) {
       // Mark campaign as failed if something went wrong
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error occurred";
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       const failedCampaign = sendingCampaign.markAsFailed(errorMessage);
       await this.#campaignRepository.save(failedCampaign);
 
@@ -168,14 +158,8 @@ export class SendNowUsecase {
     // Apply placeholder data if available
     let content = campaign.content;
 
-    if (
-      campaign.placeholderData &&
-      !campaign.placeholderData.isEmpty() &&
-      content.text
-    ) {
-      const renderedText = campaign.placeholderData.applyToTemplate(
-        content.text,
-      );
+    if (campaign.placeholderData && !campaign.placeholderData.isEmpty() && content.text) {
+      const renderedText = campaign.placeholderData.applyToTemplate(content.text);
       content = { ...content, text: renderedText };
     }
 

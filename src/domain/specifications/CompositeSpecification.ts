@@ -1,5 +1,5 @@
-import type { MessageSpecification } from "./MessageSpecification";
-import { IncomingMessage } from "../entities/IncomingMessage";
+import type { IncomingMessage } from '../entities/IncomingMessage';
+import type { MessageSpecification } from './MessageSpecification';
 
 /**
  * 複数の条件を組み合わせるCompositeSpecification
@@ -35,15 +35,13 @@ export abstract class CompositeSpecification implements MessageSpecification {
 export class AndSpecification extends CompositeSpecification {
   constructor(
     private readonly left: MessageSpecification,
-    private readonly right: MessageSpecification,
+    private readonly right: MessageSpecification
   ) {
     super();
   }
 
   isSatisfiedBy(message: IncomingMessage): boolean {
-    return (
-      this.left.isSatisfiedBy(message) && this.right.isSatisfiedBy(message)
-    );
+    return this.left.isSatisfiedBy(message) && this.right.isSatisfiedBy(message);
   }
 }
 
@@ -53,15 +51,13 @@ export class AndSpecification extends CompositeSpecification {
 export class OrSpecification extends CompositeSpecification {
   constructor(
     private readonly left: MessageSpecification,
-    private readonly right: MessageSpecification,
+    private readonly right: MessageSpecification
   ) {
     super();
   }
 
   isSatisfiedBy(message: IncomingMessage): boolean {
-    return (
-      this.left.isSatisfiedBy(message) || this.right.isSatisfiedBy(message)
-    );
+    return this.left.isSatisfiedBy(message) || this.right.isSatisfiedBy(message);
   }
 }
 

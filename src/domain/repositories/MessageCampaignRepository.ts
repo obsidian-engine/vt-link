@@ -1,4 +1,4 @@
-import { MessageCampaign } from "../entities/MessageCampaign";
+import type { MessageCampaign } from '../entities/MessageCampaign';
 
 export interface MessageCampaignRepository {
   save(campaign: MessageCampaign): Promise<void>;

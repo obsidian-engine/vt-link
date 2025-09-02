@@ -1,25 +1,21 @@
 /**
  * ユーザードメイン専用Zodスキーマ
  */
-import { z } from "zod";
+import { z } from 'zod';
 import {
+  CreateEntitySchemaBase,
   IdSchemaBase,
   LineUserIdSchemaBase,
   NameSchemaBase,
-  UrlSchemaBase,
-  CreateEntitySchemaBase,
   UpdateEntitySchemaBase,
+  UrlSchemaBase,
   createEnumSchema,
-} from "../base";
+} from '../base';
 
 // ============================================================================
 // ユーザー関連Enum
 // ============================================================================
-export const UserRoleSchema = createEnumSchema([
-  "admin",
-  "member",
-  "viewer",
-] as const);
+export const UserRoleSchema = createEnumSchema(['admin', 'member', 'viewer'] as const);
 
 // ============================================================================
 // ユーザーID関連
@@ -41,7 +37,7 @@ const UserFieldsSchema = {
   line_user_id: LineUserIdSchema,
   display_name: DisplayNameSchema,
   avatar_url: AvatarUrlSchema,
-  role: UserRoleSchema.default("member"),
+  role: UserRoleSchema.default('member'),
 } as const;
 
 export const UserSchema = CreateEntitySchemaBase(UserFieldsSchema);
@@ -49,7 +45,7 @@ export const CreateUserSchema = z.object({
   line_user_id: LineUserIdSchema,
   display_name: DisplayNameSchema,
   avatar_url: AvatarUrlSchema,
-  role: UserRoleSchema.default("member"),
+  role: UserRoleSchema.default('member'),
 });
 
 export const UpdateUserSchema = UpdateEntitySchemaBase({

@@ -1,18 +1,18 @@
-import { MessageContent } from "../../valueObjects/MessageContent";
-import { PlaceholderData } from "../../valueObjects/PlaceholderData";
+import type { MessageContent } from '../../valueObjects/MessageContent';
+import { PlaceholderData } from '../../valueObjects/PlaceholderData';
 
 export enum CampaignType {
-  Broadcast = "broadcast", // 全員配信
-  Segment = "segment", // セグメント配信
+  Broadcast = 'broadcast', // 全員配信
+  Segment = 'segment', // セグメント配信
 }
 
 export enum CampaignStatus {
-  Draft = "draft", // 下書き
-  Scheduled = "scheduled", // 配信予約済み
-  Sending = "sending", // 配信中
-  Sent = "sent", // 配信完了
-  Failed = "failed", // 配信失敗
-  Cancelled = "cancelled", // キャンセル
+  Draft = 'draft', // 下書き
+  Scheduled = 'scheduled', // 配信予約済み
+  Sending = 'sending', // 配信中
+  Sent = 'sent', // 配信完了
+  Failed = 'failed', // 配信失敗
+  Cancelled = 'cancelled', // キャンセル
 }
 
 export interface CampaignSettings {
@@ -64,7 +64,7 @@ export class MessageCampaign {
     sentAt: Date | null,
     failureReason: string | null,
     createdAt: Date,
-    updatedAt: Date,
+    updatedAt: Date
   ) {
     this.#id = id;
     this.#accountId = accountId;
@@ -96,34 +96,32 @@ export class MessageCampaign {
     content: MessageContent,
     templateId?: string,
     segmentId?: string,
-    placeholderData?: PlaceholderData,
+    placeholderData?: PlaceholderData
   ): MessageCampaign {
     if (!id || id.trim().length === 0) {
-      throw new Error("Campaign ID is required");
+      throw new Error('Campaign ID is required');
     }
     if (!accountId || accountId.trim().length === 0) {
-      throw new Error("Account ID is required");
+      throw new Error('Account ID is required');
     }
     if (!name || name.trim().length === 0) {
-      throw new Error("Campaign name is required");
+      throw new Error('Campaign name is required');
     }
-    if (name.length > this.MAX_NAME_LENGTH) {
-      throw new Error(
-        `Campaign name cannot exceed ${this.MAX_NAME_LENGTH} characters`,
-      );
+    if (name.length > MessageCampaign.MAX_NAME_LENGTH) {
+      throw new Error(`Campaign name cannot exceed ${MessageCampaign.MAX_NAME_LENGTH} characters`);
     }
-    if (description && description.length > this.MAX_DESCRIPTION_LENGTH) {
+    if (description && description.length > MessageCampaign.MAX_DESCRIPTION_LENGTH) {
       throw new Error(
-        `Campaign description cannot exceed ${this.MAX_DESCRIPTION_LENGTH} characters`,
+        `Campaign description cannot exceed ${MessageCampaign.MAX_DESCRIPTION_LENGTH} characters`
       );
     }
     if (type === CampaignType.Segment && !segmentId) {
-      throw new Error("Segment ID is required for segment campaigns");
+      throw new Error('Segment ID is required for segment campaigns');
     }
 
     const defaultSettings: CampaignSettings = {
-      retryCount: this.DEFAULT_RETRY_COUNT,
-      retryIntervalMinutes: this.DEFAULT_RETRY_INTERVAL_MINUTES,
+      retryCount: MessageCampaign.DEFAULT_RETRY_COUNT,
+      retryIntervalMinutes: MessageCampaign.DEFAULT_RETRY_INTERVAL_MINUTES,
       enableDeliveryTracking: true,
     };
 
@@ -132,7 +130,7 @@ export class MessageCampaign {
       id.trim(),
       accountId.trim(),
       name.trim(),
-      description?.trim() || "",
+      description?.trim() || '',
       type,
       templateId?.trim() || null,
       segmentId?.trim() || null,
@@ -146,7 +144,7 @@ export class MessageCampaign {
       null,
       null,
       now,
-      now,
+      now
     );
   }
 
@@ -168,7 +166,7 @@ export class MessageCampaign {
     sentAt: Date | null,
     failureReason: string | null,
     createdAt: Date,
-    updatedAt: Date,
+    updatedAt: Date
   ): MessageCampaign {
     return new MessageCampaign(
       id,
@@ -188,7 +186,7 @@ export class MessageCampaign {
       sentAt,
       failureReason,
       createdAt,
-      updatedAt,
+      updatedAt
     );
   }
 
@@ -255,29 +253,26 @@ export class MessageCampaign {
     name?: string,
     description?: string,
     content?: MessageContent,
-    placeholderData?: PlaceholderData,
+    placeholderData?: PlaceholderData
   ): MessageCampaign {
     if (this.#status !== CampaignStatus.Draft) {
-      throw new Error("Only draft campaigns can be updated");
+      throw new Error('Only draft campaigns can be updated');
     }
 
     if (name !== undefined) {
       if (!name || name.trim().length === 0) {
-        throw new Error("Campaign name is required");
+        throw new Error('Campaign name is required');
       }
       if (name.length > MessageCampaign.MAX_NAME_LENGTH) {
         throw new Error(
-          `Campaign name cannot exceed ${MessageCampaign.MAX_NAME_LENGTH} characters`,
+          `Campaign name cannot exceed ${MessageCampaign.MAX_NAME_LENGTH} characters`
         );
       }
     }
 
-    if (
-      description !== undefined &&
-      description.length > MessageCampaign.MAX_DESCRIPTION_LENGTH
-    ) {
+    if (description !== undefined && description.length > MessageCampaign.MAX_DESCRIPTION_LENGTH) {
       throw new Error(
-        `Campaign description cannot exceed ${MessageCampaign.MAX_DESCRIPTION_LENGTH} characters`,
+        `Campaign description cannot exceed ${MessageCampaign.MAX_DESCRIPTION_LENGTH} characters`
       );
     }
 
@@ -299,7 +294,7 @@ export class MessageCampaign {
       this.#sentAt,
       this.#failureReason,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -308,11 +303,11 @@ export class MessageCampaign {
    */
   schedule(scheduledAt: Date): MessageCampaign {
     if (this.#status !== CampaignStatus.Draft) {
-      throw new Error("Only draft campaigns can be scheduled");
+      throw new Error('Only draft campaigns can be scheduled');
     }
 
     if (scheduledAt <= new Date()) {
-      throw new Error("Scheduled time must be in the future");
+      throw new Error('Scheduled time must be in the future');
     }
 
     return new MessageCampaign(
@@ -333,7 +328,7 @@ export class MessageCampaign {
       this.#sentAt,
       this.#failureReason,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -341,13 +336,8 @@ export class MessageCampaign {
    * キャンペーンを送信開始状態にマークします
    */
   markAsSending(): MessageCampaign {
-    if (
-      this.#status !== CampaignStatus.Draft &&
-      this.#status !== CampaignStatus.Scheduled
-    ) {
-      throw new Error(
-        "Only draft or scheduled campaigns can be marked as sending",
-      );
+    if (this.#status !== CampaignStatus.Draft && this.#status !== CampaignStatus.Scheduled) {
+      throw new Error('Only draft or scheduled campaigns can be marked as sending');
     }
 
     return new MessageCampaign(
@@ -368,7 +358,7 @@ export class MessageCampaign {
       this.#sentAt,
       this.#failureReason,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -377,11 +367,11 @@ export class MessageCampaign {
    */
   markAsSent(sentCount: number, failCount = 0): MessageCampaign {
     if (this.#status !== CampaignStatus.Sending) {
-      throw new Error("Only sending campaigns can be marked as sent");
+      throw new Error('Only sending campaigns can be marked as sent');
     }
 
     if (sentCount < 0 || failCount < 0) {
-      throw new Error("Sent count and fail count must be non-negative");
+      throw new Error('Sent count and fail count must be non-negative');
     }
 
     return new MessageCampaign(
@@ -402,7 +392,7 @@ export class MessageCampaign {
       new Date(),
       null,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -411,11 +401,11 @@ export class MessageCampaign {
    */
   markAsFailed(failureReason: string): MessageCampaign {
     if (this.#status !== CampaignStatus.Sending) {
-      throw new Error("Only sending campaigns can be marked as failed");
+      throw new Error('Only sending campaigns can be marked as failed');
     }
 
     if (!failureReason || failureReason.trim().length === 0) {
-      throw new Error("Failure reason is required");
+      throw new Error('Failure reason is required');
     }
 
     return new MessageCampaign(
@@ -436,7 +426,7 @@ export class MessageCampaign {
       this.#sentAt,
       failureReason.trim(),
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -444,11 +434,8 @@ export class MessageCampaign {
    * キャンペーンをキャンセルします
    */
   cancel(): MessageCampaign {
-    if (
-      this.#status !== CampaignStatus.Draft &&
-      this.#status !== CampaignStatus.Scheduled
-    ) {
-      throw new Error("Only draft or scheduled campaigns can be cancelled");
+    if (this.#status !== CampaignStatus.Draft && this.#status !== CampaignStatus.Scheduled) {
+      throw new Error('Only draft or scheduled campaigns can be cancelled');
     }
 
     return new MessageCampaign(
@@ -469,7 +456,7 @@ export class MessageCampaign {
       this.#sentAt,
       this.#failureReason,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -477,10 +464,7 @@ export class MessageCampaign {
    * キャンペーンが送信可能かチェックします
    */
   canBeSent(): boolean {
-    return (
-      this.#status === CampaignStatus.Draft ||
-      this.#status === CampaignStatus.Scheduled
-    );
+    return this.#status === CampaignStatus.Draft || this.#status === CampaignStatus.Scheduled;
   }
 
   /**
@@ -494,10 +478,7 @@ export class MessageCampaign {
    * キャンペーンがキャンセル可能かチェックします
    */
   canBeCancelled(): boolean {
-    return (
-      this.#status === CampaignStatus.Draft ||
-      this.#status === CampaignStatus.Scheduled
-    );
+    return this.#status === CampaignStatus.Draft || this.#status === CampaignStatus.Scheduled;
   }
 
   /**

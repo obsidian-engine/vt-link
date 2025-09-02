@@ -1,4 +1,4 @@
-import { MessageTemplate } from "../entities/MessageTemplate";
+import type { MessageTemplate } from '../entities/MessageTemplate';
 
 export interface MessageTemplateRepository {
   /**
@@ -24,18 +24,12 @@ export interface MessageTemplateRepository {
   /**
    * テンプレート名での部分一致検索
    */
-  findByNamePattern(
-    accountId: string,
-    namePattern: string,
-  ): Promise<MessageTemplate[]>;
+  findByNamePattern(accountId: string, namePattern: string): Promise<MessageTemplate[]>;
 
   /**
    * 指定されたプレースホルダーキーを含むテンプレートを検索します
    */
-  findByPlaceholderKey(
-    accountId: string,
-    placeholderKey: string,
-  ): Promise<MessageTemplate[]>;
+  findByPlaceholderKey(accountId: string, placeholderKey: string): Promise<MessageTemplate[]>;
 
   /**
    * テンプレートを削除します

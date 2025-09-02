@@ -1,4 +1,4 @@
-import { MessageCampaignRepository } from "@/domain/campaign/repositories/MessageCampaignRepository";
+import type { MessageCampaignRepository } from '@/domain/campaign/repositories/MessageCampaignRepository';
 
 export interface ScheduleDeliveryInput {
   readonly campaignId: string;
@@ -25,13 +25,13 @@ export class ScheduleDeliveryUsecase {
   async execute(input: ScheduleDeliveryInput): Promise<ScheduleDeliveryOutput> {
     // Input validation
     if (!input.campaignId || input.campaignId.trim().length === 0) {
-      throw new Error("Campaign ID is required");
+      throw new Error('Campaign ID is required');
     }
     if (!input.scheduledAt) {
-      throw new Error("Scheduled time is required");
+      throw new Error('Scheduled time is required');
     }
     if (input.scheduledAt <= new Date()) {
-      throw new Error("Scheduled time must be in the future");
+      throw new Error('Scheduled time must be in the future');
     }
 
     // Find campaign
@@ -42,7 +42,7 @@ export class ScheduleDeliveryUsecase {
 
     // Check if campaign can be scheduled
     if (!campaign.canBeEdited()) {
-      throw new Error("Campaign cannot be scheduled in its current state");
+      throw new Error('Campaign cannot be scheduled in its current state');
     }
 
     // Schedule the campaign

@@ -1,5 +1,5 @@
-import { MessageContent } from "../../valueObjects/MessageContent";
-import { PlaceholderData } from "../../valueObjects/PlaceholderData";
+import { MessageContent } from '../../valueObjects/MessageContent';
+import { PlaceholderData } from '../../valueObjects/PlaceholderData';
 
 export class MessageTemplate {
   static readonly MAX_TITLE_LENGTH = 100;
@@ -10,7 +10,7 @@ export class MessageTemplate {
   readonly #title: string;
   readonly #description: string;
   readonly #content: MessageContent;
-  readonly #placeholderKeys: ReadonlyArray<string>;
+  readonly #placeholderKeys: readonly string[];
   readonly #isActive: boolean;
   readonly #createdAt: Date;
   readonly #updatedAt: Date;
@@ -21,10 +21,10 @@ export class MessageTemplate {
     title: string,
     description: string,
     content: MessageContent,
-    placeholderKeys: ReadonlyArray<string>,
+    placeholderKeys: readonly string[],
     isActive: boolean,
     createdAt: Date,
-    updatedAt: Date,
+    updatedAt: Date
   ) {
     this.#id = id;
     this.#accountId = accountId;
@@ -43,25 +43,25 @@ export class MessageTemplate {
     accountId: string,
     title: string,
     description: string,
-    content: MessageContent,
+    content: MessageContent
   ): MessageTemplate {
     if (!id || id.trim().length === 0) {
-      throw new Error("Template ID is required");
+      throw new Error('Template ID is required');
     }
     if (!accountId || accountId.trim().length === 0) {
-      throw new Error("Account ID is required");
+      throw new Error('Account ID is required');
     }
     if (!title || title.trim().length === 0) {
-      throw new Error("Template title is required");
+      throw new Error('Template title is required');
     }
-    if (title.length > this.MAX_TITLE_LENGTH) {
+    if (title.length > MessageTemplate.MAX_TITLE_LENGTH) {
       throw new Error(
-        `Template title cannot exceed ${this.MAX_TITLE_LENGTH} characters`,
+        `Template title cannot exceed ${MessageTemplate.MAX_TITLE_LENGTH} characters`
       );
     }
-    if (description && description.length > this.MAX_DESCRIPTION_LENGTH) {
+    if (description && description.length > MessageTemplate.MAX_DESCRIPTION_LENGTH) {
       throw new Error(
-        `Template description cannot exceed ${this.MAX_DESCRIPTION_LENGTH} characters`,
+        `Template description cannot exceed ${MessageTemplate.MAX_DESCRIPTION_LENGTH} characters`
       );
     }
 
@@ -75,12 +75,12 @@ export class MessageTemplate {
       id.trim(),
       accountId.trim(),
       title.trim(),
-      description?.trim() || "",
+      description?.trim() || '',
       content,
       placeholderKeys,
       true,
       now,
-      now,
+      now
     );
   }
 
@@ -90,10 +90,10 @@ export class MessageTemplate {
     title: string,
     description: string,
     content: MessageContent,
-    placeholderKeys: ReadonlyArray<string>,
+    placeholderKeys: readonly string[],
     isActive: boolean,
     createdAt: Date,
-    updatedAt: Date,
+    updatedAt: Date
   ): MessageTemplate {
     return new MessageTemplate(
       id,
@@ -104,7 +104,7 @@ export class MessageTemplate {
       placeholderKeys,
       isActive,
       createdAt,
-      updatedAt,
+      updatedAt
     );
   }
 
@@ -128,7 +128,7 @@ export class MessageTemplate {
     return this.#content;
   }
 
-  get placeholderKeys(): ReadonlyArray<string> {
+  get placeholderKeys(): readonly string[] {
     return this.#placeholderKeys;
   }
 
@@ -147,28 +147,21 @@ export class MessageTemplate {
   /**
    * テンプレートを更新します
    */
-  update(
-    title?: string,
-    description?: string,
-    content?: MessageContent,
-  ): MessageTemplate {
+  update(title?: string, description?: string, content?: MessageContent): MessageTemplate {
     if (title !== undefined) {
       if (!title || title.trim().length === 0) {
-        throw new Error("Template title is required");
+        throw new Error('Template title is required');
       }
       if (title.length > MessageTemplate.MAX_TITLE_LENGTH) {
         throw new Error(
-          `Template title cannot exceed ${MessageTemplate.MAX_TITLE_LENGTH} characters`,
+          `Template title cannot exceed ${MessageTemplate.MAX_TITLE_LENGTH} characters`
         );
       }
     }
 
-    if (
-      description !== undefined &&
-      description.length > MessageTemplate.MAX_DESCRIPTION_LENGTH
-    ) {
+    if (description !== undefined && description.length > MessageTemplate.MAX_DESCRIPTION_LENGTH) {
       throw new Error(
-        `Template description cannot exceed ${MessageTemplate.MAX_DESCRIPTION_LENGTH} characters`,
+        `Template description cannot exceed ${MessageTemplate.MAX_DESCRIPTION_LENGTH} characters`
       );
     }
 
@@ -191,7 +184,7 @@ export class MessageTemplate {
       newPlaceholderKeys,
       this.#isActive,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -212,7 +205,7 @@ export class MessageTemplate {
       this.#placeholderKeys,
       false,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -233,7 +226,7 @@ export class MessageTemplate {
       this.#placeholderKeys,
       true,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -245,13 +238,9 @@ export class MessageTemplate {
       return this.#content;
     }
 
-    const missingKeys = placeholderData.getMissingKeysForTemplate(
-      this.#content.text,
-    );
+    const missingKeys = placeholderData.getMissingKeysForTemplate(this.#content.text);
     if (missingKeys.length > 0) {
-      throw new Error(
-        `Missing placeholder values for: ${missingKeys.join(", ")}`,
-      );
+      throw new Error(`Missing placeholder values for: ${missingKeys.join(', ')}`);
     }
 
     const renderedText = placeholderData.applyToTemplate(this.#content.text);
@@ -266,9 +255,7 @@ export class MessageTemplate {
       return true;
     }
 
-    return (
-      placeholderData.getMissingKeysForTemplate(this.#content.text).length === 0
-    );
+    return placeholderData.getMissingKeysForTemplate(this.#content.text).length === 0;
   }
 
   equals(other: MessageTemplate): boolean {

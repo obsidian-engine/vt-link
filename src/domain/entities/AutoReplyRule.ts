@@ -1,8 +1,8 @@
-import { Condition } from "./Condition";
-import { Response } from "./Response";
-import { RateLimit } from "./RateLimit";
-import { TimeWindow } from "./TimeWindow";
-import { IncomingMessage } from "./IncomingMessage";
+import type { Condition } from './Condition';
+import type { IncomingMessage } from './IncomingMessage';
+import type { RateLimit } from './RateLimit';
+import type { Response } from './Response';
+import type { TimeWindow } from './TimeWindow';
 
 export class AutoReplyRule {
   static readonly MAX_NAME_LENGTH = 100;
@@ -13,8 +13,8 @@ export class AutoReplyRule {
   readonly #accountId: string;
   readonly #name: string;
   readonly #priority: number;
-  readonly #conditions: ReadonlyArray<Condition>;
-  readonly #responses: ReadonlyArray<Response>;
+  readonly #conditions: readonly Condition[];
+  readonly #responses: readonly Response[];
   readonly #rateLimit: RateLimit | null;
   readonly #timeWindow: TimeWindow | null;
   readonly #enabled: boolean;
@@ -26,13 +26,13 @@ export class AutoReplyRule {
     accountId: string,
     name: string,
     priority: number,
-    conditions: ReadonlyArray<Condition>,
-    responses: ReadonlyArray<Response>,
+    conditions: readonly Condition[],
+    responses: readonly Response[],
     rateLimit: RateLimit | null,
     timeWindow: TimeWindow | null,
     enabled: boolean,
     createdAt: Date,
-    updatedAt: Date,
+    updatedAt: Date
   ) {
     this.#id = id;
     this.#accountId = accountId;
@@ -53,40 +53,38 @@ export class AutoReplyRule {
     accountId: string,
     name: string,
     priority: number,
-    conditions: ReadonlyArray<Condition>,
-    responses: ReadonlyArray<Response>,
+    conditions: readonly Condition[],
+    responses: readonly Response[],
     rateLimit: RateLimit | null = null,
     timeWindow: TimeWindow | null = null,
-    enabled = true,
+    enabled = true
   ): AutoReplyRule {
     if (!id) {
-      throw new Error("Rule ID is required");
+      throw new Error('Rule ID is required');
     }
     if (!accountId) {
-      throw new Error("Account ID is required");
+      throw new Error('Account ID is required');
     }
     if (!name || name.trim().length === 0) {
-      throw new Error("Rule name is required");
+      throw new Error('Rule name is required');
     }
-    if (name.length > this.MAX_NAME_LENGTH) {
-      throw new Error(
-        `Rule name cannot exceed ${this.MAX_NAME_LENGTH} characters`,
-      );
+    if (name.length > AutoReplyRule.MAX_NAME_LENGTH) {
+      throw new Error(`Rule name cannot exceed ${AutoReplyRule.MAX_NAME_LENGTH} characters`);
     }
     if (priority < 0) {
-      throw new Error("Priority must be non-negative");
+      throw new Error('Priority must be non-negative');
     }
     if (!conditions || conditions.length === 0) {
-      throw new Error("At least one condition is required");
+      throw new Error('At least one condition is required');
     }
-    if (conditions.length > this.MAX_CONDITIONS) {
-      throw new Error(`Cannot exceed ${this.MAX_CONDITIONS} conditions`);
+    if (conditions.length > AutoReplyRule.MAX_CONDITIONS) {
+      throw new Error(`Cannot exceed ${AutoReplyRule.MAX_CONDITIONS} conditions`);
     }
     if (!responses || responses.length === 0) {
-      throw new Error("At least one response is required");
+      throw new Error('At least one response is required');
     }
-    if (responses.length > this.MAX_RESPONSES) {
-      throw new Error(`Cannot exceed ${this.MAX_RESPONSES} responses`);
+    if (responses.length > AutoReplyRule.MAX_RESPONSES) {
+      throw new Error(`Cannot exceed ${AutoReplyRule.MAX_RESPONSES} responses`);
     }
 
     const now = new Date();
@@ -101,7 +99,7 @@ export class AutoReplyRule {
       timeWindow,
       enabled,
       now,
-      now,
+      now
     );
   }
 
@@ -110,13 +108,13 @@ export class AutoReplyRule {
     accountId: string,
     name: string,
     priority: number,
-    conditions: ReadonlyArray<Condition>,
-    responses: ReadonlyArray<Response>,
+    conditions: readonly Condition[],
+    responses: readonly Response[],
     rateLimit: RateLimit | null,
     timeWindow: TimeWindow | null,
     enabled: boolean,
     createdAt: Date,
-    updatedAt: Date,
+    updatedAt: Date
   ): AutoReplyRule {
     return new AutoReplyRule(
       id,
@@ -129,7 +127,7 @@ export class AutoReplyRule {
       timeWindow,
       enabled,
       createdAt,
-      updatedAt,
+      updatedAt
     );
   }
 
@@ -149,11 +147,11 @@ export class AutoReplyRule {
     return this.#priority;
   }
 
-  get conditions(): ReadonlyArray<Condition> {
+  get conditions(): readonly Condition[] {
     return this.#conditions;
   }
 
-  get responses(): ReadonlyArray<Response> {
+  get responses(): readonly Response[] {
     return this.#responses;
   }
 
@@ -197,9 +195,7 @@ export class AutoReplyRule {
     }
 
     // Filter responses by probability
-    const availableResponses = this.#responses.filter((response) =>
-      response.shouldExecute(),
-    );
+    const availableResponses = this.#responses.filter((response) => response.shouldExecute());
 
     if (availableResponses.length === 0) {
       return null;
@@ -218,18 +214,16 @@ export class AutoReplyRule {
     return this.#rateLimit.generateKey(
       message.userId,
       message.groupId || undefined,
-      message.roomId || undefined,
+      message.roomId || undefined
     );
   }
 
   updateName(name: string): AutoReplyRule {
     if (!name || name.trim().length === 0) {
-      throw new Error("Rule name is required");
+      throw new Error('Rule name is required');
     }
     if (name.length > AutoReplyRule.MAX_NAME_LENGTH) {
-      throw new Error(
-        `Rule name cannot exceed ${AutoReplyRule.MAX_NAME_LENGTH} characters`,
-      );
+      throw new Error(`Rule name cannot exceed ${AutoReplyRule.MAX_NAME_LENGTH} characters`);
     }
 
     return AutoReplyRule.reconstruct(
@@ -243,13 +237,13 @@ export class AutoReplyRule {
       this.#timeWindow,
       this.#enabled,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
   updatePriority(priority: number): AutoReplyRule {
     if (priority < 0) {
-      throw new Error("Priority must be non-negative");
+      throw new Error('Priority must be non-negative');
     }
 
     return AutoReplyRule.reconstruct(
@@ -263,18 +257,16 @@ export class AutoReplyRule {
       this.#timeWindow,
       this.#enabled,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
-  updateConditions(conditions: ReadonlyArray<Condition>): AutoReplyRule {
+  updateConditions(conditions: readonly Condition[]): AutoReplyRule {
     if (!conditions || conditions.length === 0) {
-      throw new Error("At least one condition is required");
+      throw new Error('At least one condition is required');
     }
     if (conditions.length > AutoReplyRule.MAX_CONDITIONS) {
-      throw new Error(
-        `Cannot exceed ${AutoReplyRule.MAX_CONDITIONS} conditions`,
-      );
+      throw new Error(`Cannot exceed ${AutoReplyRule.MAX_CONDITIONS} conditions`);
     }
 
     return AutoReplyRule.reconstruct(
@@ -288,13 +280,13 @@ export class AutoReplyRule {
       this.#timeWindow,
       this.#enabled,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
-  updateResponses(responses: ReadonlyArray<Response>): AutoReplyRule {
+  updateResponses(responses: readonly Response[]): AutoReplyRule {
     if (!responses || responses.length === 0) {
-      throw new Error("At least one response is required");
+      throw new Error('At least one response is required');
     }
     if (responses.length > AutoReplyRule.MAX_RESPONSES) {
       throw new Error(`Cannot exceed ${AutoReplyRule.MAX_RESPONSES} responses`);
@@ -311,7 +303,7 @@ export class AutoReplyRule {
       this.#timeWindow,
       this.#enabled,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -327,7 +319,7 @@ export class AutoReplyRule {
       this.#timeWindow,
       this.#enabled,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -343,7 +335,7 @@ export class AutoReplyRule {
       timeWindow,
       this.#enabled,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -363,7 +355,7 @@ export class AutoReplyRule {
       this.#timeWindow,
       true,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
@@ -383,14 +375,11 @@ export class AutoReplyRule {
       this.#timeWindow,
       false,
       this.#createdAt,
-      new Date(),
+      new Date()
     );
   }
 
   canBeExecuted(currentTime: Date = new Date()): boolean {
-    return (
-      this.#enabled &&
-      (this.#timeWindow === null || this.#timeWindow.contains(currentTime))
-    );
+    return this.#enabled && (this.#timeWindow === null || this.#timeWindow.contains(currentTime));
   }
 }

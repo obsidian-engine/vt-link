@@ -8,9 +8,9 @@ export interface RichMenuArea {
 }
 
 export enum LineActionType {
-  Postback = "postback",
-  Message = "message",
-  Uri = "uri",
+  Postback = 'postback',
+  Message = 'message',
+  Uri = 'uri',
 }
 
 export interface RichMenuAction {
@@ -26,10 +26,9 @@ export interface RichMenuSize {
   readonly height: number;
 }
 
-import { RICH_MENU_DISPLAY_SIZES } from "@/constants";
+import { RICH_MENU_DISPLAY_SIZES } from '@/constants';
 
-export const RICH_MENU_SIZES: Record<"full" | "half", RichMenuSize> =
-  RICH_MENU_DISPLAY_SIZES;
+export const RICH_MENU_SIZES: Record<'full' | 'half', RichMenuSize> = RICH_MENU_DISPLAY_SIZES;
 
 export const EDITOR_SCALE = 0.3; // エディター表示用のスケール
 

@@ -1,27 +1,25 @@
-import { LineReplyService } from "@/domain/services/LineReplyService";
-import { Response } from "@/domain/entities/Response";
+import type { Response } from '@/domain/entities/Response';
+import type { LineReplyService } from '@/domain/services/LineReplyService';
 
 export class LineReplyServiceImpl implements LineReplyService {
-  readonly #baseUrl = "https://api.line.me/v2/bot";
+  readonly #baseUrl = 'https://api.line.me/v2/bot';
   readonly #channelAccessToken: string;
 
   constructor(channelAccessToken: string) {
     if (!channelAccessToken) {
-      throw new Error("LINE channel access token is required");
+      throw new Error('LINE channel access token is required');
     }
     this.#channelAccessToken = channelAccessToken;
   }
 
   async sendReply(replyToken: string, responses: Response[]): Promise<void> {
-    const messages = responses.map((response) =>
-      response.toLineMessageObject(),
-    );
+    const messages = responses.map((response) => response.toLineMessageObject());
 
     const response = await fetch(`${this.#baseUrl}/message/reply`, {
-      method: "POST",
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${this.#channelAccessToken}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         replyToken,
@@ -36,15 +34,13 @@ export class LineReplyServiceImpl implements LineReplyService {
   }
 
   async pushMessage(to: string, responses: Response[]): Promise<void> {
-    const messages = responses.map((response) =>
-      response.toLineMessageObject(),
-    );
+    const messages = responses.map((response) => response.toLineMessageObject());
 
     const response = await fetch(`${this.#baseUrl}/message/push`, {
-      method: "POST",
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${this.#channelAccessToken}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         to,

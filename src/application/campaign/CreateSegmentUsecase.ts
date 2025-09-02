@@ -14,7 +14,7 @@ export interface CreateSegmentInput {
     };
     behavioral?: {
       lastActiveWithin?: number; // days
-      messageFrequency?: "high" | "medium" | "low";
+      messageFrequency?: 'high' | 'medium' | 'low';
     };
   };
 }
@@ -31,7 +31,7 @@ export interface CreateSegmentOutput {
 export class CreateSegmentUsecase {
   async execute(input: CreateSegmentInput): Promise<CreateSegmentOutput> {
     // TODO: 実装
-    throw new Error("CreateSegmentUsecase: Method not implemented");
+    throw new Error('CreateSegmentUsecase: Method not implemented');
   }
 }
 

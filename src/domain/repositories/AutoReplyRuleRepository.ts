@@ -1,4 +1,4 @@
-import { AutoReplyRule } from "../entities/AutoReplyRule";
+import type { AutoReplyRule } from '../entities/AutoReplyRule';
 
 export interface AutoReplyRuleRepository {
   /**
@@ -31,6 +31,6 @@ export interface AutoReplyRuleRepository {
    */
   updatePriorities(
     accountId: string,
-    rulePriorities: Array<{ id: string; priority: number }>,
+    rulePriorities: Array<{ id: string; priority: number }>
   ): Promise<void>;
 }

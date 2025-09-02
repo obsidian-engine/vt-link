@@ -15,7 +15,11 @@
     "types:generate": "node scripts/generate-types.js",
     "types:watch": "chokidar 'supabase/**/*.sql' -c 'npm run types:generate'",
     "db:types": "npm run types:generate",
-    "prebuild": "npm run types:generate"
+    "prebuild": "npm run types:generate",
+    "biome:check": "npx @biomejs/biome check .",
+    "biome:fix": "npx @biomejs/biome check --write .",
+    "biome:format": "npx @biomejs/biome format --write .",
+    "prepare": "lefthook install"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -32,6 +36,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@evilmartians/lefthook": "^1.12.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",

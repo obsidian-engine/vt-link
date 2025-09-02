@@ -8,9 +8,5 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
-  "include": [
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "../src/domain/__tests__/**/*.ts"
-  ]
+  "include": ["**/*.test.ts", "**/*.test.tsx", "../src/domain/__tests__/**/*.ts"]
 }

@@ -1,25 +1,20 @@
 import {
-  MessageCampaign,
   CampaignStatus,
-  CampaignType,
-} from "@/domain/campaign/entities/MessageCampaign";
-import type { MessageCampaignRepository } from "@/domain/campaign/repositories/MessageCampaignRepository";
-import {
-  MessageContent,
-  MessageType,
-} from "@/domain/valueObjects/MessageContent";
-import { PlaceholderData } from "@/domain/valueObjects/PlaceholderData";
-import { supabaseAdmin } from "@/infrastructure/clients/supabaseClient";
+  type CampaignType,
+  MessageCampaign,
+} from '@/domain/campaign/entities/MessageCampaign';
+import type { MessageCampaignRepository } from '@/domain/campaign/repositories/MessageCampaignRepository';
+import { MessageContent, type MessageType } from '@/domain/valueObjects/MessageContent';
+import { PlaceholderData } from '@/domain/valueObjects/PlaceholderData';
+import { supabaseAdmin } from '@/infrastructure/clients/supabaseClient';
 
-export class MessageCampaignRepositorySupabase
-  implements MessageCampaignRepository
-{
+export class MessageCampaignRepositorySupabase implements MessageCampaignRepository {
   async save(campaign: MessageCampaign): Promise<void> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin.from("campaigns").upsert({
+    const { error } = await supabaseAdmin.from('campaigns').upsert({
       id: campaign.id,
       account_id: campaign.accountId,
       name: campaign.name,
@@ -47,17 +42,13 @@ export class MessageCampaignRepositorySupabase
 
   async findById(id: string): Promise<MessageCampaign | null> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
-    const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*")
-      .eq("id", id)
-      .single();
+    const { data, error } = await supabaseAdmin.from('campaigns').select('*').eq('id', id).single();
 
     if (error) {
-      if (error.code === "PGRST116") return null;
+      if (error.code === 'PGRST116') return null;
       throw new Error(`Failed to find campaign: ${error.message}`);
     }
 
@@ -66,14 +57,14 @@ export class MessageCampaignRepositorySupabase
 
   async findByAccountId(accountId: string): Promise<MessageCampaign[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*")
-      .eq("account_id", accountId)
-      .order("created_at", { ascending: false });
+      .from('campaigns')
+      .select('*')
+      .eq('account_id', accountId)
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to find campaigns: ${error.message}`);
@@ -84,18 +75,18 @@ export class MessageCampaignRepositorySupabase
 
   async findByAccountIdAndStatus(
     accountId: string,
-    status: CampaignStatus,
+    status: CampaignStatus
   ): Promise<MessageCampaign[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*")
-      .eq("account_id", accountId)
-      .eq("status", status)
-      .order("created_at", { ascending: false });
+      .from('campaigns')
+      .select('*')
+      .eq('account_id', accountId)
+      .eq('status', status)
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to find campaigns by status: ${error.message}`);
@@ -104,20 +95,17 @@ export class MessageCampaignRepositorySupabase
     return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
-  async findByAccountIdAndType(
-    accountId: string,
-    type: CampaignType,
-  ): Promise<MessageCampaign[]> {
+  async findByAccountIdAndType(accountId: string, type: CampaignType): Promise<MessageCampaign[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*")
-      .eq("account_id", accountId)
-      .eq("type", type)
-      .order("created_at", { ascending: false });
+      .from('campaigns')
+      .select('*')
+      .eq('account_id', accountId)
+      .eq('type', type)
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to find campaigns by type: ${error.message}`);
@@ -126,19 +114,17 @@ export class MessageCampaignRepositorySupabase
     return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
-  async findScheduledReadyToSend(
-    currentTime = new Date(),
-  ): Promise<MessageCampaign[]> {
+  async findScheduledReadyToSend(currentTime = new Date()): Promise<MessageCampaign[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*")
-      .eq("status", CampaignStatus.Scheduled)
-      .lte("scheduled_at", currentTime.toISOString())
-      .order("scheduled_at", { ascending: true });
+      .from('campaigns')
+      .select('*')
+      .eq('status', CampaignStatus.Scheduled)
+      .lte('scheduled_at', currentTime.toISOString())
+      .order('scheduled_at', { ascending: true });
 
     if (error) {
       throw new Error(`Failed to find scheduled campaigns: ${error.message}`);
@@ -149,14 +135,14 @@ export class MessageCampaignRepositorySupabase
 
   async findByTemplateId(templateId: string): Promise<MessageCampaign[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*")
-      .eq("template_id", templateId)
-      .order("created_at", { ascending: false });
+      .from('campaigns')
+      .select('*')
+      .eq('template_id', templateId)
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to find campaigns by template: ${error.message}`);
@@ -167,14 +153,14 @@ export class MessageCampaignRepositorySupabase
 
   async findBySegmentId(segmentId: string): Promise<MessageCampaign[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*")
-      .eq("segment_id", segmentId)
-      .order("created_at", { ascending: false });
+      .from('campaigns')
+      .select('*')
+      .eq('segment_id', segmentId)
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to find campaigns by segment: ${error.message}`);
@@ -183,20 +169,17 @@ export class MessageCampaignRepositorySupabase
     return (data ?? []).map((item) => this.mapToEntity(item));
   }
 
-  async findByNamePattern(
-    accountId: string,
-    namePattern: string,
-  ): Promise<MessageCampaign[]> {
+  async findByNamePattern(accountId: string, namePattern: string): Promise<MessageCampaign[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*")
-      .eq("account_id", accountId)
-      .ilike("name", `%${namePattern}%`)
-      .order("created_at", { ascending: false });
+      .from('campaigns')
+      .select('*')
+      .eq('account_id', accountId)
+      .ilike('name', `%${namePattern}%`)
+      .order('created_at', { ascending: false });
 
     if (error) {
       throw new Error(`Failed to search campaigns: ${error.message}`);
@@ -208,24 +191,22 @@ export class MessageCampaignRepositorySupabase
   async findByCreatedDateRange(
     accountId: string,
     startDate: Date,
-    endDate: Date,
+    endDate: Date
   ): Promise<MessageCampaign[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*")
-      .eq("account_id", accountId)
-      .gte("created_at", startDate.toISOString())
-      .lte("created_at", endDate.toISOString())
-      .order("created_at", { ascending: false });
+      .from('campaigns')
+      .select('*')
+      .eq('account_id', accountId)
+      .gte('created_at', startDate.toISOString())
+      .lte('created_at', endDate.toISOString())
+      .order('created_at', { ascending: false });
 
     if (error) {
-      throw new Error(
-        `Failed to find campaigns by created date range: ${error.message}`,
-      );
+      throw new Error(`Failed to find campaigns by created date range: ${error.message}`);
     }
 
     return (data ?? []).map((item) => this.mapToEntity(item));
@@ -234,24 +215,22 @@ export class MessageCampaignRepositorySupabase
   async findBySentDateRange(
     accountId: string,
     startDate: Date,
-    endDate: Date,
+    endDate: Date
   ): Promise<MessageCampaign[]> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*")
-      .eq("account_id", accountId)
-      .gte("sent_at", startDate.toISOString())
-      .lte("sent_at", endDate.toISOString())
-      .order("sent_at", { ascending: false });
+      .from('campaigns')
+      .select('*')
+      .eq('account_id', accountId)
+      .gte('sent_at', startDate.toISOString())
+      .lte('sent_at', endDate.toISOString())
+      .order('sent_at', { ascending: false });
 
     if (error) {
-      throw new Error(
-        `Failed to find campaigns by sent date range: ${error.message}`,
-      );
+      throw new Error(`Failed to find campaigns by sent date range: ${error.message}`);
     }
 
     return (data ?? []).map((item) => this.mapToEntity(item));
@@ -259,13 +238,10 @@ export class MessageCampaignRepositorySupabase
 
   async delete(id: string): Promise<void> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
-    const { error } = await supabaseAdmin
-      .from("campaigns")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabaseAdmin.from('campaigns').delete().eq('id', id);
 
     if (error) {
       throw new Error(`Failed to delete campaign: ${error.message}`);
@@ -274,13 +250,13 @@ export class MessageCampaignRepositorySupabase
 
   async countByAccountId(accountId: string): Promise<number> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { count, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*", { count: "exact", head: true })
-      .eq("account_id", accountId);
+      .from('campaigns')
+      .select('*', { count: 'exact', head: true })
+      .eq('account_id', accountId);
 
     if (error) {
       throw new Error(`Failed to count campaigns: ${error.message}`);
@@ -289,19 +265,16 @@ export class MessageCampaignRepositorySupabase
     return count ?? 0;
   }
 
-  async countByAccountIdAndStatus(
-    accountId: string,
-    status: CampaignStatus,
-  ): Promise<number> {
+  async countByAccountIdAndStatus(accountId: string, status: CampaignStatus): Promise<number> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { count, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("*", { count: "exact", head: true })
-      .eq("account_id", accountId)
-      .eq("status", status);
+      .from('campaigns')
+      .select('*', { count: 'exact', head: true })
+      .eq('account_id', accountId)
+      .eq('status', status);
 
     if (error) {
       throw new Error(`Failed to count campaigns by status: ${error.message}`);
@@ -318,13 +291,13 @@ export class MessageCampaignRepositorySupabase
     averageSuccessRate: number;
   }> {
     if (!supabaseAdmin) {
-      throw new Error("Supabase service role key is required");
+      throw new Error('Supabase service role key is required');
     }
 
     const { data, error } = await supabaseAdmin
-      .from("campaigns")
-      .select("status, sent_count, fail_count")
-      .eq("account_id", accountId);
+      .from('campaigns')
+      .select('status, sent_count, fail_count')
+      .eq('account_id', accountId);
 
     if (error) {
       throw new Error(`Failed to get account statistics: ${error.message}`);
@@ -332,21 +305,12 @@ export class MessageCampaignRepositorySupabase
 
     const campaigns = data ?? [];
     const totalCampaigns = campaigns.length;
-    const sentCampaigns = campaigns.filter(
-      (c) => c.status === CampaignStatus.Sent,
-    ).length;
-    const totalSentMessages = campaigns.reduce(
-      (sum, c) => sum + (c.sent_count || 0),
-      0,
-    );
-    const totalFailedMessages = campaigns.reduce(
-      (sum, c) => sum + (c.fail_count || 0),
-      0,
-    );
+    const sentCampaigns = campaigns.filter((c) => c.status === CampaignStatus.Sent).length;
+    const totalSentMessages = campaigns.reduce((sum, c) => sum + (c.sent_count || 0), 0);
+    const totalFailedMessages = campaigns.reduce((sum, c) => sum + (c.fail_count || 0), 0);
 
     const totalMessages = totalSentMessages + totalFailedMessages;
-    const averageSuccessRate =
-      totalMessages > 0 ? totalSentMessages / totalMessages : 0;
+    const averageSuccessRate = totalMessages > 0 ? totalSentMessages / totalMessages : 0;
 
     return {
       totalCampaigns,
@@ -360,12 +324,10 @@ export class MessageCampaignRepositorySupabase
   private mapToEntity(data: any): MessageCampaign {
     const content = MessageContent.reconstruct(
       data.content.type as MessageType,
-      data.content.payload,
+      data.content.payload
     );
 
-    const placeholderData = PlaceholderData.reconstruct(
-      data.placeholder_data || {},
-    );
+    const placeholderData = PlaceholderData.reconstruct(data.placeholder_data || {});
 
     return MessageCampaign.reconstruct(
       data.id,
@@ -385,7 +347,7 @@ export class MessageCampaignRepositorySupabase
       data.sent_at ? new Date(data.sent_at) : null,
       data.failure_reason,
       new Date(data.created_at),
-      new Date(data.updated_at),
+      new Date(data.updated_at)
     );
   }
 }

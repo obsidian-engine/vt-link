@@ -1,26 +1,26 @@
+import type {
+  LineChannelID,
+  LineRichMenuID,
+  LineUserID,
+  URL,
+} from "@/domain/valueObjects/BaseTypes";
+import { IDFactory } from "@/domain/valueObjects/IDFactory";
 /**
  * 型安全なLINE Bot API クライアント
  * 公式APIの型定義を厳密に実装し、ランタイム検証も行う
  */
 import { z } from "zod";
 import type {
-  LineMessage,
+  LineApiResponse,
   LineBroadcastRequest,
+  LineErrorResponse,
+  LineMessage,
   LineNarrowcastRequest,
-  LineReplyRequest,
   LinePushRequest,
+  LineReplyRequest,
   LineRichMenuRequest,
   LineRichMenuResponse,
-  LineApiResponse,
-  LineErrorResponse,
 } from "./types";
-import type {
-  LineChannelID,
-  LineUserID,
-  LineRichMenuID,
-  URL,
-} from "@/domain/valueObjects/BaseTypes";
-import { IDFactory } from "@/domain/valueObjects/IDFactory";
 
 // ============================================================================
 // エラークラス定義

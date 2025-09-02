@@ -1,4 +1,4 @@
-import { DeliveryBatch, DeliveryBatchStatus } from "../entities/DeliveryBatch";
+import type { DeliveryBatch, DeliveryBatchStatus } from '../entities/DeliveryBatch';
 
 export interface DeliveryBatchRepository {
   /**
@@ -26,7 +26,7 @@ export interface DeliveryBatchRepository {
    */
   findByCampaignIdAndStatus(
     campaignId: string,
-    status: DeliveryBatchStatus,
+    status: DeliveryBatchStatus
   ): Promise<DeliveryBatch[]>;
 
   /**
@@ -42,10 +42,7 @@ export interface DeliveryBatchRepository {
   /**
    * 指定期間内に作成されたバッチを検索します
    */
-  findByCreatedDateRange(
-    startDate: Date,
-    endDate: Date,
-  ): Promise<DeliveryBatch[]>;
+  findByCreatedDateRange(startDate: Date, endDate: Date): Promise<DeliveryBatch[]>;
 
   /**
    * 指定期間内に送信されたバッチを検索します
@@ -75,7 +72,7 @@ export interface DeliveryBatchRepository {
    */
   getOverallDeliveryStats(
     startDate: Date,
-    endDate: Date,
+    endDate: Date
   ): Promise<{
     totalBatches: number;
     completedBatches: number;

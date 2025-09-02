@@ -1,4 +1,4 @@
-import type { ReplyCommand, MessageContext } from "./ReplyCommand";
+import type { MessageContext, ReplyCommand } from './ReplyCommand';
 
 /**
  * テキスト返信コマンド
@@ -7,12 +7,12 @@ export class TextReplyCommand implements ReplyCommand {
   readonly #text: string;
   readonly #probability: number;
 
-  constructor(text: string, probability: number = 1.0) {
+  constructor(text: string, probability = 1.0) {
     if (!text || text.trim().length === 0) {
-      throw new Error("Text cannot be empty");
+      throw new Error('Text cannot be empty');
     }
     if (probability < 0 || probability > 1) {
-      throw new Error("Probability must be between 0 and 1");
+      throw new Error('Probability must be between 0 and 1');
     }
 
     this.#text = text;

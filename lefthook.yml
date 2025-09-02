@@ -1,15 +1,21 @@
 pre-push:
-  jobs:
-    - run: pnpm turbo check:fix
+  commands:
+    type-check:
       glob: "*.{js,ts,jsx,tsx}"
-    - run: pnpm turbo test
+      run: npm run type-check
+    lint:
       glob: "*.{js,ts,jsx,tsx}"
-    - run: pnpm turbo tsc
-      glob: "*.{js,ts,jsx,tsx}"
+      run: npm run lint
+    build:
+      glob: "*.{js,ts,jsx,tsx,json}"
+      run: npm run build
 
 pre-commit:
   commands:
-    check:
+    biome-check:
       glob: "*.{js,ts,jsx,tsx,cts,mts,d.cts,d.mts,json,jsonc}"
-      run: pnpm dlx @biomejs/biome@1.9.4 check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+      run: npx @biomejs/biome@1.9.4 check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
       stage_fixed: true
+    type-check:
+      glob: "*.{js,ts,jsx,tsx}"
+      run: npm run type-check

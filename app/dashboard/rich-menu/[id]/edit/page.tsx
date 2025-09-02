@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { RichMenuEditor } from "@/ui/components/rich-menu/RichMenuEditor";
-import { RichMenuPreview } from "@/ui/components/rich-menu/RichMenuPreview";
-import type { RichMenuArea } from "@/ui/components/rich-menu/types";
+import { RichMenuEditor } from '@/ui/components/rich-menu/RichMenuEditor';
+import { RichMenuPreview } from '@/ui/components/rich-menu/RichMenuPreview';
+import type { RichMenuArea } from '@/ui/components/rich-menu/types';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface EditRichMenuPageProps {
   params: {
@@ -18,9 +18,9 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [richMenu, setRichMenu] = useState<any>(null);
-  const [name, setName] = useState("");
-  const [chatBarText, setChatBarText] = useState("");
-  const [menuSize, setMenuSize] = useState<"full" | "half">("full");
+  const [name, setName] = useState('');
+  const [chatBarText, setChatBarText] = useState('');
+  const [menuSize, setMenuSize] = useState<'full' | 'half'>('full');
   const [areas, setAreas] = useState<RichMenuArea[]>([]);
 
   useEffect(() => {
@@ -46,20 +46,20 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
       // デモデータ
       const demoMenu = {
         id: params.id,
-        name: "サンプルリッチメニュー",
-        size: "full" as const,
-        chatBarText: "メニュー",
+        name: 'サンプルリッチメニュー',
+        size: 'full' as const,
+        chatBarText: 'メニュー',
         areas: [
           {
-            id: "demo-1",
+            id: 'demo-1',
             x: 100,
             y: 100,
             width: 400,
             height: 200,
             action: {
-              type: "postback" as const,
-              data: "menu_action_1",
-              displayText: "メニュー1",
+              type: 'postback' as const,
+              data: 'menu_action_1',
+              displayText: 'メニュー1',
             },
           },
         ],
@@ -71,7 +71,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
       setMenuSize(demoMenu.size);
       setAreas(demoMenu.areas);
     } catch (error) {
-      setError("リッチメニューの読み込みに失敗しました");
+      setError('リッチメニューの読み込みに失敗しました');
     } finally {
       setIsLoading(false);
     }
@@ -83,8 +83,8 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
 
     try {
       // エリア情報をFormDataに追加
-      formData.set("areas", JSON.stringify(areas));
-      formData.set("id", params.id);
+      formData.set('areas', JSON.stringify(areas));
+      formData.set('id', params.id);
 
       // TODO: 更新APIを実装
       // const result = await updateRichMenu(formData);
@@ -95,9 +95,9 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
       // }
 
       // 成功時はリッチメニュー一覧にリダイレクト
-      window.location.href = "/dashboard/rich-menu";
+      window.location.href = '/dashboard/rich-menu';
     } catch (error) {
-      setError("予期しないエラーが発生しました");
+      setError('予期しないエラーが発生しました');
     } finally {
       setIsSubmitting(false);
     }
@@ -107,10 +107,8 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <div className="mt-4 text-gray-600 dark:text-gray-400">
-            読み込み中...
-          </div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
+          <div className="mt-4 text-gray-600 dark:text-gray-400">読み込み中...</div>
         </div>
       </div>
     );
@@ -144,9 +142,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
             {/* エラー表示 */}
             {error && (
               <div className="rounded-md bg-red-50 dark:bg-red-900/50 p-4">
-                <div className="text-sm text-red-700 dark:text-red-200">
-                  {error}
-                </div>
+                <div className="text-sm text-red-700 dark:text-red-200">{error}</div>
               </div>
             )}
 
@@ -194,9 +190,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
                         id="size"
                         name="size"
                         value={menuSize}
-                        onChange={(e) =>
-                          setMenuSize(e.target.value as "full" | "half")
-                        }
+                        onChange={(e) => setMenuSize(e.target.value as 'full' | 'half')}
                         required
                         className="mt-1 block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       >
@@ -240,11 +234,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
                   </p>
                 </div>
                 <div className="mt-5 md:mt-0 md:col-span-2">
-                  <RichMenuEditor
-                    size={menuSize}
-                    onAreasChange={setAreas}
-                    initialAreas={areas}
-                  />
+                  <RichMenuEditor size={menuSize} onAreasChange={setAreas} initialAreas={areas} />
                 </div>
               </div>
             </div>
@@ -279,7 +269,7 @@ export default function EditRichMenuPage({ params }: EditRichMenuPageProps) {
                 disabled={isSubmitting}
                 className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isSubmitting ? "更新中..." : "更新"}
+                {isSubmitting ? '更新中...' : '更新'}
               </button>
             </div>
           </form>

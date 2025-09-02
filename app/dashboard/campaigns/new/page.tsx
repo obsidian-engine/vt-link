@@ -1,6 +1,6 @@
-import { Suspense } from "react";
-import Link from "next/link";
-import { CreateCampaignForm } from "@/ui/components/campaign/CreateCampaignForm";
+import { CreateCampaignForm } from '@/ui/components/campaign/CreateCampaignForm';
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function NewCampaignPage() {
   return (
@@ -39,42 +39,42 @@ function CreateCampaignFormSkeleton() {
     <div className="space-y-6">
       {/* キャンペーン基本情報 */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <div className="h-6 w-48 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-6"></div>
+        <div className="h-6 w-48 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-6" />
         <div className="space-y-4">
           <div>
-            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-2"></div>
-            <div className="h-10 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-2" />
+            <div className="h-10 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
           </div>
           <div>
-            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-2"></div>
-            <div className="h-10 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-2" />
+            <div className="h-10 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
           </div>
         </div>
       </div>
 
       {/* 配信設定 */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <div className="h-6 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-6"></div>
+        <div className="h-6 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-6" />
         <div className="space-y-4">
           <div className="flex space-x-4">
-            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
-            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
+            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
           </div>
         </div>
       </div>
 
       {/* メッセージ内容 */}
       <div className="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
-        <div className="h-6 w-40 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-6"></div>
+        <div className="h-6 w-40 bg-gray-200 dark:bg-gray-600 rounded animate-pulse mb-6" />
         <div className="space-y-4">
-          <div className="h-32 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+          <div className="h-32 w-full bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
         </div>
       </div>
 
       {/* ボタンエリア */}
       <div className="flex justify-end space-x-4">
-        <div className="h-10 w-24 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
-        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse"></div>
+        <div className="h-10 w-24 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
+        <div className="h-10 w-32 bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
       </div>
     </div>
   );

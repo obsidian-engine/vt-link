@@ -22,7 +22,7 @@
     "allowImportingTsExtensions": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "jsxImportSource": "react",
     "incremental": true,
     "plugins": [
@@ -41,10 +41,13 @@
     },
     "target": "es2022",
     "composite": true,
-    "incremental": true,
     "tsBuildInfoFile": "./.next/tsconfig.main.tsbuildinfo"
   },
-  "references": [{ "path": "./tsconfig.test.json" }],
+  "references": [
+    {
+      "path": "./tsconfig.test.json"
+    }
+  ],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": [
     "node_modules",

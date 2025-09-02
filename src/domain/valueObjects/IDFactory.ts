@@ -1,21 +1,21 @@
-import { z } from "zod";
+import { z } from 'zod';
 import type {
-  UserID,
   AccountID,
-  LineChannelID,
-  LineUserID,
-  CampaignID,
-  TemplateID,
-  SegmentID,
-  RichMenuID,
-  LineRichMenuID,
   AutoReplyRuleID,
   BatchID,
+  CampaignID,
   DeliveryLogID,
   EmailAddress,
+  LineChannelID,
+  LineRichMenuID,
+  LineUserID,
   PhoneNumber,
+  RichMenuID,
+  SegmentID,
+  TemplateID,
   URL,
-} from "./BaseTypes";
+  UserID,
+} from './BaseTypes';
 
 /**
  * Zodスキーマ定義

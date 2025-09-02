@@ -1,5 +1,5 @@
-import { Suspense } from "react";
-import Link from "next/link";
+import Link from 'next/link';
+import { Suspense } from 'react';
 
 export default function DashboardPage() {
   return (
@@ -97,13 +97,7 @@ interface DashboardCardProps {
   stats: string;
 }
 
-function DashboardCard({
-  title,
-  description,
-  icon,
-  href,
-  stats,
-}: DashboardCardProps) {
+function DashboardCard({ title, description, icon, href, stats }: DashboardCardProps) {
   return (
     <Link href={href}>
       <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
@@ -117,16 +111,12 @@ function DashboardCard({
                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                   {title}
                 </dt>
-                <dd className="text-lg font-medium text-gray-900 dark:text-white">
-                  {stats}
-                </dd>
+                <dd className="text-lg font-medium text-gray-900 dark:text-white">{stats}</dd>
               </dl>
             </div>
           </div>
           <div className="mt-4">
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              {description}
-            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{description}</p>
           </div>
         </div>
       </div>
@@ -147,21 +137,9 @@ function QuickActions() {
             icon="➕"
             href="/dashboard/rich-menu/new"
           />
-          <QuickActionButton
-            label="返信ルール追加"
-            icon="🔧"
-            href="/dashboard/auto-reply/new"
-          />
-          <QuickActionButton
-            label="メッセージ送信"
-            icon="📨"
-            href="/dashboard/messages/new"
-          />
-          <QuickActionButton
-            label="設定を確認"
-            icon="⚙️"
-            href="/dashboard/settings"
-          />
+          <QuickActionButton label="返信ルール追加" icon="🔧" href="/dashboard/auto-reply/new" />
+          <QuickActionButton label="メッセージ送信" icon="📨" href="/dashboard/messages/new" />
+          <QuickActionButton label="設定を確認" icon="⚙️" href="/dashboard/settings" />
         </div>
       </div>
     </div>
@@ -179,9 +157,7 @@ function QuickActionButton({ label, icon, href }: QuickActionButtonProps) {
     <Link href={href}>
       <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
         <span className="text-xl mr-3">{icon}</span>
-        <span className="text-sm font-medium text-gray-900 dark:text-white">
-          {label}
-        </span>
+        <span className="text-sm font-medium text-gray-900 dark:text-white">{label}</span>
       </div>
     </Link>
   );

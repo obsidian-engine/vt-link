@@ -1,8 +1,8 @@
 export enum ReplyStatus {
-  Success = "success",
-  Failed = "failed",
-  RateLimited = "rate_limited",
-  TimeWindowBlocked = "time_window_blocked",
+  Success = 'success',
+  Failed = 'failed',
+  RateLimited = 'rate_limited',
+  TimeWindowBlocked = 'time_window_blocked',
 }
 
 export class ReplyLog {
@@ -35,7 +35,7 @@ export class ReplyLog {
     status: ReplyStatus,
     error: string | null,
     latencyMs: number,
-    timestamp: Date,
+    timestamp: Date
   ) {
     this.#id = id;
     this.#ruleId = ruleId;
@@ -66,33 +66,33 @@ export class ReplyLog {
     responseType: string,
     responseContent: string,
     status: ReplyStatus,
-    error: string | null = null,
+    error: string | null,
     latencyMs: number,
-    timestamp: Date = new Date(),
+    timestamp: Date = new Date()
   ): ReplyLog {
     if (!id) {
-      throw new Error("Log ID is required");
+      throw new Error('Log ID is required');
     }
     if (!ruleId) {
-      throw new Error("Rule ID is required");
+      throw new Error('Rule ID is required');
     }
     if (!accountId) {
-      throw new Error("Account ID is required");
+      throw new Error('Account ID is required');
     }
     if (!userId) {
-      throw new Error("User ID is required");
+      throw new Error('User ID is required');
     }
     if (!messageId) {
-      throw new Error("Message ID is required");
+      throw new Error('Message ID is required');
     }
     if (!responseType) {
-      throw new Error("Response type is required");
+      throw new Error('Response type is required');
     }
     if (!responseContent) {
-      throw new Error("Response content is required");
+      throw new Error('Response content is required');
     }
     if (latencyMs < 0) {
-      throw new Error("Latency must be non-negative");
+      throw new Error('Latency must be non-negative');
     }
 
     return new ReplyLog(
@@ -109,7 +109,7 @@ export class ReplyLog {
       status,
       error,
       latencyMs,
-      timestamp,
+      timestamp
     );
   }
 
@@ -127,7 +127,7 @@ export class ReplyLog {
     status: ReplyStatus,
     error: string | null,
     latencyMs: number,
-    timestamp: Date,
+    timestamp: Date
   ): ReplyLog {
     return new ReplyLog(
       id,
@@ -143,7 +143,7 @@ export class ReplyLog {
       status,
       error,
       latencyMs,
-      timestamp,
+      timestamp
     );
   }
 

@@ -1,4 +1,4 @@
-export type RichMenuSize = "full" | "half";
+export type RichMenuSize = 'full' | 'half';
 
 export interface RichMenuArea {
   readonly x: number;
@@ -6,7 +6,7 @@ export interface RichMenuArea {
   readonly width: number;
   readonly height: number;
   readonly action: {
-    readonly type: "message" | "uri" | "postback";
+    readonly type: 'message' | 'uri' | 'postback';
     readonly text?: string;
     readonly uri?: string;
     readonly data?: string;
@@ -30,7 +30,7 @@ export class RichMenu {
   readonly #name: string;
   readonly #size: RichMenuSize;
   readonly #chatBarText: string | null;
-  readonly #areas: ReadonlyArray<RichMenuArea>;
+  readonly #areas: readonly RichMenuArea[];
   readonly #imageUrl: string | null;
   readonly #isDefault: boolean;
   readonly #isPublished: boolean;
@@ -42,21 +42,21 @@ export class RichMenu {
     name: string,
     size: RichMenuSize,
     chatBarText: string | null,
-    areas: ReadonlyArray<RichMenuArea>,
+    areas: readonly RichMenuArea[],
     imageUrl: string | null,
     isDefault: boolean,
-    isPublished: boolean,
+    isPublished: boolean
   ) {
     if (name.length === 0 || name.length > RichMenu.MAX_NAME_LENGTH) {
-      throw new Error("Name must be between 1 and 100 characters");
+      throw new Error('Name must be between 1 and 100 characters');
     }
 
     if (chatBarText && chatBarText.length > RichMenu.MAX_CHAT_BAR_TEXT_LENGTH) {
-      throw new Error("Chat bar text must be 14 characters or less");
+      throw new Error('Chat bar text must be 14 characters or less');
     }
 
     if (areas.length > RichMenu.MAX_AREAS_COUNT) {
-      throw new Error("Areas count must be 20 or less");
+      throw new Error('Areas count must be 20 or less');
     }
 
     this.#id = id;
@@ -77,10 +77,10 @@ export class RichMenu {
     id: string,
     accountId: string,
     name: string,
-    size: RichMenuSize = "full",
+    size: RichMenuSize = 'full',
     chatBarText: string | null = null,
-    areas: ReadonlyArray<RichMenuArea> = [],
-    imageUrl: string | null = null,
+    areas: readonly RichMenuArea[] = [],
+    imageUrl: string | null = null
   ): RichMenu {
     return new RichMenu(
       id,
@@ -92,7 +92,7 @@ export class RichMenu {
       areas,
       imageUrl,
       false,
-      false,
+      false
     );
   }
 
@@ -103,10 +103,10 @@ export class RichMenu {
     name: string,
     size: RichMenuSize,
     chatBarText: string | null,
-    areas: ReadonlyArray<RichMenuArea>,
+    areas: readonly RichMenuArea[],
     imageUrl: string | null,
     isDefault: boolean,
-    isPublished: boolean,
+    isPublished: boolean
   ): RichMenu {
     return new RichMenu(
       id,
@@ -118,7 +118,7 @@ export class RichMenu {
       areas,
       imageUrl,
       isDefault,
-      isPublished,
+      isPublished
     );
   }
 
@@ -140,7 +140,7 @@ export class RichMenu {
   get chatBarText(): string | null {
     return this.#chatBarText;
   }
-  get areas(): ReadonlyArray<RichMenuArea> {
+  get areas(): readonly RichMenuArea[] {
     return this.#areas;
   }
   get imageUrl(): string | null {
@@ -158,7 +158,7 @@ export class RichMenu {
   }
 
   getExpectedHeight(): number {
-    return this.#size === "full" ? RichMenu.FULL_HEIGHT : RichMenu.HALF_HEIGHT;
+    return this.#size === 'full' ? RichMenu.FULL_HEIGHT : RichMenu.HALF_HEIGHT;
   }
 
   isValidAreaBounds(area: RichMenuArea): boolean {
@@ -186,11 +186,11 @@ export class RichMenu {
       this.#areas,
       this.#imageUrl,
       this.#isDefault,
-      this.#isPublished,
+      this.#isPublished
     );
   }
 
-  updateAreas(areas: ReadonlyArray<RichMenuArea>): RichMenu {
+  updateAreas(areas: readonly RichMenuArea[]): RichMenu {
     const validAreas = areas.filter((area) => this.isValidAreaBounds(area));
 
     return RichMenu.reconstruct(
@@ -203,7 +203,7 @@ export class RichMenu {
       validAreas,
       this.#imageUrl,
       this.#isDefault,
-      this.#isPublished,
+      this.#isPublished
     );
   }
 
@@ -218,7 +218,7 @@ export class RichMenu {
       this.#areas,
       this.#imageUrl,
       true,
-      this.#isPublished,
+      this.#isPublished
     );
   }
 
@@ -233,7 +233,7 @@ export class RichMenu {
       this.#areas,
       this.#imageUrl,
       this.#isDefault,
-      true,
+      true
     );
   }
 
