@@ -1,6 +1,18 @@
 import { getAutoReplyRules } from '@/ui/actions/autoReplyActions';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { getAutoReplyRules } from '@/ui/actions/autoReplyActions';
+
+// 自動返信ルールの型定義
+interface AutoReplyRule {
+  id: string;
+  name: string;
+  enabled: boolean;
+  priority: number;
+  conditionsCount: number;
+  responsesCount: number;
+  createdAt: Date;
+}
 
 export default async function AutoReplyPage() {
   return (
@@ -103,7 +115,7 @@ async function AutoReplyRulesList() {
   }
 }
 
-function AutoReplyRuleCard({ rule }: { rule: any }) {
+function AutoReplyRuleCard({ rule }: { rule: AutoReplyRule }) {
   return (
     <div className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
       <div className="flex items-center justify-between">

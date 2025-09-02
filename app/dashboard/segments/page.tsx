@@ -1,6 +1,7 @@
 import { getSegments } from '@/ui/actions/segmentActions';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import type { TargetSegment, SegmentCriteria } from '@/types/dashboard.types';
 
 export default function SegmentsPage() {
   return (
@@ -177,8 +178,8 @@ async function SegmentList() {
   );
 }
 
-function SegmentCard({ segment }: { segment: any }) {
-  const getCriteriaText = (criteria: any) => {
+function SegmentCard({ segment }: { segment: TargetSegment }) {
+  const getCriteriaText = (criteria: SegmentCriteria) => {
     const parts = [];
 
     if (criteria.ageRange) {

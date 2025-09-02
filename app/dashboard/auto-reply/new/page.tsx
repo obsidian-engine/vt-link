@@ -5,15 +5,76 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-interface Condition {
+// 基本条件インターフェース
+interface BaseCondition {
   type: 'keyword' | 'regex' | 'messageType' | 'time' | 'user';
-  [key: string]: any;
 }
 
-interface Response {
-  type: 'text' | 'image' | 'sticker';
-  [key: string]: any;
+// キーワード条件の型定義
+interface KeywordCondition extends BaseCondition {
+  type: 'keyword';
+  keyword: string;
+  mode: 'partial' | 'exact' | 'startsWith' | 'endsWith';
+  caseSensitive: boolean;
 }
+
+// 正規表現条件の型定義
+interface RegexCondition extends BaseCondition {
+  type: 'regex';
+  pattern: string;
+}
+
+// メッセージタイプ条件の型定義
+interface MessageTypeCondition extends BaseCondition {
+  type: 'messageType';
+  messageType: string;
+}
+
+// 時間条件の型定義
+interface TimeCondition extends BaseCondition {
+  type: 'time';
+  startTime: string;
+  endTime: string;
+  weekdays: number[];
+}
+
+// ユーザー条件の型定義
+interface UserCondition extends BaseCondition {
+  type: 'user';
+  userIds: string[];
+}
+
+// 統合条件型
+type Condition = KeywordCondition | RegexCondition | MessageTypeCondition | TimeCondition | UserCondition;
+
+// 基本返信インターフェース
+interface BaseResponse {
+  type: 'text' | 'image' | 'sticker';
+  probability?: number;
+}
+
+// テキスト返信の型定義
+interface TextResponse extends BaseResponse {
+  type: 'text';
+  text: string;
+}
+
+// 画像返信の型定義
+interface ImageResponse extends BaseResponse {
+  type: 'image';
+  originalContentUrl: string;
+  previewImageUrl: string;
+}
+
+// スタンプ返信の型定義
+interface StickerResponse extends BaseResponse {
+  type: 'sticker';
+  packageId: string;
+  stickerId: string;
+}
+
+// 統合返信型
+type Response = TextResponse | ImageResponse | StickerResponse;
 
 export default function NewAutoReplyPage() {
   const router = useRouter();
@@ -256,7 +317,7 @@ function ConditionEditor({
       <div className="flex justify-between items-start mb-3">
         <select
           value={condition.type}
-          onChange={(e) => onChange({ type: e.target.value as any })}
+          onChange={(e) => onChange({ type: e.target.value as Condition['type'] })}
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
         >
           <option value="keyword">キーワード</option>
@@ -336,7 +397,7 @@ function ResponseEditor({
       <div className="flex justify-between items-start mb-3">
         <select
           value={response.type}
-          onChange={(e) => onChange({ type: e.target.value as any })}
+          onChange={(e) => onChange({ type: e.target.value as Response['type'] })}
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
         >
           <option value="text">テキスト</option>

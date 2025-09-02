@@ -142,7 +142,7 @@ export class SendNowUsecase {
         status: sentCampaign.status,
         batchId: completedBatch.id,
         targetCount: targetUserIds.length,
-        sentAt: sentCampaign.sentAt!,
+        sentAt: sentCampaign.sentAt || new Date(),
       };
     } catch (error) {
       // Mark campaign as failed if something went wrong

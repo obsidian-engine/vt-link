@@ -1,6 +1,26 @@
 import { getCampaigns } from '@/ui/actions/campaignActions';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { getCampaigns } from '@/ui/actions/campaignActions';
+
+// キャンペーンのステータス型
+type CampaignStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed';
+
+// キャンペーンのタイプ型  
+type CampaignType = 'broadcast' | 'narrowcast';
+
+// キャンペーンデータの型定義
+interface Campaign {
+  id: string;
+  name: string;
+  status: CampaignStatus;
+  type: CampaignType;
+  estimatedRecipients?: number;
+  scheduledAt?: string | Date;
+  sentCount?: number;
+  sentAt?: string | Date;
+  createdAt: string | Date;
+}
 
 export default function CampaignsPage() {
   return (
@@ -114,7 +134,7 @@ async function CampaignList() {
   );
 }
 
-function CampaignCard({ campaign }: { campaign: any }) {
+function CampaignCard({ campaign }: { campaign: Campaign }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'draft':

@@ -9,8 +9,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const maxDuration = 30;
 
-const LINE_CHANNEL_SECRET = process.env['LINE_CHANNEL_SECRET'];
-const LINE_CHANNEL_ACCESS_TOKEN = process.env['LINE_CHANNEL_ACCESS_TOKEN'];
+const LINE_CHANNEL_SECRET = process.env.LINE_CHANNEL_SECRET;
+const LINE_CHANNEL_ACCESS_TOKEN = process.env.LINE_CHANNEL_ACCESS_TOKEN;
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,7 +36,13 @@ export async function POST(request: NextRequest) {
     const autoReplyRuleRepository = new AutoReplyRuleRepositorySupabase();
     const replyLogRepository = new ReplyLogRepositorySupabase();
     const rateLimiter = new RateLimiterSupabase();
-    const lineReplyService = new LineReplyServiceImpl(LINE_CHANNEL_ACCESS_TOKEN!);
+    if (!LINE_CHANNEL_ACCESS_TOKEN) {
+      return NextResponse.json(
+        { error: 'LINE channel access token is not configured' },
+        { status: 500 }
+      );
+    }
+    const lineReplyService = new LineReplyServiceImpl(LINE_CHANNEL_ACCESS_TOKEN);
 
     // Execute webhook handling
     const usecase = new HandleWebhookUsecase(

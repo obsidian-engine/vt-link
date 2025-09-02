@@ -1,6 +1,7 @@
 import { getCampaignHistory } from '@/ui/actions/campaignActions';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import type { DeliveryHistory } from '@/types/dashboard.types';
 
 export default function HistoryPage() {
   return (
@@ -89,7 +90,7 @@ async function HistoryContent() {
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {campaigns
-                      .reduce((sum: number, c: any) => sum + (c.sentCount || 0), 0)
+                      .reduce((sum: number, c: DeliveryHistory) => sum + (c.sentCount || 0), 0)
                       .toLocaleString()}
                   </dd>
                 </dl>
@@ -111,7 +112,7 @@ async function HistoryContent() {
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {campaigns
-                      .reduce((sum: number, c: any) => sum + (c.failedCount || 0), 0)
+                      .reduce((sum: number, c: DeliveryHistory) => sum + (c.failedCount || 0), 0)
                       .toLocaleString()}
                   </dd>
                 </dl>
@@ -134,9 +135,9 @@ async function HistoryContent() {
                   <dd className="text-lg font-medium text-gray-900 dark:text-white">
                     {campaigns.length > 0
                       ? Math.round(
-                          (campaigns.reduce((sum: number, c: any) => sum + (c.sentCount || 0), 0) /
+                          (campaigns.reduce((sum: number, c: DeliveryHistory) => sum + (c.sentCount || 0), 0) /
                             (campaigns.reduce(
-                              (sum: number, c: any) =>
+                              (sum: number, c: DeliveryHistory) =>
                                 sum + (c.sentCount || 0) + (c.failedCount || 0),
                               0
                             ) || 1)) *
@@ -225,7 +226,7 @@ async function HistoryContent() {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {campaigns.map((campaign: any) => (
+                {campaigns.map((campaign: DeliveryHistory) => (
                   <HistoryRow key={campaign.id} campaign={campaign} />
                 ))}
               </tbody>
@@ -237,7 +238,7 @@ async function HistoryContent() {
   );
 }
 
-function HistoryRow({ campaign }: { campaign: any }) {
+function HistoryRow({ campaign }: { campaign: DeliveryHistory }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'sent':

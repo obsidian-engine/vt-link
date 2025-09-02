@@ -108,6 +108,9 @@ declare global {
 
       // OpenAI
       readonly OPENAI_API_KEY?: string;
+
+      // Cron Jobs
+      readonly CRON_SECRET?: string;
     }
   }
 }

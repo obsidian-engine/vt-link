@@ -1,6 +1,7 @@
 import { getTemplates } from '@/ui/actions/templateActions';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import type { MessageTemplate, TemplateContent } from '@/types/dashboard.types';
 
 export default function TemplatesPage() {
   return (
@@ -109,7 +110,7 @@ async function TemplateList() {
   );
 }
 
-function TemplateCard({ template }: { template: any }) {
+function TemplateCard({ template }: { template: MessageTemplate }) {
   const getTypeIcon = (contentType: string) => {
     switch (contentType) {
       case 'text':
@@ -152,7 +153,7 @@ function TemplateCard({ template }: { template: any }) {
     }
   };
 
-  const getPreviewText = (content: any[]) => {
+  const getPreviewText = (content: TemplateContent) => {
     if (!content || content.length === 0) return 'コンテンツがありません';
 
     const firstContent = content[0];
