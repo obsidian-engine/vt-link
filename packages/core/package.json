@@ -1,0 +1,20 @@
+{
+  "name": "@vt-link/core",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "tsc": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.24.1",
+    "superjson": "^2.2.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "@biomejs/biome": "1.9.4"
+  }
+}

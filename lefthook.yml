@@ -1,0 +1,15 @@
+pre-push:
+  commands:
+    check:
+      run: pnpm turbo check
+    test:
+      run: pnpm turbo test
+    typecheck:
+      run: pnpm turbo tsc
+
+pre-commit:
+  commands:
+    format:
+      glob: "*.{js,ts,jsx,tsx,json}"
+      run: pnpm biome check --write {staged_files}
+      stage_fixed: true
