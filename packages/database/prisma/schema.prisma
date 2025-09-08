@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ユーザー管理
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // リレーション
+  vtubers Vtuber[]
+
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+// VTuber情報
+model Vtuber {
+  id          String  @id @default(cuid())
+  name        String
+  displayName String
+  description String?
+  avatarUrl   String?
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // リレーション
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lineAccounts   LineAccount[]
+  messageGroups  MessageGroup[]
+
+  @@map("vtubers")
+}
+
+// LINE公式アカウント情報
+model LineAccount {
+  id                String  @id @default(cuid())
+  channelId         String  @unique
+  channelSecret     String
+  channelAccessToken String
+  displayName       String
+  pictureUrl        String?
+  isActive          Boolean @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // リレーション
+  vtuberId      String
+  vtuber        Vtuber        @relation(fields: [vtuberId], references: [id], onDelete: Cascade)
+  fans          Fan[]
+  messages      Message[]
+
+  @@map("line_accounts")
+}
+
+// ファン管理
+model Fan {
+  id           String   @id @default(cuid())
+  lineUserId   String   @unique
+  displayName  String?
+  pictureUrl   String?
+  statusMessage String?
+  isBlocked    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // リレーション
+  lineAccountId String
+  lineAccount   LineAccount @relation(fields: [lineAccountId], references: [id], onDelete: Cascade)
+  messages      Message[]
+
+  @@map("fans")
+}
+
+// メッセージグループ
+model MessageGroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // リレーション
+  vtuberId String
+  vtuber   Vtuber    @relation(fields: [vtuberId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@map("message_groups")
+}
+
+// メッセージ
+model Message {
+  id        String      @id @default(cuid())
+  content   String
+  type      MessageType @default(TEXT)
+  status    MessageStatus @default(DRAFT)
+  scheduledAt DateTime?
+  sentAt    DateTime?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  // リレーション
+  lineAccountId  String?
+  lineAccount    LineAccount?   @relation(fields: [lineAccountId], references: [id], onDelete: SetNull)
+  messageGroupId String?
+  messageGroup   MessageGroup?  @relation(fields: [messageGroupId], references: [id], onDelete: SetNull)
+  fanId          String?
+  fan            Fan?           @relation(fields: [fanId], references: [id], onDelete: SetNull)
+
+  @@map("messages")
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  STICKER
+}
+
+enum MessageStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+  FAILED
+}

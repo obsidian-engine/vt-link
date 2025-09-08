@@ -1,61 +1,33 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
   "formatter": {
     "enabled": true,
-    "formatWithErrors": false,
     "indentStyle": "space",
-    "indentWidth": 2,
-    "lineWidth": 100,
-    "lineEnding": "lf",
-    "ignore": ["**/node_modules/**", "**/.next/**", "**/dist/**", "**/build/**"]
+    "indentWidth": 2
   },
   "organizeImports": {
     "enabled": true
   },
   "linter": {
     "enabled": true,
-    "ignore": ["**/node_modules/**", "**/.next/**", "**/dist/**", "**/build/**"],
     "rules": {
       "recommended": true,
-      "suspicious": {
-        "noExplicitAny": "warn",
-        "noArrayIndexKey": "warn"
-      },
       "correctness": {
-        "useExhaustiveDependencies": "warn"
+        "noUnusedImports": "error"
       },
       "style": {
-        "useImportType": "error",
-        "useConsistentArrayType": "error"
+        "noNonNullAssertion": "off"
       }
     }
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "single",
-      "jsxQuoteStyle": "double",
-      "semicolons": "always",
-      "trailingCommas": "es5"
-    },
-    "parser": {
-      "unsafeParameterDecoratorsEnabled": true
+      "quoteStyle": "double"
     }
-  },
-  "json": {
-    "formatter": {
-      "enabled": true
-    }
-  },
-  "files": {
-    "include": ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx", "**/*.json", "**/*.jsonc"],
-    "ignore": [
-      "**/node_modules/**",
-      "**/.next/**",
-      "**/dist/**",
-      "**/build/**",
-      "**/coverage/**",
-      "**/.git/**",
-      "**/src/generated/**"
-    ]
   }
 }
