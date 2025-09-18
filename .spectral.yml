@@ -1,4 +1,4 @@
-extends: ["@stoplight/spectral-rulesets/oas"]
+extends: ["spectral:oas"]
 
 rules:
   # OpenAPI基本ルール
