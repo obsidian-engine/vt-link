@@ -9,6 +9,8 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "clean": "rm -rf .next"
@@ -33,11 +35,16 @@
     "@types/node": "^20.17.13",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
     "eslint": "^9.18.0",
     "eslint-config-next": "^15.5.2",
     "postcss": "^8.5.1",
     "prettier": "^3.4.2",
+    "jsdom": "^25.0.1",
     "tailwindcss": "^4.1.12",
+    "vitest": "^2.1.8",
     "typescript": "^5.7.2"
   }
 }

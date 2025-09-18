@@ -1,178 +1,69 @@
 "use client"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, UserPlus, Target, TrendingUp } from "lucide-react"
 
 export default function AudiencePage() {
   return (
     <div className="space-y-8">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">オーディエンス管理</h1>
-          <p className="text-muted-foreground">
-            セグメント作成、タグ付け、属性管理
-          </p>
+          <p className="text-slate-600 dark:text-slate-400">セグメント作成、タグ付け、属性管理</p>
         </div>
-        <Button className="gap-2">
+        <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground shadow-md hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
           <UserPlus className="h-4 w-4" />
           セグメント作成
-        </Button>
+        </button>
       </div>
 
-      {/* Audience Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">総友だち数</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12,340</div>
-            <p className="text-xs text-muted-foreground">+180 今月</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">アクティブユーザー</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8,920</div>
-            <p className="text-xs text-muted-foreground">72.3% 全体の</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">セグメント数</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">15</div>
-            <p className="text-xs text-muted-foreground">8個 アクティブ</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">新規登録</CardTitle>
-            <UserPlus className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">今日</p>
-          </CardContent>
-        </Card>
+        {[
+          { label: '総友だち数', icon: Users, value: '12,340', sub: '+180 今月' },
+          { label: 'アクティブユーザー', icon: TrendingUp, value: '8,920', sub: '72.3% 全体の' },
+          { label: 'セグメント数', icon: Target, value: '15', sub: '8個 アクティブ' },
+          { label: '新規登録', icon: UserPlus, value: '24', sub: '今日' },
+        ].map((s, i) => (
+          <div key={i} className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+            <div className="flex flex-row items-center justify-between pb-2">
+              <div className="text-sm font-medium">{s.label}</div>
+              <s.icon className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+            </div>
+            <div className="text-2xl font-bold">{s.value}</div>
+            <p className="text-xs text-slate-600 dark:text-slate-400">{s.sub}</p>
+          </div>
+        ))}
       </div>
 
-      {/* Segments */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>オーディエンスセグメント</CardTitle>
-              <CardDescription>
-                ターゲット別のオーディエンス管理
-              </CardDescription>
-            </div>
-            <Button variant="outline" size="sm">
-              セグメント編集
-            </Button>
+      <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+        <div className="flex items-center justify-between pb-4 border-b border-white/30 dark:border-slate-700/60">
+          <div>
+            <h2 className="text-base font-semibold">オーディエンスセグメント</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400">ターゲット別のオーディエンス管理</p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold">VIPファン</h3>
-                  <span className="text-sm text-muted-foreground">1,234人</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  高エンゲージメント・購入履歴あり
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">配信</Button>
-                </div>
+          <button className="px-3 py-2 rounded-lg border bg-white/50 hover:bg-white/70 transition text-sm">セグメント編集</button>
+        </div>
+        <div className="pt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {[
+            { title: 'VIPファン', count: '1,234人', desc: '高エンゲージメント・購入履歴あり' },
+            { title: '新規ファン', count: '3,456人', desc: '登録30日以内の新しいファン' },
+            { title: 'ライブ参加者', count: '2,890人', desc: '過去3ヶ月のライブ参加履歴あり' },
+            { title: '休眠ユーザー', count: '1,567人', desc: '30日以上アクティビティなし' },
+            { title: 'グッズ購入者', count: '890人', desc: '過去6ヶ月のグッズ購入履歴' },
+            { title: '全体', count: '12,340人', desc: 'すべてのLINE友だち' },
+          ].map((seg) => (
+            <div key={seg.title} className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold">{seg.title}</h3>
+                <span className="text-sm text-slate-600 dark:text-slate-400">{seg.count}</span>
               </div>
-
-              <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold">新規ファン</h3>
-                  <span className="text-sm text-muted-foreground">3,456人</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  登録30日以内の新しいファン
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">配信</Button>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold">ライブ参加者</h3>
-                  <span className="text-sm text-muted-foreground">2,890人</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  過去3ヶ月のライブ参加履歴あり
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">配信</Button>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold">休眠ユーザー</h3>
-                  <span className="text-sm text-muted-foreground">1,567人</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  30日以上アクティビティなし
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">復帰策</Button>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold">グッズ購入者</h3>
-                  <span className="text-sm text-muted-foreground">890人</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  過去6ヶ月のグッズ購入履歴
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">配信</Button>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold">全体</h3>
-                  <span className="text-sm text-muted-foreground">12,340人</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  すべてのLINE友だち
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">配信</Button>
-                </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">{seg.desc}</p>
+              <div className="flex gap-2">
+                <button className="px-3 py-1.5 text-sm rounded-md border bg-white/60 hover:bg-white/80">詳細</button>
+                <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">配信</button>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

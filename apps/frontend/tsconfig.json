@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "es6"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es6"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -18,11 +22,28 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@vt-link/api-client": ["../../packages/api-client/src"],
-      "@vt-link/schema-zod": ["../../packages/schema-zod/src"]
-    }
+      "@/*": [
+        "./*"
+      ],
+      "@vt-link/api-client": [
+        "../../packages/api-client/src"
+      ],
+      "@vt-link/schema-zod": [
+        "../../packages/schema-zod/src"
+      ]
+    },
+    "target": "ES2017"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "app/__tests__/**",
+    "vitest.config.ts",
+    "setupTests.ts"
+  ]
 }

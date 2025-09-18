@@ -10,10 +10,12 @@ import {
   History,
   Menu as MenuIcon,
   Settings,
-  X
+  X,
+  Grid3X3,
+  MessageCircle
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Button } from "./ui/button"
+// shadcn削除: Buttonをプレーン要素へ置換
 import { ThemeToggle } from "./theme-toggle"
 
 const navigation = [
@@ -21,6 +23,8 @@ const navigation = [
   { name: "メッセージ", href: "/messages", icon: MessageSquare },
   { name: "オーディエンス", href: "/audience", icon: Users },
   { name: "履歴", href: "/history", icon: History },
+  { name: "リッチメニュー", href: "/richmenu", icon: Grid3X3 },
+  { name: "自動返信", href: "/autoreply", icon: MessageCircle },
   { name: "設定", href: "/settings", icon: Settings },
 ]
 
@@ -57,14 +61,14 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           <div className="font-semibold text-xl text-primary drop-shadow">
             VT-Line
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden"
+          <button
+            type="button"
+            aria-label="サイドバーを閉じる"
+            className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             onClick={() => setIsOpen(false)}
           >
             <X className="h-4 w-4" />
-          </Button>
+          </button>
         </div>
 
         {/* Navigation */}
