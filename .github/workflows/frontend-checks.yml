@@ -1,4 +1,4 @@
-name: Frontend Quality Checks
+name: Frontend CI
 
 on:
   pull_request:
@@ -8,6 +8,12 @@ on:
       - 'packages/api-client/**'
       - 'package.json'
       - 'pnpm-lock.yaml'
+  push:
+    branches: [main]
+    paths:
+      - 'apps/frontend/**'
+      - 'packages/schema-zod/**'
+      - 'packages/api-client/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -24,12 +30,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Enable Corepack
         run: corepack enable
 
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
+
+      - name: Security audit
+        run: pnpm audit --audit-level=high
+        continue-on-error: true
 
       - name: Spectral Lint OpenAPI
         run: pnpm spectral || echo "Spectral warnings/errors detected but continuing..."
@@ -57,5 +76,18 @@ jobs:
       - name: Lint
         run: pnpm -C apps/frontend lint
 
+      - name: Format check
+        run: pnpm -C apps/frontend format:check
+
+      - name: Test
+        run: pnpm -C apps/frontend test
+
       - name: Build check
         run: pnpm -C apps/frontend build
+
+      - name: Bundle size analysis
+        run: |
+          if [ -d "apps/frontend/.next" ]; then
+            du -sh apps/frontend/.next
+            echo "Build completed successfully"
+          fi
