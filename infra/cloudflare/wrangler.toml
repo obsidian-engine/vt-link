@@ -1,0 +1,29 @@
+name = "vt-link-scheduler"
+main = "scheduler.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Cron Triggers for scheduled execution
+[triggers]
+crons = ["* * * * *"]  # 毎分実行
+
+# Environment variables
+[vars]
+VERCEL_API_URL = "https://vt-link.vercel.app"  # Deploy後に更新
+
+# Secrets (wrangler secret put コマンドで設定)
+# SCHEDULER_SECRET - VercelのSCHEDULER_SECRETと同じ値を設定
+
+# Worker settings
+[env.production]
+name = "vt-link-scheduler"
+vars = { VERCEL_API_URL = "https://vt-link.vercel.app" }
+
+[env.staging]
+name = "vt-link-scheduler-staging"
+vars = { VERCEL_API_URL = "https://vt-link-staging.vercel.app" }
+
+# For local development (optional)
+[env.development]
+name = "vt-link-scheduler-dev"
+vars = { VERCEL_API_URL = "http://localhost:3000" }
