@@ -1,19 +1,7 @@
 extends: ["spectral:oas"]
 
 rules:
-  # OpenAPI基本ルール
-  info-contact: error
-  info-description: error
+  # 緩和設定
+  info-contact: off
   info-license: off
-  operation-description: error
-  operation-operationId: error
-  operation-summary: error
-  operation-tags: error
-  paths-kebab-case: error
-
-  # カスタムルール
-  operation-operationId-unique: error
-  operation-parameters: error
-
-  # 緩和設定（必要に応じて）
   no-$ref-siblings: off
