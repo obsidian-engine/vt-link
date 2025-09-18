@@ -1,0 +1,131 @@
+name: CI Optimized
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+# 無料枠節約のため、ドラフトPRではCI実行をスキップ
+jobs:
+  # 変更ファイル検出
+  changes:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false || github.event_name == 'push'
+    outputs:
+      frontend: ${{ steps.changes.outputs.frontend }}
+      backend: ${{ steps.changes.outputs.backend }}
+      workflows: ${{ steps.changes.outputs.workflows }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            frontend:
+              - 'apps/frontend/**'
+              - 'packages/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+            backend:
+              - 'apps/backend/**'
+            workflows:
+              - '.github/workflows/**'
+
+  frontend:
+    name: Frontend Check
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.workflows == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Generate types & check diff
+        run: |
+          pnpm gen
+          if ! git diff --exit-code -- packages/api-client/src/__generated__/types.ts; then
+            echo "❌ 型生成ファイルに未コミットの差分があります"
+            exit 1
+          fi
+
+      - name: Format & Lint check
+        run: |
+          pnpm -C apps/frontend format:check
+          pnpm -C apps/frontend lint
+
+      - name: Type check & Build
+        run: |
+          pnpm -C apps/frontend type-check
+          pnpm -C apps/frontend build
+
+  backend:
+    name: Backend Check
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.workflows == 'true'
+    defaults:
+      run:
+        working-directory: apps/backend
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: vt_link_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+          cache: true
+          cache-dependency-path: apps/backend/go.sum
+
+      - name: Install dependencies & tools
+        run: |
+          make deps
+          go install github.com/vektra/mockery/v2@latest
+          go install github.com/pressly/goose/v3/cmd/goose@latest
+
+      - name: Format check
+        run: |
+          make generate
+          make fmt
+          if [ -n "$(git diff --name-only)" ]; then
+            echo "Code is not formatted. Run 'make fmt'"
+            exit 1
+          fi
+
+      - name: Test & Build
+        env:
+          TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/vt_link_test?sslmode=disable
+        run: |
+          make vet
+          make test-unit
+          goose -dir ./internal/migrations postgres "$TEST_DATABASE_URL" up
+          make test-integration
+          make build
