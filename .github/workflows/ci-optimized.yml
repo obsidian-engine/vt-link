@@ -1,5 +1,9 @@
 name: CI Optimized
 
+permissions:
+  contents: read
+  pull-requests: read
+
 on:
   push:
     branches: [ main, develop ]
@@ -7,9 +11,7 @@ on:
     branches: [ main, develop ]
     types: [opened, synchronize, reopened, ready_for_review]
 
-# 無料枠節約のため、ドラフトPRではCI実行をスキップ
 jobs:
-  # 変更ファイル検出
   changes:
     runs-on: ubuntu-latest
     if: github.event.pull_request.draft == false || github.event_name == 'push'
@@ -32,6 +34,7 @@ jobs:
               - 'apps/backend/**'
             workflows:
               - '.github/workflows/**'
+
 
   frontend:
     name: Frontend Check
