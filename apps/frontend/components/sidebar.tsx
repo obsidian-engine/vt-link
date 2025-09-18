@@ -10,7 +10,9 @@ import {
   History,
   Menu as MenuIcon,
   Settings,
-  X
+  X,
+  Grid3X3,
+  MessageCircle
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "./ui/button"
@@ -21,6 +23,8 @@ const navigation = [
   { name: "メッセージ", href: "/messages", icon: MessageSquare },
   { name: "オーディエンス", href: "/audience", icon: Users },
   { name: "履歴", href: "/history", icon: History },
+  { name: "リッチメニュー", href: "/richmenu", icon: Grid3X3 },
+  { name: "自動返信", href: "/autoreply", icon: MessageCircle },
   { name: "設定", href: "/settings", icon: Settings },
 ]
 
