@@ -1,6 +1,6 @@
 'use client'
-import { useCreateCampaignForm } from './useCreateCampaignForm'
-import { makeClient } from '@vt/api-client/src/client'
+import { useCreateCampaignForm, type FormValues } from './useCreateCampaignForm'
+import { makeClient } from '../../../lib/api-client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -10,7 +10,7 @@ export default function NewCampaignPage() {
   const router = useRouter()
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useCreateCampaignForm()
 
-  const onSubmit = async (values: any) => {
+  const onSubmit = async (values: FormValues) => {
     try {
       const res = await client.POST('/api/v1/campaigns', { body: values })
       if (res.error) {
