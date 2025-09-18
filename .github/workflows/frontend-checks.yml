@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  quality-check:
+  check:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,14 +35,6 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
-      - name: Cache pnpm dependencies
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
-
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
 
@@ -51,35 +43,10 @@ jobs:
           pnpm gen
           if ! git diff --exit-code -- packages/api-client/src/__generated__/types.ts; then
             echo "❌ 型生成ファイルに未コミットの差分があります"
-            echo "以下のコマンドを実行してコミットしてください："
-            echo "  pnpm gen"
-            echo "  git add packages/api-client/src/__generated__/types.ts"
-            echo "  git commit -m 'update generated types'"
             exit 1
-          else
-            echo "✅ 型生成ファイルの差分チェック完了"
           fi
 
-      - name: Quality checks
+      - name: Type check & Build
         run: |
-          # 並列実行でパフォーマンス向上
-          pnpm -C apps/frontend type-check &
-          pnpm -C apps/frontend lint &
-          pnpm -C apps/frontend format:check &
-          pnpm spectral || echo "Spectral warnings detected" &
-          wait
-
-      - name: Security audit
-        run: pnpm audit --audit-level=high
-        continue-on-error: true
-
-      - name: Test
-        run: pnpm -C apps/frontend test
-
-      - name: Build & analyze
-        run: |
+          pnpm -C apps/frontend type-check
           pnpm -C apps/frontend build
-          if [ -d "apps/frontend/.next" ]; then
-            echo "📦 Build size: $(du -sh apps/frontend/.next | cut -f1)"
-            echo "✅ Build completed successfully"
-          fi

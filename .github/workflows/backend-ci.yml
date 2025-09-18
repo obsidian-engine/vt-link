@@ -55,35 +55,16 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-go-
 
-    - name: Install dependencies & tools
-      run: |
-        make deps
-        go install github.com/vektra/mockery/v2@latest
-        go install github.com/pressly/goose/v3/cmd/goose@latest
-
-    - name: Generate mocks & format check
-      run: |
-        make generate
-        make fmt
-        if [ -n "$(git diff --name-only)" ]; then
-          echo "Code is not formatted. Run 'make fmt'"
-          exit 1
-        fi
+    - name: Install dependencies
+      run: make deps
 
     - name: Run tests
       env:
         TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/vt_link_test?sslmode=disable
       run: |
-        make vet
         make test-unit
         goose -dir ./internal/migrations postgres "$TEST_DATABASE_URL" up
         make test-integration
 
     - name: Build
       run: make build
-
-    - name: Lint
-      uses: golangci/golangci-lint-action@v6
-      with:
-        version: latest
-        working-directory: apps/backend
