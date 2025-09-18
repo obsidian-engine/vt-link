@@ -10,19 +10,22 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"vt-link/backend/internal/domain/model"
+	"vt-link/backend/internal/domain/repository"
+	"vt-link/backend/internal/infrastructure/db"
 	"vt-link/backend/internal/infrastructure/db/pg"
 )
 
 type CampaignRepositoryIntegrationTestSuite struct {
 	suite.Suite
 	testDB *TestDB
-	repo   *pg.CampaignRepository
+	repo   repository.CampaignRepository
 	ctx    context.Context
 }
 
 func (s *CampaignRepositoryIntegrationTestSuite) SetupSuite() {
 	s.testDB = SetupTestDB(s.T())
-	s.repo = pg.NewCampaignRepository(s.testDB.DB)
+	dbWrapper := &db.DB{DB: s.testDB.DB}
+	s.repo = pg.NewCampaignRepository(dbWrapper)
 	s.ctx = context.Background()
 }
 
@@ -53,7 +56,7 @@ func (s *CampaignRepositoryIntegrationTestSuite) TestCreate_Success() {
 	assert.NoError(s.T(), err)
 
 	// データベースから取得して確認
-	retrieved, err := s.repo.GetByID(s.ctx, campaign.ID)
+	retrieved, err := s.repo.FindByID(s.ctx, campaign.ID)
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), retrieved)
 	assert.Equal(s.T(), campaign.Title, retrieved.Title)
@@ -61,14 +64,14 @@ func (s *CampaignRepositoryIntegrationTestSuite) TestCreate_Success() {
 	assert.Equal(s.T(), campaign.Status, retrieved.Status)
 }
 
-func (s *CampaignRepositoryIntegrationTestSuite) TestGetByID_Success() {
+func (s *CampaignRepositoryIntegrationTestSuite) TestFindByID_Success() {
 	// テスト用データを事前に作成
 	campaignID := s.testDB.CreateTestCampaign(s.T(), "取得テスト", "取得テストメッセージ")
 	uuid, err := uuid.Parse(campaignID)
 	assert.NoError(s.T(), err)
 
 	// キャンペーンを取得
-	campaign, err := s.repo.GetByID(s.ctx, uuid)
+	campaign, err := s.repo.FindByID(s.ctx, uuid)
 
 	// アサーション
 	assert.NoError(s.T(), err)
@@ -78,10 +81,10 @@ func (s *CampaignRepositoryIntegrationTestSuite) TestGetByID_Success() {
 	assert.Equal(s.T(), model.CampaignStatusDraft, campaign.Status)
 }
 
-func (s *CampaignRepositoryIntegrationTestSuite) TestGetByID_NotFound() {
+func (s *CampaignRepositoryIntegrationTestSuite) TestFindByID_NotFound() {
 	// 存在しないIDで取得を試行
 	nonExistentID := uuid.New()
-	campaign, err := s.repo.GetByID(s.ctx, nonExistentID)
+	campaign, err := s.repo.FindByID(s.ctx, nonExistentID)
 
 	// アサーション
 	assert.Error(s.T(), err)
@@ -95,7 +98,7 @@ func (s *CampaignRepositoryIntegrationTestSuite) TestUpdate_Success() {
 	assert.NoError(s.T(), err)
 
 	// キャンペーンを取得
-	campaign, err := s.repo.GetByID(s.ctx, uuid)
+	campaign, err := s.repo.FindByID(s.ctx, uuid)
 	assert.NoError(s.T(), err)
 
 	// データを更新
@@ -110,7 +113,7 @@ func (s *CampaignRepositoryIntegrationTestSuite) TestUpdate_Success() {
 	assert.NoError(s.T(), err)
 
 	// 更新されたデータを取得して確認
-	updated, err := s.repo.GetByID(s.ctx, uuid)
+	updated, err := s.repo.FindByID(s.ctx, uuid)
 	assert.NoError(s.T(), err)
 	assert.Equal(s.T(), "更新後", updated.Title)
 	assert.Equal(s.T(), "更新後メッセージ", updated.Message)
@@ -125,7 +128,7 @@ func (s *CampaignRepositoryIntegrationTestSuite) TestList_Success() {
 	s.testDB.CreateTestCampaign(s.T(), "キャンペーン3", "メッセージ3")
 
 	// キャンペーン一覧を取得
-	campaigns, err := s.repo.List(s.ctx)
+	campaigns, err := s.repo.List(s.ctx, 10, 0)
 
 	// アサーション
 	assert.NoError(s.T(), err)
@@ -142,7 +145,7 @@ func (s *CampaignRepositoryIntegrationTestSuite) TestList_Success() {
 	assert.Contains(s.T(), titles, "キャンペーン3")
 }
 
-func (s *CampaignRepositoryIntegrationTestSuite) TestGetScheduledCampaigns_Success() {
+func (s *CampaignRepositoryIntegrationTestSuite) TestFindScheduledCampaigns_Success() {
 	// スケジュール済みのキャンペーンを作成
 	campaign := &model.Campaign{
 		ID:        uuid.New(),
@@ -171,7 +174,7 @@ func (s *CampaignRepositoryIntegrationTestSuite) TestGetScheduledCampaigns_Succe
 	assert.NoError(s.T(), err)
 
 	// スケジュール済みキャンペーンを取得
-	scheduledCampaigns, err := s.repo.GetScheduledCampaigns(s.ctx)
+	scheduledCampaigns, err := s.repo.FindScheduledCampaigns(s.ctx, time.Now().Add(time.Hour), 10)
 
 	// アサーション
 	assert.NoError(s.T(), err)

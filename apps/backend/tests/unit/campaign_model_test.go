@@ -124,9 +124,9 @@ func (s *CampaignModelTestSuite) TestStatusTransitions() {
 	// ステータス遷移のテスト
 	testCases := []struct {
 		name           string
-		initialStatus  string
+		initialStatus  model.CampaignStatus
 		action         func(*model.Campaign)
-		expectedStatus string
+		expectedStatus model.CampaignStatus
 		shouldSuccess  bool
 	}{
 		{
