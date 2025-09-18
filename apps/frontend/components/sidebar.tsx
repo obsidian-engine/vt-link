@@ -49,12 +49,13 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 z-30 h-screen w-64 shrink-0 transform backdrop-blur-lg",
-          "bg-white/40 dark:bg-slate-800/40 border-r border-white/30 dark:border-slate-700/60",
-          "flex flex-col gap-6 p-6 shadow-lg transition-transform duration-200 ease-in-out",
-          isOpen ? "translate-x-0" : "-translate-x-full",
-          "md:relative md:translate-x-0"
+          "w-64 shrink-0 backdrop-blur-lg bg-white/40 dark:bg-slate-800/40",
+          "border-r border-white/30 dark:border-slate-700/60 flex flex-col gap-6 p-6",
+          "sticky top-0 h-screen shadow-lg",
+          "max-md:fixed max-md:top-0 max-md:h-dvh max-md:transition-all max-md:z-30",
+          isOpen ? "max-md:left-0" : "max-md:-left-72"
         )}
+        aria-label="メインナビゲーション"
       >
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -72,7 +73,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col gap-1">
+        <nav className="flex flex-col gap-1 text-sm font-medium">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -80,7 +81,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-2 rounded-lg px-3 py-2 transition-colors",
                   "hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                   isActive
                     ? "bg-primary/10 text-primary"
@@ -101,7 +102,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         {/* Footer */}
         <div className="mt-auto space-y-3">
           <ThemeToggle />
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-[11px] text-slate-600/80 dark:text-slate-300/80">
             ローカル優先・個人運用の軽量UI
           </p>
         </div>
