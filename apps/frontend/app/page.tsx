@@ -51,27 +51,27 @@ export default function HomePage() {
     <div className="space-y-12">
       {/* Stats Grid */}
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-lg border border-white/30 bg-white/55 backdrop-blur-md p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
           <p className="text-xs text-muted-foreground mb-1">友だち数</p>
           <p className="text-2xl font-bold">12,340</p>
         </div>
-        <div className="rounded-lg border border-white/30 bg-white/55 backdrop-blur-md p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
           <p className="text-xs text-muted-foreground mb-1">今月の送信</p>
           <p className="text-2xl font-bold">8,900 / 15,000</p>
         </div>
-        <div className="rounded-lg border border-white/30 bg-white/55 backdrop-blur-md p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
           <p className="text-xs text-muted-foreground mb-1">平均CTR</p>
           <p className="text-2xl font-bold">4.8%</p>
         </div>
-        <div className="rounded-lg border border-white/30 bg-white/55 backdrop-blur-md p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
           <p className="text-xs text-muted-foreground mb-1">今月の売上</p>
           <p className="text-2xl font-bold">¥540,000</p>
         </div>
       </div>
 
       {/* Recent Campaigns */}
-      <div className="rounded-lg border border-white/30 bg-white/55 backdrop-blur-md shadow-md overflow-hidden">
-        <div className="p-6 border-b border-white/30 font-medium flex items-center justify-between">
+      <div className="glass dark:glass-dark rounded-lg shadow-soft overflow-hidden">
+        <div className="p-6 border-b border-white/30 dark:border-slate-700/60 font-medium flex items-center justify-between">
           <span>最近のキャンペーン</span>
           <div className="flex items-center gap-2">
             <button
@@ -84,7 +84,7 @@ export default function HomePage() {
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="text-muted-foreground bg-white/40 dark:bg-slate-800/30">
+            <thead className="text-slate-600 dark:text-slate-400 bg-white/40 dark:bg-slate-800/30">
               <tr>
                 <th className="px-6 py-3 text-left font-medium">キャンペーン名</th>
                 <th className="px-6 py-3 text-right font-medium">送信</th>
@@ -114,4 +114,3 @@ export default function HomePage() {
     </div>
   )
 }
-

@@ -75,6 +75,19 @@
     background:
       radial-gradient(at 25% 35%, rgba(30,58,138,.6) 0%, transparent 60%),
       radial-gradient(at 75% 80%, rgba(15,23,42,.8) 0%, transparent 60%),
-      linear-gradient(120deg, #0f172a 0%, #1e293b 100%);
+    linear-gradient(120deg, #0f172a 0%, #1e293b 100%);
+  }
+
+  /* glass cards */
+  .glass { background: rgba(255,255,255,.55); backdrop-filter: saturate(170%) blur(18px); }
+  .dark .glass { background: rgba(255,255,255,.08); }
+  .glass-dark { background: rgba(30,41,59,.35); backdrop-filter: saturate(150%) blur(28px); }
+
+  /* soft shadow */
+  .shadow-soft { box-shadow: 0 8px 30px rgba(2, 6, 23, 0.08); }
+
+  /* reduce motion */
+  @media (prefers-reduced-motion: reduce) {
+    * { scroll-behavior: auto !important; transition: none !important; }
   }
 }
