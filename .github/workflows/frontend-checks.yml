@@ -52,7 +52,7 @@ jobs:
           fi
 
       - name: Type check
-        run: pnpm type-check
+        run: pnpm -C apps/frontend type-check
 
       - name: Lint
         run: pnpm -C apps/frontend lint
