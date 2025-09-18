@@ -1,0 +1,10 @@
+# Trivy ignore file for known issues
+
+# 開発環境のみで使用される依存関係の軽微な脆弱性
+# テスト関連のツールは除外
+CVE-2021-44716  # net/http: limit growth of header canonicalization cache (テストのみで使用)
+
+# 一時的に無視する脆弱性（修正版が利用可能になるまで）
+# 各エントリには期限と理由を記載すること
+
+# 例: CVE-YYYY-XXXX  # 理由: 修正版未リリース、影響範囲限定、期限: 2024-12-31

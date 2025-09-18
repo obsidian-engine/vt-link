@@ -129,9 +129,76 @@ crons = ["*/1 * * * *"]  # 毎分実行
 
 ## 🧪 テスト
 
+### テスト種別
+
+- **ユニットテスト**: ビジネスロジックの単体テスト（モック使用）
+- **結合テスト**: データベースを含む統合テスト
+- **E2Eテスト**: API エンドポイントの動作テスト
+
+### テスト実行
+
 ```bash
 cd apps/backend
-go test ./...
+
+# ユニットテストのみ実行
+make test
+# または
+make test-unit
+
+# 結合テスト実行（TEST_DATABASE_URL が必要）
+export TEST_DATABASE_URL="postgres://user:pass@localhost:5432/test_db"
+make test-integration
+
+# E2Eテスト実行（サーバーが起動している必要がある）
+export E2E_BASE_URL="http://localhost:3000"
+make test-e2e
+
+# 全てのテスト実行
+make test-all
+
+# カバレッジ付きテスト実行
+make test-coverage
+
+# テストスクリプト使用
+./scripts/test.sh -t all -c -v
+```
+
+### TDD 開発フロー
+
+1. **環境準備**: `make deps-dev` で開発依存関係をインストール
+2. **モック生成**: `make generate` でインターフェースのモックを生成
+3. **テスト作成**: Red - 失敗するテストを先に書く
+   - ユニット: `tests/unit/`
+   - 結合: `tests/integration/`
+   - E2E: `tests/e2e/`
+4. **テスト実行**: `make test-unit` - Red状態を確認
+5. **実装**: Green - テストが通る最小限の実装
+6. **リファクタリング**: Blue - テストが通る状態でコードを改善
+7. **品質チェック**: `make check` でlint/format/vetを実行
+
+### テスト設定
+
+#### 環境変数
+
+```bash
+# .env.local に追加
+TEST_DATABASE_URL=postgres://user:pass@localhost:5432/test_db
+E2E_BASE_URL=http://localhost:3000
+E2E_SKIP=false  # E2Eテストをスキップする場合は true
+```
+
+#### モック生成設定
+
+`.mockery.yaml` でモック生成の設定を管理：
+
+```yaml
+with-expecter: true
+dir: "{{.InterfaceDir}}/mocks"
+filename: "{{.MockName}}.go"
+packages:
+  vt-link/backend/internal/domain/repository:
+    interfaces:
+      CampaignRepository:
 ```
 
 ## 📊 監視・ログ
