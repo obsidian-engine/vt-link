@@ -52,19 +52,19 @@ export default function HomePage() {
       {/* Stats Grid */}
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-muted-foreground mb-1">友だち数</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">友だち数</p>
           <p className="text-2xl font-bold">12,340</p>
         </div>
         <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-muted-foreground mb-1">今月の送信</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">今月の送信</p>
           <p className="text-2xl font-bold">8,900 / 15,000</p>
         </div>
         <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-muted-foreground mb-1">平均CTR</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">平均CTR</p>
           <p className="text-2xl font-bold">4.8%</p>
         </div>
         <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-muted-foreground mb-1">今月の売上</p>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">今月の売上</p>
           <p className="text-2xl font-bold">¥540,000</p>
         </div>
       </div>
