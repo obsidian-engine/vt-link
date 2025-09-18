@@ -1,0 +1,15 @@
+with-expecter: true
+dir: "{{.InterfaceDir}}/mocks"
+filename: "{{.MockName}}.go"
+log-level: info
+structname: "Mock{{.InterfaceName}}"
+packages:
+  vt-link/backend/internal/domain/repository:
+    interfaces:
+      CampaignRepository:
+  vt-link/backend/internal/domain/service:
+    interfaces:
+      Pusher:
+  vt-link/backend/internal/application/campaign:
+    interfaces:
+      Usecase:
