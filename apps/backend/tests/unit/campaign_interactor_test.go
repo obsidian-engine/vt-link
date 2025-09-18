@@ -20,11 +20,11 @@ import (
 
 type CampaignInteractorTestSuite struct {
 	suite.Suite
-	interactor  campaign.Usecase
-	mockRepo    *repoMocks.MockCampaignRepository
-	mockPusher  *serviceMocks.MockPusher
-	mockTxMgr   *repoMocks.MockTxManager
-	ctx         context.Context
+	interactor campaign.Usecase
+	mockRepo   *repoMocks.MockCampaignRepository
+	mockPusher *serviceMocks.MockPusher
+	mockTxMgr  *repoMocks.MockTxManager
+	ctx        context.Context
 }
 
 func (s *CampaignInteractorTestSuite) SetupTest() {
