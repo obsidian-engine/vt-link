@@ -1,0 +1,59 @@
+name: Frontend Quality Checks
+
+on:
+  pull_request:
+    paths:
+      - 'apps/frontend/**'
+      - 'packages/schema-zod/**'
+      - 'packages/api-client/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          corepack: true
+
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Spectral Lint OpenAPI
+        run: pnpm spectral
+
+      - name: Check type generation diff
+        run: |
+          # 型生成を実行
+          pnpm gen
+
+          # 差分をチェック
+          if ! git diff --exit-code -- packages/api-client/src/__generated__/types.ts; then
+            echo "❌ 型生成ファイルに未コミットの差分があります"
+            echo "以下のコマンドを実行してコミットしてください："
+            echo "  pnpm gen"
+            echo "  git add packages/api-client/src/__generated__/types.ts"
+            echo "  git commit -m 'update generated types'"
+            exit 1
+          else
+            echo "✅ 型生成ファイルの差分チェック完了"
+          fi
+
+      - name: Type check
+        run: pnpm type-check
+
+      - name: Lint
+        run: pnpm -C apps/frontend lint
+
+      - name: Build check
+        run: pnpm -C apps/frontend build
