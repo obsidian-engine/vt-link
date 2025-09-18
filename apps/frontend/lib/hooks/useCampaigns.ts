@@ -1,6 +1,7 @@
 'use client'
 import useSWR from 'swr'
 import { getCampaigns, createCampaign, type CreateCampaignInput } from '../repo'
+import { type Campaign, type ApiResponse } from '../api-client'
 
 export function useCampaigns() {
   const { data, error, isLoading, mutate } = useSWR(
@@ -23,8 +24,8 @@ export function useCreateCampaign() {
     const result = await createCampaign(input)
 
     // Optimistic update
-    await mutate(async (current) => {
-      if (!current) return current
+    await mutate(async (current: ApiResponse<Campaign[]> | undefined) => {
+      if (!current || !result.data) return current
       return {
         ...current,
         data: [result.data, ...(current.data || [])]

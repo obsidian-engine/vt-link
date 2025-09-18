@@ -1,5 +1,6 @@
 'use client'
 import { useCampaigns } from '../../lib/hooks/useCampaigns'
+import { type Campaign } from '../../lib/api-client'
 import Link from 'next/link'
 
 export default function CampaignsPage() {
@@ -32,7 +33,7 @@ export default function CampaignsPage() {
         <div className="bg-white rounded-lg border">
           {campaigns?.length ? (
             <ul className="divide-y">
-              {campaigns.map((campaign) => (
+              {campaigns.map((campaign: Campaign) => (
                 <li key={campaign.id} className="p-4">
                   <div className="flex justify-between items-start">
                     <div>
