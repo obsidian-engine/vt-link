@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: spectral-lint
+        name: Spectral OpenAPI Lint
+        entry: npx @stoplight/spectral-cli lint packages/schema-zod/openapi.yaml
+        language: system
+        files: packages/schema-zod/.*\.yaml$
+
+      - id: check-type-generation
+        name: Check Type Generation
+        entry: bash -c 'pnpm gen && git diff --exit-code -- packages/api-client/src/__generated__/types.ts || (echo "型生成差分あり: pnpm gen を実行してコミットしてください" && exit 1)'
+        language: system
+        files: (packages/schema-zod/.*|packages/api-client/.*)
+        always_run: false
