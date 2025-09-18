@@ -23,8 +23,8 @@ func NewCampaignRepository(db *db.DB) repository.CampaignRepository {
 
 func (r *CampaignRepository) Create(ctx context.Context, campaign *model.Campaign) error {
 	query := `
-		INSERT INTO campaigns (id, title, message, status, scheduled_at, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		INSERT INTO campaigns (id, title, message, status, scheduled_at, sent_at, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	`
 
 	executor := db.GetExecutor(ctx, r.db)
@@ -34,6 +34,7 @@ func (r *CampaignRepository) Create(ctx context.Context, campaign *model.Campaig
 		campaign.Message,
 		campaign.Status,
 		campaign.ScheduledAt,
+		campaign.SentAt,
 		campaign.CreatedAt,
 		campaign.UpdatedAt,
 	)
@@ -47,7 +48,7 @@ func (r *CampaignRepository) Create(ctx context.Context, campaign *model.Campaig
 
 func (r *CampaignRepository) FindByID(ctx context.Context, id uuid.UUID) (*model.Campaign, error) {
 	query := `
-		SELECT id, title, message, status, scheduled_at, created_at, updated_at
+		SELECT id, title, message, status, scheduled_at, sent_at, created_at, updated_at
 		FROM campaigns
 		WHERE id = $1
 	`
@@ -68,7 +69,7 @@ func (r *CampaignRepository) FindByID(ctx context.Context, id uuid.UUID) (*model
 
 func (r *CampaignRepository) List(ctx context.Context, limit, offset int) ([]*model.Campaign, error) {
 	query := `
-		SELECT id, title, message, status, scheduled_at, created_at, updated_at
+		SELECT id, title, message, status, scheduled_at, sent_at, created_at, updated_at
 		FROM campaigns
 		ORDER BY created_at DESC
 		LIMIT $1 OFFSET $2
@@ -88,7 +89,7 @@ func (r *CampaignRepository) List(ctx context.Context, limit, offset int) ([]*mo
 func (r *CampaignRepository) Update(ctx context.Context, campaign *model.Campaign) error {
 	query := `
 		UPDATE campaigns
-		SET title = $2, message = $3, status = $4, scheduled_at = $5, updated_at = $6
+		SET title = $2, message = $3, status = $4, scheduled_at = $5, sent_at = $6, updated_at = $7
 		WHERE id = $1
 	`
 
@@ -99,6 +100,7 @@ func (r *CampaignRepository) Update(ctx context.Context, campaign *model.Campaig
 		campaign.Message,
 		campaign.Status,
 		campaign.ScheduledAt,
+		campaign.SentAt,
 		campaign.UpdatedAt,
 	)
 
@@ -120,7 +122,7 @@ func (r *CampaignRepository) Update(ctx context.Context, campaign *model.Campaig
 
 func (r *CampaignRepository) FindScheduledCampaigns(ctx context.Context, until time.Time, limit int) ([]*model.Campaign, error) {
 	query := `
-		SELECT id, title, message, status, scheduled_at, created_at, updated_at
+		SELECT id, title, message, status, scheduled_at, sent_at, created_at, updated_at
 		FROM campaigns
 		WHERE status = 'scheduled' AND scheduled_at <= $1
 		ORDER BY scheduled_at ASC
