@@ -53,27 +53,3 @@ export function AppLayout({ children }: AppLayoutProps) {
     </div>
   )
 }
-            >
-              <Menu className="h-5 w-5" />
-            </button>
-            <h1 className="text-lg font-semibold drop-shadow">VT-Line</h1>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button type="button" className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground shadow-md hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-              新規メッセージ
-            </button>
-            <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold shadow-md">
-              SA
-            </div>
-          </div>
-        </header>
-
-        {/* Main content */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-10 space-y-12">
-          {children}
-        </main>
-      </div>
-    </div>
-  )
-}
