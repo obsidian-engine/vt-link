@@ -1,7 +1,4 @@
 "use client"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, UserPlus, Target, TrendingUp } from "lucide-react"
 
 export default function AudiencePage() {
@@ -15,164 +12,146 @@ export default function AudiencePage() {
             セグメント作成、タグ付け、属性管理
           </p>
         </div>
-        <Button className="gap-2">
+        <button className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground shadow-md hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
           <UserPlus className="h-4 w-4" />
           セグメント作成
-        </Button>
+        </button>
       </div>
 
       {/* Audience Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">総友だち数</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12,340</div>
-            <p className="text-xs text-muted-foreground">+180 今月</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">アクティブユーザー</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8,920</div>
-            <p className="text-xs text-muted-foreground">72.3% 全体の</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">セグメント数</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">15</div>
-            <p className="text-xs text-muted-foreground">8個 アクティブ</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">新規登録</CardTitle>
-            <UserPlus className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">今日</p>
-          </CardContent>
-        </Card>
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <div className="text-sm font-medium">総友だち数</div>
+            <Users className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          </div>
+        <div className="text-2xl font-bold">12,340</div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">+180 今月</p>
+        </div>
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <div className="text-sm font-medium">アクティブユーザー</div>
+            <TrendingUp className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          </div>
+          <div className="text-2xl font-bold">8,920</div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">72.3% 全体の</p>
+        </div>
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <div className="text-sm font-medium">セグメント数</div>
+            <Target className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          </div>
+          <div className="text-2xl font-bold">15</div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">8個 アクティブ</p>
+        </div>
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <div className="text-sm font-medium">新規登録</div>
+            <UserPlus className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          </div>
+          <div className="text-2xl font-bold">24</div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">今日</p>
+        </div>
       </div>
 
       {/* Segments */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>オーディエンスセグメント</CardTitle>
-              <CardDescription>
-                ターゲット別のオーディエンス管理
-              </CardDescription>
-            </div>
-            <Button variant="outline" size="sm">
-              セグメント編集
-            </Button>
+      <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+        <div className="flex items-center justify-between pb-4 border-b border-white/30 dark:border-slate-700/60">
+          <div>
+            <h2 className="text-base font-semibold">オーディエンスセグメント</h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400">ターゲット別のオーディエンス管理</p>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-semibold">VIPファン</h3>
-                  <span className="text-sm text-muted-foreground">1,234人</span>
-                </div>
-                <p className="text-sm text-muted-foreground mb-3">
-                  高エンゲージメント・購入履歴あり
-                </p>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">配信</Button>
-                </div>
+          <button className="px-3 py-2 rounded-lg border bg-white/50 hover:bg-white/70 transition text-sm">セグメント編集</button>
+        </div>
+        <div className="pt-4 space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold">VIPファン</h3>
+                <span className="text-sm text-slate-600 dark:text-slate-400">1,234人</span>
               </div>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                高エンゲージメント・購入履歴あり
+              </p>
+              <div className="flex gap-2">
+                <button className="px-3 py-1.5 text-sm rounded-md border bg-white/60 hover:bg-white/80">詳細</button>
+                <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">配信</button>
+              </div>
+            </div>
 
               <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">新規ファン</h3>
-                  <span className="text-sm text-muted-foreground">3,456人</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400">3,456人</span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-3">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
                   登録30日以内の新しいファン
                 </p>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">配信</Button>
+                  <button className="px-3 py-1.5 text-sm rounded-md border bg-white/60 hover:bg-white/80">詳細</button>
+                  <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">配信</button>
                 </div>
               </div>
 
               <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">ライブ参加者</h3>
-                  <span className="text-sm text-muted-foreground">2,890人</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400">2,890人</span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-3">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
                   過去3ヶ月のライブ参加履歴あり
                 </p>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">配信</Button>
+                  <button className="px-3 py-1.5 text-sm rounded-md border bg-white/60 hover:bg-white/80">詳細</button>
+                  <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">配信</button>
                 </div>
               </div>
 
               <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">休眠ユーザー</h3>
-                  <span className="text-sm text-muted-foreground">1,567人</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400">1,567人</span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-3">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
                   30日以上アクティビティなし
                 </p>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">復帰策</Button>
+                  <button className="px-3 py-1.5 text-sm rounded-md border bg-white/60 hover:bg-white/80">詳細</button>
+                  <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">復帰策</button>
                 </div>
               </div>
 
               <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">グッズ購入者</h3>
-                  <span className="text-sm text-muted-foreground">890人</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400">890人</span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-3">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
                   過去6ヶ月のグッズ購入履歴
                 </p>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">配信</Button>
+                  <button className="px-3 py-1.5 text-sm rounded-md border bg-white/60 hover:bg-white/80">詳細</button>
+                  <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">配信</button>
                 </div>
               </div>
 
               <div className="rounded-lg border border-white/30 bg-white/30 p-4 hover:bg-white/40 transition-colors">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-semibold">全体</h3>
-                  <span className="text-sm text-muted-foreground">12,340人</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400">12,340人</span>
                 </div>
-                <p className="text-sm text-muted-foreground mb-3">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">
                   すべてのLINE友だち
                 </p>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm">詳細</Button>
-                  <Button variant="ghost" size="sm">配信</Button>
+                  <button className="px-3 py-1.5 text-sm rounded-md border bg-white/60 hover:bg-white/80">詳細</button>
+                  <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">配信</button>
                 </div>
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

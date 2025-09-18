@@ -1,7 +1,4 @@
 "use client"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar, Download, Filter, BarChart3 } from "lucide-react"
 
 export default function HistoryPage() {
@@ -16,76 +13,60 @@ export default function HistoryPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" className="gap-2">
+          <button className="px-3 py-2 rounded-lg border bg-white/50 hover:bg-white/70 transition inline-flex items-center gap-2 text-sm">
             <Filter className="h-4 w-4" />
             フィルター
-          </Button>
-          <Button variant="outline" className="gap-2">
+          </button>
+          <button className="px-3 py-2 rounded-lg border bg-white/50 hover:bg-white/70 transition inline-flex items-center gap-2 text-sm">
             <Download className="h-4 w-4" />
             エクスポート
-          </Button>
+          </button>
         </div>
       </div>
 
       {/* Summary Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">総配信数</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">127</div>
-            <p className="text-xs text-muted-foreground">全期間</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">総リーチ</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1.2M</div>
-            <p className="text-xs text-muted-foreground">累計</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">平均CTR</CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">4.8%</div>
-            <p className="text-xs text-muted-foreground">全期間平均</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">今月配信</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">+8 先月比</p>
-          </CardContent>
-        </Card>
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <div className="text-sm font-medium">総配信数</div>
+            <Calendar className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          </div>
+          <div className="text-2xl font-bold">127</div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">全期間</p>
+        </div>
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <div className="text-sm font-medium">総リーチ</div>
+            <BarChart3 className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          </div>
+          <div className="text-2xl font-bold">1.2M</div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">累計</p>
+        </div>
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <div className="text-sm font-medium">平均CTR</div>
+            <BarChart3 className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          </div>
+          <div className="text-2xl font-bold">4.8%</div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">全期間平均</p>
+        </div>
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <div className="flex flex-row items-center justify-between pb-2">
+            <div className="text-sm font-medium">今月配信</div>
+            <Calendar className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          </div>
+          <div className="text-2xl font-bold">24</div>
+          <p className="text-xs text-slate-600 dark:text-slate-400">+8 先月比</p>
+        </div>
       </div>
 
       {/* History Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>配信履歴詳細</CardTitle>
-          <CardDescription>
-            配信されたメッセージとその結果
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-lg border border-white/30 overflow-hidden">
+      <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+        <h2 className="text-base font-semibold mb-1">配信履歴詳細</h2>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">配信されたメッセージとその結果</p>
+        <div className="rounded-lg border border-white/30 overflow-hidden">
             <table className="min-w-full text-sm">
-              <thead className="text-muted-foreground bg-white/40 dark:bg-slate-800/30">
+              <thead className="text-slate-600 dark:text-slate-400 bg-white/40 dark:bg-slate-800/30">
                 <tr>
                   <th className="px-6 py-3 text-left font-medium">配信日時</th>
                   <th className="px-6 py-3 text-left font-medium">メッセージタイトル</th>
@@ -109,7 +90,7 @@ export default function HistoryPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <Button variant="ghost" size="sm">詳細</Button>
+                    <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">詳細</button>
                   </td>
                 </tr>
 
@@ -125,7 +106,7 @@ export default function HistoryPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <Button variant="ghost" size="sm">詳細</Button>
+                    <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">詳細</button>
                   </td>
                 </tr>
 
@@ -141,7 +122,7 @@ export default function HistoryPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <Button variant="ghost" size="sm">詳細</Button>
+                    <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">詳細</button>
                   </td>
                 </tr>
 
@@ -173,14 +154,13 @@ export default function HistoryPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <Button variant="ghost" size="sm">詳細</Button>
+                    <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">詳細</button>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-        </CardContent>
-      </Card>
+      </div>
     </div>
   )
 }
