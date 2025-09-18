@@ -97,9 +97,9 @@ export default function HomePage() {
               {campaigns.map((c) => (
                 <tr key={`${c.name}-${c.send}`} className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
                   <td className="px-6 py-4">{c.name}</td>
-                  <td className="px-6 py-4 text-right">{c.send.toLocaleString()}</td>
-                  <td className="px-6 py-4 text-right">{c.ctr}%</td>
-                  <td className="px-6 py-4 text-right">{c.cvr}%</td>
+                  <td className="px-6 py-4 text-right">{formatInt(c.send)}</td>
+                  <td className="px-6 py-4 text-right">{formatPct(c.ctr)}</td>
+                  <td className="px-6 py-4 text-right">{formatPct(c.cvr)}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusBadgeClasses(c.status)}`}>
                       {c.status}
@@ -113,4 +113,15 @@ export default function HomePage() {
       </div>
     </div>
   )
+}
+
+const nfInt = new Intl.NumberFormat('ja-JP')
+const nfPct = new Intl.NumberFormat('ja-JP', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+
+function formatInt(n: number): string {
+  return nfInt.format(n)
+}
+
+function formatPct(n: number): string {
+  return `${nfPct.format(n)}%`
 }
