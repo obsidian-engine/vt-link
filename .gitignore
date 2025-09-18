@@ -1,11 +1,2 @@
-.env
+.claude
 .serena
-/.idea/
-.idea
-/.claude/
-docs
-.next
-node_modules
-.playwright-mcp
-.turbo
-apps/api/dist
