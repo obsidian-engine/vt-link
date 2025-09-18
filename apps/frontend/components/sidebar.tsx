@@ -49,6 +49,71 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={cn(
+          "w-64 shrink-0 backdrop-blur-lg bg-white/40 dark:bg-slate-800/40",
+          "border-r border-white/30 dark:border-slate-700/60 flex flex-col gap-6 p-6",
+          "sticky top-0 h-screen shadow-lg",
+          "max-md:fixed max-md:top-0 max-md:h-dvh max-md:transition-all max-md:z-30",
+          isOpen ? "max-md:left-0" : "max-md:-left-72"
+        )}
+        aria-label="メインナビゲーション"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="font-semibold text-xl text-primary drop-shadow">
+            VT-Line
+          </div>
+          <button
+            type="button"
+            aria-label="サイドバーを閉じる"
+            className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            onClick={() => setIsOpen(false)}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex flex-col gap-1 text-sm font-medium">
+          {navigation.map((item) => {
+            const isActive = pathname === item.href
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg px-3 py-2 transition-colors",
+                  "hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                  isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+                onClick={() => setIsOpen(false)}
+              >
+                <item.icon className={cn(
+                  "h-4 w-4",
+                  isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100"
+                )} />
+                {item.name}
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* Footer */}
+        <div className="mt-auto space-y-3">
+          <ThemeToggle />
+          <p className="text-[11px] text-slate-600/80 dark:text-slate-300/80">
+            ローカル優先・個人運用の軽量UI
+          </p>
+        </div>
+      </aside>
+    </>
+  )
+}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
           "fixed left-0 top-0 z-30 h-screen w-64 shrink-0 transform backdrop-blur-lg",
           "bg-white/40 dark:bg-slate-800/40 border-r border-white/30 dark:border-slate-700/60",
           "flex flex-col gap-6 p-6 shadow-lg transition-transform duration-200 ease-in-out",
