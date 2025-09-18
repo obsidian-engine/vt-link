@@ -4,28 +4,48 @@ export default function HomePage() {
     <div className="space-y-12">
       {/* Stats Grid */}
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">友だち数</p>
-          <p className="text-2xl font-bold">12,340</p>
+        <div className="rounded-xl p-6 transition
+                       bg-white/60 dark:bg-slate-800/40
+                       backdrop-blur border border-white/40 dark:border-slate-700/60
+                       shadow-md hover:shadow-lg">
+          <p className="text-[11px] tracking-wide uppercase text-slate-600 dark:text-slate-400 mb-1">友だち数</p>
+          <p className="text-3xl font-bold leading-tight">12,340</p>
+          <p className="text-xs text-slate-500/90 dark:text-slate-400/90 mt-1">前月比 +3.2%</p>
         </div>
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">今月の送信</p>
-          <p className="text-2xl font-bold">8,900 / 15,000</p>
+        <div className="rounded-xl p-6 transition
+                       bg-white/60 dark:bg-slate-800/40
+                       backdrop-blur border border-white/40 dark:border-slate-700/60
+                       shadow-md hover:shadow-lg">
+          <p className="text-[11px] tracking-wide uppercase text-slate-600 dark:text-slate-400 mb-1">今月の送信</p>
+          <p className="text-3xl font-bold leading-tight">8,900</p>
+          <p className="text-xs text-slate-500/90 dark:text-slate-400/90 mt-1">/ 15,000 制限</p>
         </div>
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">平均CTR</p>
-          <p className="text-2xl font-bold">4.8%</p>
+        <div className="rounded-xl p-6 transition
+                       bg-white/60 dark:bg-slate-800/40
+                       backdrop-blur border border-white/40 dark:border-slate-700/60
+                       shadow-md hover:shadow-lg">
+          <p className="text-[11px] tracking-wide uppercase text-slate-600 dark:text-slate-400 mb-1">平均CTR</p>
+          <p className="text-3xl font-bold leading-tight">4.8%</p>
+          <p className="text-xs text-slate-500/90 dark:text-slate-400/90 mt-1">前月比 +0.3%</p>
         </div>
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">今月の売上</p>
-          <p className="text-2xl font-bold">¥540,000</p>
+        <div className="rounded-xl p-6 transition
+                       bg-white/60 dark:bg-slate-800/40
+                       backdrop-blur border border-white/40 dark:border-slate-700/60
+                       shadow-md hover:shadow-lg">
+          <p className="text-[11px] tracking-wide uppercase text-slate-600 dark:text-slate-400 mb-1">今月の売上</p>
+          <p className="text-3xl font-bold leading-tight">¥540,000</p>
+          <p className="text-xs text-slate-500/90 dark:text-slate-400/90 mt-1">前月比 +12.5%</p>
         </div>
       </div>
 
       {/* Recent Campaigns */}
-      <div className="glass dark:glass-dark rounded-lg shadow-soft overflow-hidden">
-        <div className="p-6 border-b border-white/30 dark:border-slate-700/60 font-medium flex items-center justify-between">
-          <span>最近のキャンペーン</span>
+      <div className="rounded-xl overflow-hidden
+                     bg-white/70 dark:bg-slate-800/40
+                     backdrop-blur border border-white/40 dark:border-slate-700/60
+                     shadow-md">
+        <div className="p-6 border-b border-white/50 dark:border-slate-700/60
+                        flex items-center justify-between">
+          <span className="text-sm font-semibold tracking-wide">最近のキャンペーン</span>
           <div className="flex items-center gap-2">
             <button className="text-xs px-3 py-1.5 rounded-md hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors">
               更新
@@ -34,18 +54,20 @@ export default function HomePage() {
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="text-slate-600 dark:text-slate-400 bg-white/40 dark:bg-slate-800/30">
-              <tr>
-                <th className="px-6 py-3 text-left font-medium">キャンペーン名</th>
-                <th className="px-6 py-3 text-right font-medium">送信</th>
-                <th className="px-6 py-3 text-right font-medium">CTR</th>
-                <th className="px-6 py-3 text-right font-medium">CVR</th>
-                <th className="px-6 py-3 text-left font-medium">状態</th>
+            <thead className="text-slate-700/80 dark:text-slate-300
+                             bg-white/60 dark:bg-slate-800/50">
+              <tr className="border-b border-white/50 dark:border-slate-700/60">
+                <th className="px-6 py-3 text-left font-semibold">キャンペーン名</th>
+                <th className="px-6 py-3 text-right font-semibold">送信</th>
+                <th className="px-6 py-3 text-right font-semibold">CTR</th>
+                <th className="px-6 py-3 text-right font-semibold">CVR</th>
+                <th className="px-6 py-3 text-left font-semibold">状態</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/20 dark:divide-slate-700/60">
-              <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
-                <td className="px-6 py-4">夏のセール告知</td>
+            <tbody className="divide-y divide-white/40 dark:divide-slate-700/60">
+              <tr className="transition-colors
+                             hover:bg-white/40 dark:hover:bg-slate-700/50">
+                <td className="px-6 py-4 font-medium">夏のセール告知</td>
                 <td className="px-6 py-4 text-right">5,000</td>
                 <td className="px-6 py-4 text-right">6.2%</td>
                 <td className="px-6 py-4 text-right">1.1%</td>
@@ -55,8 +77,9 @@ export default function HomePage() {
                   </span>
                 </td>
               </tr>
-              <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
-                <td className="px-6 py-4">新スタンプ発売</td>
+              <tr className="transition-colors
+                             hover:bg-white/40 dark:hover:bg-slate-700/50">
+                <td className="px-6 py-4 font-medium">新スタンプ発売</td>
                 <td className="px-6 py-4 text-right">7,800</td>
                 <td className="px-6 py-4 text-right">5.0%</td>
                 <td className="px-6 py-4 text-right">0.9%</td>
@@ -66,8 +89,9 @@ export default function HomePage() {
                   </span>
                 </td>
               </tr>
-              <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
-                <td className="px-6 py-4">限定ライブ招待</td>
+              <tr className="transition-colors
+                             hover:bg-white/40 dark:hover:bg-slate-700/50">
+                <td className="px-6 py-4 font-medium">限定ライブ招待</td>
                 <td className="px-6 py-4 text-right">3,200</td>
                 <td className="px-6 py-4 text-right">7.4%</td>
                 <td className="px-6 py-4 text-right">2.4%</td>
@@ -77,8 +101,9 @@ export default function HomePage() {
                   </span>
                 </td>
               </tr>
-              <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
-                <td className="px-6 py-4">秋の感謝祭ティザー</td>
+              <tr className="transition-colors
+                             hover:bg-white/40 dark:hover:bg-slate-700/50">
+                <td className="px-6 py-4 font-medium">秋の感謝祭ティザー</td>
                 <td className="px-6 py-4 text-right">2,450</td>
                 <td className="px-6 py-4 text-right">6.9%</td>
                 <td className="px-6 py-4 text-right">1.5%</td>
