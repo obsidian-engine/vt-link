@@ -41,6 +41,9 @@
     ".next/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "app/__tests__/**",
+    "vitest.config.ts",
+    "setupTests.ts"
   ]
 }

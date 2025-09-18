@@ -138,7 +138,7 @@ export default function HistoryPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <Button variant="ghost" size="sm">詳細</Button>
+                    <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">詳細</button>
                   </td>
                 </tr>
 
