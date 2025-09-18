@@ -4,11 +4,11 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/google/uuid"
 	"vt-link/backend/internal/application/campaign"
 	"vt-link/backend/internal/infrastructure/di"
 	httphelper "vt-link/backend/internal/infrastructure/http"
 	"vt-link/backend/internal/shared/errx"
-	"github.com/google/uuid"
 )
 
 // Handler Vercel Functions のハンドラ（/api/campaigns/send?id=xxx 形式）

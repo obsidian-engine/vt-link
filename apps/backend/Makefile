@@ -247,25 +247,15 @@ pre-push: check test-full ## Run pre-push checks
 # Environment setup helpers
 .PHONY: env-example
 env-example: ## Create example environment file
-	@cat > .env.example << 'EOF'
-# Database
-DATABASE_URL=postgres://user:pass@localhost:5432/vt_link
-TEST_DATABASE_URL=postgres://user:pass@localhost:5432/vt_link_test
-
-# JWT
-JWT_SECRET=your_jwt_secret_32chars_minimum
-
-# LINE Bot
-LINE_ACCESS_TOKEN=your_line_access_token
-LINE_CHANNEL_ID=your_line_channel_id
-LINE_CHANNEL_SECRET=your_line_channel_secret
-LINE_TARGET_USER_ID=your_test_user_id
-
-# Scheduler
-SCHEDULER_SECRET=your_scheduler_secret
-
-# E2E Testing
-E2E_BASE_URL=http://localhost:3000
-E2E_SKIP=false
-EOF
+	@echo "Creating .env.example file..."
+	@echo "DATABASE_URL=postgres://user:pass@localhost:5432/vt_link" > .env.example
+	@echo "TEST_DATABASE_URL=postgres://user:pass@localhost:5432/vt_link_test" >> .env.example
+	@echo "JWT_SECRET=your_jwt_secret_32chars_minimum" >> .env.example
+	@echo "LINE_ACCESS_TOKEN=your_line_access_token" >> .env.example
+	@echo "LINE_CHANNEL_ID=your_line_channel_id" >> .env.example
+	@echo "LINE_CHANNEL_SECRET=your_line_channel_secret" >> .env.example
+	@echo "LINE_TARGET_USER_ID=your_test_user_id" >> .env.example
+	@echo "SCHEDULER_SECRET=your_scheduler_secret" >> .env.example
+	@echo "E2E_BASE_URL=http://localhost:3000" >> .env.example
+	@echo "E2E_SKIP=false" >> .env.example
 	@echo "Created .env.example file"

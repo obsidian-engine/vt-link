@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/google/uuid"
 	"vt-link/backend/internal/domain/model"
 	"vt-link/backend/internal/domain/repository"
 	"vt-link/backend/internal/domain/service"
 	"vt-link/backend/internal/shared/clock"
 	"vt-link/backend/internal/shared/errx"
-	"github.com/google/uuid"
 )
 
 type Interactor struct {
@@ -35,11 +35,11 @@ func NewInteractor(
 }
 
 func (i *Interactor) CreateCampaign(ctx context.Context, input *CreateCampaignInput) (*model.Campaign, error) {
-	if input.Title == "" || input.Body == "" {
+	if input.Title == "" || input.Message == "" {
 		return nil, errx.ErrInvalidInput
 	}
 
-	campaign := model.NewCampaign(input.Title, input.Body)
+	campaign := model.NewCampaign(input.Title, input.Message)
 
 	err := i.campaignRepo.Create(ctx, campaign)
 	if err != nil {
@@ -93,7 +93,7 @@ func (i *Interactor) SendCampaign(ctx context.Context, input *SendCampaignInput)
 		}
 
 		// LINE Push送信
-		message := fmt.Sprintf("%s\n\n%s", campaign.Title, campaign.Body)
+		message := fmt.Sprintf("%s\n\n%s", campaign.Title, campaign.Message)
 		err = i.pusher.PushText(ctx, message)
 		if err != nil {
 			log.Printf("Failed to push message: %v", err)

@@ -236,7 +236,7 @@ func (s *CampaignAPIE2ETestSuite) TestCompleteWorkflow() {
 	}
 
 	// 送信されたキャンペーンとドラフトキャンペーンの数を確認
-	expectedSent := (len(campaigns) + 1) / 2  // 偶数番目の数
+	expectedSent := (len(campaigns) + 1) / 2 // 偶数番目の数
 	expectedDraft := len(campaigns) - expectedSent
 	assert.Equal(s.T(), expectedSent, sentCount)
 	assert.Equal(s.T(), expectedDraft, draftCount)

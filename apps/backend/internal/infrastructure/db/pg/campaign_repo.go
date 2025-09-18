@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/jmoiron/sqlx"
 	"vt-link/backend/internal/domain/model"
 	"vt-link/backend/internal/domain/repository"
 	"vt-link/backend/internal/infrastructure/db"
-	"github.com/google/uuid"
 )
 
 type CampaignRepository struct {
@@ -22,7 +23,7 @@ func NewCampaignRepository(db *db.DB) repository.CampaignRepository {
 
 func (r *CampaignRepository) Create(ctx context.Context, campaign *model.Campaign) error {
 	query := `
-		INSERT INTO campaigns (id, title, body, status, scheduled_at, created_at, updated_at)
+		INSERT INTO campaigns (id, title, message, status, scheduled_at, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 	`
 
@@ -30,7 +31,7 @@ func (r *CampaignRepository) Create(ctx context.Context, campaign *model.Campaig
 	_, err := executor.ExecContext(ctx, query,
 		campaign.ID,
 		campaign.Title,
-		campaign.Body,
+		campaign.Message,
 		campaign.Status,
 		campaign.ScheduledAt,
 		campaign.CreatedAt,
@@ -46,7 +47,7 @@ func (r *CampaignRepository) Create(ctx context.Context, campaign *model.Campaig
 
 func (r *CampaignRepository) FindByID(ctx context.Context, id uuid.UUID) (*model.Campaign, error) {
 	query := `
-		SELECT id, title, body, status, scheduled_at, created_at, updated_at
+		SELECT id, title, message, status, scheduled_at, created_at, updated_at
 		FROM campaigns
 		WHERE id = $1
 	`
@@ -54,7 +55,7 @@ func (r *CampaignRepository) FindByID(ctx context.Context, id uuid.UUID) (*model
 	executor := db.GetExecutor(ctx, r.db)
 
 	var campaign model.Campaign
-	err := executor.GetContext(ctx, &campaign, query, id)
+	err := sqlx.GetContext(ctx, executor, &campaign, query, id)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, fmt.Errorf("campaign not found")
@@ -67,7 +68,7 @@ func (r *CampaignRepository) FindByID(ctx context.Context, id uuid.UUID) (*model
 
 func (r *CampaignRepository) List(ctx context.Context, limit, offset int) ([]*model.Campaign, error) {
 	query := `
-		SELECT id, title, body, status, scheduled_at, created_at, updated_at
+		SELECT id, title, message, status, scheduled_at, created_at, updated_at
 		FROM campaigns
 		ORDER BY created_at DESC
 		LIMIT $1 OFFSET $2
@@ -76,7 +77,7 @@ func (r *CampaignRepository) List(ctx context.Context, limit, offset int) ([]*mo
 	executor := db.GetExecutor(ctx, r.db)
 
 	var campaigns []*model.Campaign
-	err := executor.SelectContext(ctx, &campaigns, query, limit, offset)
+	err := sqlx.SelectContext(ctx, executor, &campaigns, query, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list campaigns: %w", err)
 	}
@@ -87,7 +88,7 @@ func (r *CampaignRepository) List(ctx context.Context, limit, offset int) ([]*mo
 func (r *CampaignRepository) Update(ctx context.Context, campaign *model.Campaign) error {
 	query := `
 		UPDATE campaigns
-		SET title = $2, body = $3, status = $4, scheduled_at = $5, updated_at = $6
+		SET title = $2, message = $3, status = $4, scheduled_at = $5, updated_at = $6
 		WHERE id = $1
 	`
 
@@ -95,7 +96,7 @@ func (r *CampaignRepository) Update(ctx context.Context, campaign *model.Campaig
 	result, err := executor.ExecContext(ctx, query,
 		campaign.ID,
 		campaign.Title,
-		campaign.Body,
+		campaign.Message,
 		campaign.Status,
 		campaign.ScheduledAt,
 		campaign.UpdatedAt,
@@ -119,7 +120,7 @@ func (r *CampaignRepository) Update(ctx context.Context, campaign *model.Campaig
 
 func (r *CampaignRepository) FindScheduledCampaigns(ctx context.Context, until time.Time, limit int) ([]*model.Campaign, error) {
 	query := `
-		SELECT id, title, body, status, scheduled_at, created_at, updated_at
+		SELECT id, title, message, status, scheduled_at, created_at, updated_at
 		FROM campaigns
 		WHERE status = 'scheduled' AND scheduled_at <= $1
 		ORDER BY scheduled_at ASC
@@ -129,7 +130,7 @@ func (r *CampaignRepository) FindScheduledCampaigns(ctx context.Context, until t
 	executor := db.GetExecutor(ctx, r.db)
 
 	var campaigns []*model.Campaign
-	err := executor.SelectContext(ctx, &campaigns, query, until, limit)
+	err := sqlx.SelectContext(ctx, executor, &campaigns, query, until, limit)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find scheduled campaigns: %w", err)
 	}
