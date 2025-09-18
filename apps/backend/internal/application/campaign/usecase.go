@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"vt-link/backend/internal/domain/model"
 	"github.com/google/uuid"
+	"vt-link/backend/internal/domain/model"
 )
 
 type CreateCampaignInput struct {

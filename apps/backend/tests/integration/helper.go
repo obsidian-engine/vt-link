@@ -2,7 +2,6 @@ package integration
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"os"
 	"testing"
@@ -11,14 +10,12 @@ import (
 	_ "github.com/lib/pq"
 
 	"vt-link/backend/internal/infrastructure/db"
-	"vt-link/backend/internal/infrastructure/db/pg"
 	"vt-link/backend/internal/infrastructure/di"
 )
 
 // TestDB テスト用のデータベース接続を管理する構造体
 type TestDB struct {
-	DB       *sqlx.DB
-	connPool *db.ConnectionPool
+	DB *sqlx.DB
 }
 
 // SetupTestDB テスト用のデータベースをセットアップ
@@ -33,16 +30,10 @@ func SetupTestDB(t *testing.T) *TestDB {
 		t.Fatal("TEST_DATABASE_URL environment variable is required for integration tests")
 	}
 
-	// データベース接続プールを作成
-	connPool, err := db.NewConnectionPool(testDBURL)
+	// データベース接続を作成
+	testDB, err := sqlx.Open("postgres", testDBURL)
 	if err != nil {
-		t.Fatalf("Failed to create connection pool: %v", err)
-	}
-
-	// データベース接続を取得
-	testDB, err := connPool.GetDB()
-	if err != nil {
-		t.Fatalf("Failed to get database connection: %v", err)
+		t.Fatalf("Failed to open database connection: %v", err)
 	}
 
 	// データベース接続をテスト
@@ -51,15 +42,14 @@ func SetupTestDB(t *testing.T) *TestDB {
 	}
 
 	return &TestDB{
-		DB:       testDB,
-		connPool: connPool,
+		DB: testDB,
 	}
 }
 
 // TeardownTestDB テスト用データベースのクリーンアップ
 func (tdb *TestDB) TeardownTestDB() {
-	if tdb.connPool != nil {
-		tdb.connPool.Close()
+	if tdb.DB != nil {
+		tdb.DB.Close()
 	}
 }
 
@@ -126,16 +116,12 @@ func (tdb *TestDB) CreateTestCampaign(t *testing.T, title, message string) strin
 
 // TestContainer 結合テスト用のDIコンテナを作成
 func SetupTestContainer(t *testing.T, testDB *TestDB) *di.Container {
-	// テスト用のPusherモック（実際のLINE APIを呼ばない）
-	mockPusher := &MockPusher{}
-
-	// リポジトリを作成
-	campaignRepo := pg.NewCampaignRepository(testDB.DB)
+	// DB構造体でラップ
+	dbWrapper := &db.DB{DB: testDB.DB}
 
 	// コンテナを作成
 	container := &di.Container{
-		CampaignRepository: campaignRepo,
-		PushService:        mockPusher,
+		DB: dbWrapper,
 	}
 
 	return container

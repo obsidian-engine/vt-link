@@ -1,8 +1,8 @@
 package model
 
 import (
-	"time"
 	"github.com/google/uuid"
+	"time"
 )
 
 type CampaignStatus string
@@ -27,18 +27,18 @@ type Campaign struct {
 
 // CanSend ビジネスルール：送信可能かどうか
 func (c *Campaign) CanSend() bool {
-    return c.Status == CampaignStatusDraft || c.Status == CampaignStatusScheduled || c.Status == CampaignStatusFailed
+	return c.Status == CampaignStatusDraft || c.Status == CampaignStatusScheduled || c.Status == CampaignStatusFailed
 }
 
 // MarkAsSent 送信済みにマーク
 func (c *Campaign) MarkAsSent() {
-    // 冪等性: 既に送信済みなら更新しない
-    if c.Status != CampaignStatusSent || c.SentAt == nil {
-        now := time.Now()
-        c.SentAt = &now
-    }
-    c.Status = CampaignStatusSent
-    c.UpdatedAt = time.Now()
+	// 冪等性: 既に送信済みなら更新しない
+	if c.Status != CampaignStatusSent || c.SentAt == nil {
+		now := time.Now()
+		c.SentAt = &now
+	}
+	c.Status = CampaignStatusSent
+	c.UpdatedAt = time.Now()
 }
 
 // MarkAsFailed 失敗にマーク

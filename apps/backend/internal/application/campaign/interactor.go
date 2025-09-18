@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/google/uuid"
 	"vt-link/backend/internal/domain/model"
 	"vt-link/backend/internal/domain/repository"
 	"vt-link/backend/internal/domain/service"
 	"vt-link/backend/internal/shared/clock"
 	"vt-link/backend/internal/shared/errx"
-	"github.com/google/uuid"
 )
 
 type Interactor struct {

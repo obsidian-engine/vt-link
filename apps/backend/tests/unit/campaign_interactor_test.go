@@ -1,9 +1,9 @@
 package unit
 
 import (
-    "context"
-    "testing"
-    "time"
+	"context"
+	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
@@ -19,10 +19,10 @@ import (
 
 type CampaignInteractorTestSuite struct {
 	suite.Suite
-	interactor   campaign.Usecase
-	mockRepo     *repoMocks.MockCampaignRepository
-	mockPusher   *serviceMocks.MockPusher
-	ctx          context.Context
+	interactor campaign.Usecase
+	mockRepo   *repoMocks.MockCampaignRepository
+	mockPusher *serviceMocks.MockPusher
+	ctx        context.Context
 }
 
 func (s *CampaignInteractorTestSuite) SetupTest() {
