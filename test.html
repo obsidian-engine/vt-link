@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VT-Line – Light Blue Liquid Mock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: "#3b82f6",
+                            fg: "#ffffff",
+                        },
+                    },
+                    borderRadius: {
+                        lg: "0.8rem",
+                        xl: "1.2rem",
+                    },
+                    boxShadow: {
+                        soft: "0 8px 30px rgba(2, 6, 23, 0.08)",
+                    },
+                },
+            },
+        };
+    </script>
+    <style>
+        /* ---------- Soft aqua / light-blue liquid background ---------- */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -20;
+            background:
+                    radial-gradient(at 25% 35%, rgba(164,218,255,.9) 0%, transparent 60%),
+                    radial-gradient(at 75% 80%, rgba(195,235,255,.8) 0%, transparent 60%),
+                    linear-gradient(120deg, #eaf6ff 0%, #f6fbff 100%);
+            filter: blur(90px) saturate(130%);
+        }
+        /* glass cards */
+        .glass { background: rgba(255,255,255,.55); backdrop-filter: saturate(170%) blur(18px); }
+        .glass-dark { background: rgba(30,41,59,.35); backdrop-filter: saturate(150%) blur(28px); }
+        /* reduce motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            * { scroll-behavior: auto !important; transition: none !important; }
+        }
+    </style>
+</head>
+<body class="text-slate-900 dark:text-slate-100 min-h-screen antialiased">
+
+<!-- App Shell -->
+<div class="flex min-h-screen">
+
+    <!-- Sidebar -->
+    <aside
+            id="sidebar"
+            class="w-64 shrink-0 backdrop-blur-lg bg-white/40 dark:bg-slate-800/40 border-r border-white/30 dark:border-slate-700/60 flex flex-col gap-6 p-6 sticky top-0 h-screen shadow-lg max-md:fixed max-md:-left-72 max-md:top-0 max-md:h-dvh max-md:transition-all"
+            aria-label="メインナビゲーション"
+    >
+        <div class="flex items-center justify-between">
+            <div class="font-semibold text-xl text-primary drop-shadow">VT-Line</div>
+            <button
+                    id="closeSidebarBtn"
+                    class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    aria-label="サイドバーを閉じる"
+            >
+                <!-- X icon -->
+                <svg viewBox="0 0 24 24" class="w-5 h-5"><path fill="currentColor" d="M6.4 6.4l11.2 11.2m0-11.2L6.4 17.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            </button>
+        </div>
+
+        <nav class="flex flex-col gap-1 text-sm font-medium" id="nav">
+            <!-- data-page は #id と一致 -->
+            <a href="#" data-page="dashboard" class="nav group px-3 py-2 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary flex items-center gap-2">
+                <svg viewBox="0 0 24 24" class="w-4 h-4 opacity-70 group-hover:opacity-100"><path fill="currentColor" d="M4 11h6V4H4v7zm0 9h6v-7H4v7zm10 0h6v-7h-6v7zm0-9h6V4h-6v7z"/></svg>
+                ダッシュボード
+            </a>
+            <a href="#" data-page="messages" class="nav px-3 py-2 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">メッセージ</a>
+            <a href="#" data-page="audience" class="nav px-3 py-2 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">オーディエンス</a>
+            <a href="#" data-page="history" class="nav px-3 py-2 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">履歴</a>
+            <a href="#" data-page="richmenu" class="nav px-3 py-2 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">リッチメニュー</a>
+            <a href="#" data-page="autoreply" class="nav px-3 py-2 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">自動返信</a>
+            <a href="#" data-page="settings" class="nav px-3 py-2 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">設定</a>
+        </nav>
+
+        <div class="mt-auto space-y-3">
+            <button
+                    id="themeToggle"
+                    class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg glass dark:glass-dark shadow-md hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    aria-pressed="false"
+            >
+                <span class="text-sm">テーマ切替</span>
+                <svg id="themeIcon" viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="M12 3a1 1 0 0 1 1 1v1.1a6.9 6.9 0 1 1-2.2 0V4a1 1 0 0 1 1-1z"/></svg>
+            </button>
+            <p class="text-[11px] text-slate-600/80 dark:text-slate-300/80">ローカル優先・個人運用の軽量UI</p>
+        </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="flex-1 flex flex-col">
+
+        <!-- Topbar -->
+        <header
+                class="h-16 flex items-center justify-between px-4 md:px-8 sticky top-0 bg-white/50 dark:bg-slate-800/50 backdrop-blur-lg border-b border-white/30 dark:border-slate-700/60 shadow-sm"
+                role="banner"
+        >
+            <div class="flex items-center gap-2">
+                <button
+                        id="openSidebarBtn"
+                        class="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        aria-label="サイドバーを開く"
+                >
+                    <!-- burger -->
+                    <svg viewBox="0 0 24 24" class="w-5 h-5"><path fill="currentColor" d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                </button>
+                <h1 id="page-title" class="text-lg font-semibold drop-shadow">ダッシュボード</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <button
+                        id="quickNewMsg"
+                        class="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-fg shadow-md hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                    <svg viewBox="0 0 24 24" class="w-4 h-4"><path fill="currentColor" d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    新規メッセージ
+                </button>
+                <div
+                        class="w-9 h-9 rounded-full bg-primary text-primary-fg flex items-center justify-center text-sm font-semibold shadow-md"
+                        aria-label="サインインアバター"
+                >
+                    SA
+                </div>
+            </div>
+        </header>
+
+        <!-- Content -->
+        <main class="flex-1 overflow-y-auto p-6 md:p-10 space-y-12" role="main">
+
+            <!-- Dashboard -->
+            <section id="dashboard" class="page space-y-12">
+                <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+                    <div class="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mb-1">友だち数</p>
+                        <p class="text-2xl font-bold" id="statFriends">12,340</p>
+                    </div>
+                    <div class="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mb-1">今月の送信</p>
+                        <p class="text-2xl font-bold" id="statSends">8,900 / 15,000</p>
+                    </div>
+                    <div class="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mb-1">平均CTR</p>
+                        <p class="text-2xl font-bold" id="statCTR">4.8%</p>
+                    </div>
+                    <div class="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mb-1">今月の売上</p>
+                        <p class="text-2xl font-bold" id="statSales">¥540,000</p>
+                    </div>
+                </div>
+
+                <div class="glass dark:glass-dark rounded-lg shadow-soft overflow-hidden">
+                    <div class="p-6 border-b border-white/30 dark:border-slate-700/60 font-medium flex items-center justify-between">
+                        <span>最近のキャンペーン</span>
+                        <div class="flex items-center gap-2">
+                            <button id="refreshCampaigns" class="text-xs px-3 py-1.5 rounded-md hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">更新</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm">
+                            <thead class="text-slate-600 dark:text-slate-400 bg-white/40 dark:bg-slate-800/30">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-medium">キャンペーン名</th>
+                                <th class="px-6 py-3 text-right font-medium">送信</th>
+                                <th class="px-6 py-3 text-right font-medium">CTR</th>
+                                <th class="px-6 py-3 text-right font-medium">CVR</th>
+                                <th class="px-6 py-3 text-left font-medium">状態</th>
+                            </tr>
+                            </thead>
+                            <tbody id="campaignTbody" class="divide-y divide-white/20 dark:divide-slate-700/60">
+                            <!-- 初期データ -->
+                            <tr class="hover:bg-white/30 dark:hover:bg-slate-700/40 transition">
+                                <td class="px-6 py-4">夏のセール告知</td>
+                                <td class="px-6 py-4 text-right">5,000</td>
+                                <td class="px-6 py-4 text-right">6.2%</td>
+                                <td class="px-6 py-4 text-right">1.1%</td>
+                                <td class="px-6 py-4"><span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-700 dark:text-green-400">配信中</span></td>
+                            </tr>
+                            <tr class="hover:bg-white/30 dark:hover:bg-slate-700/40 transition">
+                                <td class="px-6 py-4">新スタンプ発売</td>
+                                <td class="px-6 py-4 text-right">7,800</td>
+                                <td class="px-6 py-4 text-right">5.0%</td>
+                                <td class="px-6 py-4 text-right">0.9%</td>
+                                <td class="px-6 py-4"><span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-700 dark:text-red-400">終了</span></td>
+                            </tr>
+                            <tr class="hover:bg-white/30 dark:hover:bg-slate-700/40 transition">
+                                <td class="px-6 py-4">限定ライブ招待</td>
+                                <td class="px-6 py-4 text-right">3,200</td>
+                                <td class="px-6 py-4 text-right">7.4%</td>
+                                <td class="px-6 py-4 text-right">2.4%</td>
+                                <td class="px-6 py-4"><span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-400/15 text-yellow-700 dark:text-yellow-300">一時停止</span></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Messages -->
+            <section id="messages" class="page hidden space-y-6">
+                <div class="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-base font-semibold">メッセージ（モック）</h2>
+                        <button class="px-3 py-2 rounded-lg bg-primary text-primary-fg shadow-md hover:shadow-lg">新規作成</button>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400">配信用テンプレートやスケジュールの一覧をここに表示します。</p>
+                </div>
+            </section>
+
+            <!-- Audience -->
+            <section id="audience" class="page hidden space-y-6">
+                <div class="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+                    <h2 class="text-base font-semibold mb-2">オーディエンス（モック）</h2>
+                    <p class="text-slate-600 dark:text-slate-400">セグメント作成、タグ付け、属性管理など。</p>
+                </div>
+            </section>
+
+            <!-- History -->
+            <section id="history" class="page hidden space-y-6">
+                <div class="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+                    <h2 class="text-base font-semibold mb-2">履歴（モック）</h2>
+                    <p class="text-slate-600 dark:text-slate-400">過去の配信・結果を一覧表示。</p>
+                </div>
+            </section>
+
+            <!-- Rich Menu -->
+            <section id="richmenu" class="page hidden space-y-6">
+                <div class="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+                    <h2 class="text-base font-semibold mb-2">リッチメニュー（モック）</h2>
+                    <p class="text-slate-600 dark:text-slate-400">画像アップロード、エリア設定、プレビューなど。</p>
+                </div>
+            </section>
+
+            <!-- Auto Reply -->
+            <section id="autoreply" class="page hidden space-y-6">
+                <div class="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+                    <h2 class="text-base font-semibold mb-2">自動返信（モック）</h2>
+                    <p class="text-slate-600 dark:text-slate-400">キーワード応答、営業時間内応答など。</p>
+                </div>
+            </section>
+
+            <!-- Settings -->
+            <section id="settings" class="page hidden space-y-6">
+                <div class="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+                    <h2 class="text-base font-semibold mb-4">設定</h2>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="block text-xs text-slate-600 dark:text-slate-400 mb-1">表示名</label>
+                            <input type="text" class="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary" placeholder="チャンネル名" value="長月 朔（サンプル）">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-600 dark:text-slate-400 mb-1">タイムゾーン</label>
+                            <select class="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+                                <option>Asia/Tokyo (UTC+9)</option>
+                                <option>UTC</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button class="px-3 py-2 rounded-lg bg-primary text-primary-fg shadow-md hover:shadow-lg">保存</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- Minimal Router / Theme / Demo Data -->
+<script>
+    (function () {
+        const html = document.documentElement;
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const savedTheme = localStorage.getItem('vtline_theme');
+        if ((savedTheme === 'dark') || (!savedTheme && prefersDark)) html.classList.add('dark');
+
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        themeToggle?.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            const isDark = html.classList.contains('dark');
+            localStorage.setItem('vtline_theme', isDark ? 'dark' : 'light');
+            themeToggle.setAttribute('aria-pressed', String(isDark));
+            themeIcon.innerHTML = isDark
+                ? '<path fill="currentColor" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+                : '<path fill="currentColor" d="M12 5v14m-7-7h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>';
+        });
+
+        const nav = document.getElementById('nav');
+        const links = nav?.querySelectorAll('.nav') ?? [];
+        const pages = document.querySelectorAll('.page');
+        const titleEl = document.getElementById('page-title');
+
+        function setActive(pageId) {
+            pages.forEach(sec => sec.classList.toggle('hidden', sec.id !== pageId));
+            links.forEach(a => {
+                const active = a.getAttribute('data-page') === pageId;
+                a.classList.toggle('bg-primary/10', active);
+                a.classList.toggle('text-slate-800', active);
+                if (active) { a.setAttribute('aria-current', 'page'); } else { a.removeAttribute('aria-current'); }
+            });
+            const map = {
+                dashboard: 'ダッシュボード',
+                messages: 'メッセージ',
+                audience: 'オーディエンス',
+                history: '履歴',
+                richmenu: 'リッチメニュー',
+                autoreply: '自動返信',
+                settings: '設定',
+            };
+            titleEl.textContent = map[pageId] || 'VT-Line';
+            localStorage.setItem('vtline_last_page', pageId);
+        }
+
+        // initial page
+        const last = localStorage.getItem('vtline_last_page') || 'dashboard';
+        setActive(last);
+
+        // nav click
+        links.forEach(a => {
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = a.getAttribute('data-page');
+                if (target) setActive(target);
+                if (window.innerWidth < 768) closeSidebar(); // auto close on mobile
+            });
+        });
+
+        // Sidebar open/close for mobile
+        const sidebar = document.getElementById('sidebar');
+        const openBtn = document.getElementById('openSidebarBtn');
+        const closeBtn = document.getElementById('closeSidebarBtn');
+        function openSidebar() { sidebar.style.left = '0'; }
+        function closeSidebar() { sidebar.style.left = '-18rem'; }
+        openBtn?.addEventListener('click', openSidebar);
+        closeBtn?.addEventListener('click', closeSidebar);
+
+        // Quick demo actions
+        document.getElementById('refreshCampaigns')?.addEventListener('click', () => {
+            const tbody = document.getElementById('campaignTbody');
+            if (!tbody) return;
+            const row = document.createElement('tr');
+            row.className = 'hover:bg-white/30 dark:hover:bg-slate-700/40 transition';
+            row.innerHTML = `
+        <td class="px-6 py-4">秋の感謝祭ティザー</td>
+        <td class="px-6 py-4 text-right">2,450</td>
+        <td class="px-6 py-4 text-right">6.9%</td>
+        <td class="px-6 py-4 text-right">1.5%</td>
+        <td class="px-6 py-4"><span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/15 text-blue-700 dark:text-blue-400">準備中</span></td>
+      `;
+            tbody.prepend(row);
+        });
+
+        // Simple new message shortcut
+        document.getElementById('quickNewMsg')?.addEventListener('click', () => {
+            setActive('messages');
+        });
+    })();
+</script>
+
+</body>
+</html>

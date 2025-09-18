@@ -1,3 +1,6 @@
 .claude
 .serena
 .idea
+apps/frontend/node_modules
+node_modules/.bin
+node_modules

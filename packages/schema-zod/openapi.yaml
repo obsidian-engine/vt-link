@@ -1,0 +1,1903 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "VT-Link Manager API",
+    "description": "VTuber向けLINE公式アカウント統合管理プラットフォーム API",
+    "contact": {
+      "name": "VT-Link Team",
+      "email": "api@vt-link.example.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "ローカル開発環境"
+    },
+    {
+      "url": "https://api.vt-link.example.com",
+      "description": "本番環境"
+    }
+  ],
+  "tags": [
+    {
+      "name": "campaigns",
+      "description": "キャンペーン管理API"
+    },
+    {
+      "name": "fans",
+      "description": "ファン管理API"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Campaign": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "キャンペーンID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "キャンペーンタイトル",
+            "example": "新商品リリース記念キャンペーン"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "description": "キャンペーン本文",
+            "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
+          },
+          "imageUrl": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "description": "画像URL",
+            "example": "https://example.com/image.jpg"
+          },
+          "scheduledAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "配信予定日時 (ISO 8601)",
+            "example": "2025-01-15T10:00:00Z"
+          },
+          "sentAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "配信日時 (ISO 8601)",
+            "example": "2025-01-15T10:00:00Z"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "scheduled",
+              "sent",
+              "failed"
+            ],
+            "description": "キャンペーンのステータス",
+            "example": "draft"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "作成日時 (ISO 8601)",
+            "example": "2025-01-10T09:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新日時 (ISO 8601)",
+            "example": "2025-01-10T09:00:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "body",
+          "imageUrl",
+          "scheduledAt",
+          "sentAt",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ],
+        "description": "キャンペーン情報",
+        "example": {
+          "id": "550e8400-e29b-41d4-a716-446655440000",
+          "title": "新商品リリース記念キャンペーン",
+          "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
+          "imageUrl": "https://example.com/image.jpg",
+          "scheduledAt": "2025-01-15T10:00:00Z",
+          "sentAt": null,
+          "status": "scheduled",
+          "createdAt": "2025-01-10T09:00:00Z",
+          "updatedAt": "2025-01-10T09:00:00Z"
+        }
+      },
+      "CreateCampaignRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "imageUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "scheduledAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "scheduled"
+            ],
+            "default": "draft"
+          }
+        },
+        "required": [
+          "title",
+          "body"
+        ],
+        "description": "キャンペーン作成リクエスト"
+      },
+      "UpdateCampaignRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "imageUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "scheduledAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "scheduled"
+            ],
+            "default": "draft"
+          }
+        },
+        "description": "キャンペーン更新リクエスト"
+      },
+      "CampaignListResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "キャンペーンID",
+                  "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "title": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 100,
+                  "description": "キャンペーンタイトル",
+                  "example": "新商品リリース記念キャンペーン"
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000,
+                  "description": "キャンペーン本文",
+                  "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
+                },
+                "imageUrl": {
+                  "type": "string",
+                  "nullable": true,
+                  "format": "uri",
+                  "description": "画像URL",
+                  "example": "https://example.com/image.jpg"
+                },
+                "scheduledAt": {
+                  "type": "string",
+                  "nullable": true,
+                  "format": "date-time",
+                  "description": "配信予定日時 (ISO 8601)",
+                  "example": "2025-01-15T10:00:00Z"
+                },
+                "sentAt": {
+                  "type": "string",
+                  "nullable": true,
+                  "format": "date-time",
+                  "description": "配信日時 (ISO 8601)",
+                  "example": "2025-01-15T10:00:00Z"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "draft",
+                    "scheduled",
+                    "sent",
+                    "failed"
+                  ],
+                  "description": "キャンペーンのステータス",
+                  "example": "draft"
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "作成日時 (ISO 8601)",
+                  "example": "2025-01-10T09:00:00Z"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "更新日時 (ISO 8601)",
+                  "example": "2025-01-10T09:00:00Z"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "body",
+                "imageUrl",
+                "scheduledAt",
+                "sentAt",
+                "status",
+                "createdAt",
+                "updatedAt"
+              ],
+              "description": "キャンペーン情報",
+              "example": {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "title": "新商品リリース記念キャンペーン",
+                "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
+                "imageUrl": "https://example.com/image.jpg",
+                "scheduledAt": "2025-01-15T10:00:00Z",
+                "sentAt": null,
+                "status": "scheduled",
+                "createdAt": "2025-01-10T09:00:00Z",
+                "updatedAt": "2025-01-10T09:00:00Z"
+              }
+            }
+          }
+        },
+        "required": [
+          "ok",
+          "data"
+        ],
+        "description": "キャンペーン一覧レスポンス"
+      },
+      "CampaignResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "キャンペーンID",
+                "example": "550e8400-e29b-41d4-a716-446655440000"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100,
+                "description": "キャンペーンタイトル",
+                "example": "新商品リリース記念キャンペーン"
+              },
+              "body": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000,
+                "description": "キャンペーン本文",
+                "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
+              },
+              "imageUrl": {
+                "type": "string",
+                "nullable": true,
+                "format": "uri",
+                "description": "画像URL",
+                "example": "https://example.com/image.jpg"
+              },
+              "scheduledAt": {
+                "type": "string",
+                "nullable": true,
+                "format": "date-time",
+                "description": "配信予定日時 (ISO 8601)",
+                "example": "2025-01-15T10:00:00Z"
+              },
+              "sentAt": {
+                "type": "string",
+                "nullable": true,
+                "format": "date-time",
+                "description": "配信日時 (ISO 8601)",
+                "example": "2025-01-15T10:00:00Z"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "draft",
+                  "scheduled",
+                  "sent",
+                  "failed"
+                ],
+                "description": "キャンペーンのステータス",
+                "example": "draft"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "作成日時 (ISO 8601)",
+                "example": "2025-01-10T09:00:00Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "更新日時 (ISO 8601)",
+                "example": "2025-01-10T09:00:00Z"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "body",
+              "imageUrl",
+              "scheduledAt",
+              "sentAt",
+              "status",
+              "createdAt",
+              "updatedAt"
+            ],
+            "description": "キャンペーン情報",
+            "example": {
+              "id": "550e8400-e29b-41d4-a716-446655440000",
+              "title": "新商品リリース記念キャンペーン",
+              "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
+              "imageUrl": "https://example.com/image.jpg",
+              "scheduledAt": "2025-01-15T10:00:00Z",
+              "sentAt": null,
+              "status": "scheduled",
+              "createdAt": "2025-01-10T09:00:00Z",
+              "updatedAt": "2025-01-10T09:00:00Z"
+            }
+          }
+        },
+        "required": [
+          "ok",
+          "data"
+        ],
+        "description": "キャンペーンレスポンス"
+      },
+      "Fan": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ファンID",
+            "example": "660e8400-e29b-41d4-a716-446655440000"
+          },
+          "lineUserId": {
+            "type": "string",
+            "description": "LINE ユーザーID",
+            "example": "U1234567890abcdef1234567890abcdef"
+          },
+          "displayName": {
+            "type": "string",
+            "nullable": true,
+            "description": "表示名",
+            "example": "ファン太郎"
+          },
+          "pictureUrl": {
+            "type": "string",
+            "nullable": true,
+            "format": "uri",
+            "description": "プロフィール画像URL",
+            "example": "https://profile.line-scdn.net/..."
+          },
+          "followedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "フォロー日時 (ISO 8601)",
+            "example": "2025-01-01T00:00:00Z"
+          },
+          "lastInteractionAt": {
+            "type": "string",
+            "nullable": true,
+            "format": "date-time",
+            "description": "最終インタラクション日時 (ISO 8601)",
+            "example": "2025-01-10T15:30:00Z"
+          },
+          "isBlocked": {
+            "type": "boolean",
+            "default": false,
+            "description": "ブロック状態",
+            "example": false
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "ファンタグ",
+            "example": [
+              "VIP",
+              "アクティブ"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "lineUserId",
+          "displayName",
+          "pictureUrl",
+          "followedAt",
+          "lastInteractionAt",
+          "tags"
+        ],
+        "description": "ファン情報"
+      },
+      "FanListResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "ファンID",
+                  "example": "660e8400-e29b-41d4-a716-446655440000"
+                },
+                "lineUserId": {
+                  "type": "string",
+                  "description": "LINE ユーザーID",
+                  "example": "U1234567890abcdef1234567890abcdef"
+                },
+                "displayName": {
+                  "type": "string",
+                  "nullable": true,
+                  "description": "表示名",
+                  "example": "ファン太郎"
+                },
+                "pictureUrl": {
+                  "type": "string",
+                  "nullable": true,
+                  "format": "uri",
+                  "description": "プロフィール画像URL",
+                  "example": "https://profile.line-scdn.net/..."
+                },
+                "followedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "フォロー日時 (ISO 8601)",
+                  "example": "2025-01-01T00:00:00Z"
+                },
+                "lastInteractionAt": {
+                  "type": "string",
+                  "nullable": true,
+                  "format": "date-time",
+                  "description": "最終インタラクション日時 (ISO 8601)",
+                  "example": "2025-01-10T15:30:00Z"
+                },
+                "isBlocked": {
+                  "type": "boolean",
+                  "default": false,
+                  "description": "ブロック状態",
+                  "example": false
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "ファンタグ",
+                  "example": [
+                    "VIP",
+                    "アクティブ"
+                  ]
+                }
+              },
+              "required": [
+                "id",
+                "lineUserId",
+                "displayName",
+                "pictureUrl",
+                "followedAt",
+                "lastInteractionAt",
+                "tags"
+              ],
+              "description": "ファン情報"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "number"
+              },
+              "page": {
+                "type": "number"
+              },
+              "limit": {
+                "type": "number"
+              },
+              "totalPages": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "total",
+              "page",
+              "limit",
+              "totalPages"
+            ]
+          }
+        },
+        "required": [
+          "ok",
+          "data",
+          "pagination"
+        ],
+        "description": "ファン一覧レスポンス"
+      },
+      "FanResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "ファンID",
+                "example": "660e8400-e29b-41d4-a716-446655440000"
+              },
+              "lineUserId": {
+                "type": "string",
+                "description": "LINE ユーザーID",
+                "example": "U1234567890abcdef1234567890abcdef"
+              },
+              "displayName": {
+                "type": "string",
+                "nullable": true,
+                "description": "表示名",
+                "example": "ファン太郎"
+              },
+              "pictureUrl": {
+                "type": "string",
+                "nullable": true,
+                "format": "uri",
+                "description": "プロフィール画像URL",
+                "example": "https://profile.line-scdn.net/..."
+              },
+              "followedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "フォロー日時 (ISO 8601)",
+                "example": "2025-01-01T00:00:00Z"
+              },
+              "lastInteractionAt": {
+                "type": "string",
+                "nullable": true,
+                "format": "date-time",
+                "description": "最終インタラクション日時 (ISO 8601)",
+                "example": "2025-01-10T15:30:00Z"
+              },
+              "isBlocked": {
+                "type": "boolean",
+                "default": false,
+                "description": "ブロック状態",
+                "example": false
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "ファンタグ",
+                "example": [
+                  "VIP",
+                  "アクティブ"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "lineUserId",
+              "displayName",
+              "pictureUrl",
+              "followedAt",
+              "lastInteractionAt",
+              "tags"
+            ],
+            "description": "ファン情報"
+          }
+        },
+        "required": [
+          "ok",
+          "data"
+        ],
+        "description": "ファンレスポンス"
+      },
+      "ApiError": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "enum": [
+              false
+            ]
+          },
+          "error": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              },
+              "details": {
+                "type": "object",
+                "additionalProperties": {
+                  "nullable": true
+                }
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          }
+        },
+        "required": [
+          "ok",
+          "error"
+        ],
+        "description": "APIエラーレスポンス"
+      },
+      "ApiSuccess": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok"
+        ],
+        "description": "API成功レスポンス"
+      }
+    },
+    "parameters": {}
+  },
+  "paths": {
+    "/api/v1/campaigns": {
+      "get": {
+        "description": "キャンペーン一覧を取得",
+        "summary": "キャンペーン一覧取得",
+        "tags": [
+          "campaigns"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "ページ番号",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "1ページあたりの件数",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "キャンペーン一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "description": "キャンペーンID",
+                            "example": "550e8400-e29b-41d4-a716-446655440000"
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 100,
+                            "description": "キャンペーンタイトル",
+                            "example": "新商品リリース記念キャンペーン"
+                          },
+                          "body": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 1000,
+                            "description": "キャンペーン本文",
+                            "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
+                          },
+                          "imageUrl": {
+                            "type": "string",
+                            "nullable": true,
+                            "format": "uri",
+                            "description": "画像URL",
+                            "example": "https://example.com/image.jpg"
+                          },
+                          "scheduledAt": {
+                            "type": "string",
+                            "nullable": true,
+                            "format": "date-time",
+                            "description": "配信予定日時 (ISO 8601)",
+                            "example": "2025-01-15T10:00:00Z"
+                          },
+                          "sentAt": {
+                            "type": "string",
+                            "nullable": true,
+                            "format": "date-time",
+                            "description": "配信日時 (ISO 8601)",
+                            "example": "2025-01-15T10:00:00Z"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "draft",
+                              "scheduled",
+                              "sent",
+                              "failed"
+                            ],
+                            "description": "キャンペーンのステータス",
+                            "example": "draft"
+                          },
+                          "createdAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "作成日時 (ISO 8601)",
+                            "example": "2025-01-10T09:00:00Z"
+                          },
+                          "updatedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "更新日時 (ISO 8601)",
+                            "example": "2025-01-10T09:00:00Z"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "body",
+                          "imageUrl",
+                          "scheduledAt",
+                          "sentAt",
+                          "status",
+                          "createdAt",
+                          "updatedAt"
+                        ],
+                        "description": "キャンペーン情報",
+                        "example": {
+                          "id": "550e8400-e29b-41d4-a716-446655440000",
+                          "title": "新商品リリース記念キャンペーン",
+                          "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
+                          "imageUrl": "https://example.com/image.jpg",
+                          "scheduledAt": "2025-01-15T10:00:00Z",
+                          "sentAt": null,
+                          "status": "scheduled",
+                          "createdAt": "2025-01-10T09:00:00Z",
+                          "updatedAt": "2025-01-10T09:00:00Z"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data"
+                  ],
+                  "description": "キャンペーン一覧レスポンス"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "バリデーションエラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "nullable": true
+                          }
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "description": "APIエラーレスポンス"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "キャンペーンを作成",
+        "summary": "キャンペーン作成",
+        "tags": [
+          "campaigns"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject",
+                  "openapi": {
+                    "metadata": {
+                      "description": "キャンペーン作成リクエスト"
+                    }
+                  }
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "作成されたキャンペーン",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "キャンペーンID",
+                          "example": "550e8400-e29b-41d4-a716-446655440000"
+                        },
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100,
+                          "description": "キャンペーンタイトル",
+                          "example": "新商品リリース記念キャンペーン"
+                        },
+                        "body": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1000,
+                          "description": "キャンペーン本文",
+                          "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
+                        },
+                        "imageUrl": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "uri",
+                          "description": "画像URL",
+                          "example": "https://example.com/image.jpg"
+                        },
+                        "scheduledAt": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "date-time",
+                          "description": "配信予定日時 (ISO 8601)",
+                          "example": "2025-01-15T10:00:00Z"
+                        },
+                        "sentAt": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "date-time",
+                          "description": "配信日時 (ISO 8601)",
+                          "example": "2025-01-15T10:00:00Z"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "draft",
+                            "scheduled",
+                            "sent",
+                            "failed"
+                          ],
+                          "description": "キャンペーンのステータス",
+                          "example": "draft"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "作成日時 (ISO 8601)",
+                          "example": "2025-01-10T09:00:00Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "更新日時 (ISO 8601)",
+                          "example": "2025-01-10T09:00:00Z"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "body",
+                        "imageUrl",
+                        "scheduledAt",
+                        "sentAt",
+                        "status",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "description": "キャンペーン情報",
+                      "example": {
+                        "id": "550e8400-e29b-41d4-a716-446655440000",
+                        "title": "新商品リリース記念キャンペーン",
+                        "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
+                        "imageUrl": "https://example.com/image.jpg",
+                        "scheduledAt": "2025-01-15T10:00:00Z",
+                        "sentAt": null,
+                        "status": "scheduled",
+                        "createdAt": "2025-01-10T09:00:00Z",
+                        "updatedAt": "2025-01-10T09:00:00Z"
+                      }
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data"
+                  ],
+                  "description": "キャンペーンレスポンス"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "バリデーションエラー",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "nullable": true
+                          }
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "description": "APIエラーレスポンス"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{id}": {
+      "get": {
+        "description": "キャンペーン詳細を取得",
+        "summary": "キャンペーン詳細取得",
+        "tags": [
+          "campaigns"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "キャンペーンID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "キャンペーン詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "キャンペーンID",
+                          "example": "550e8400-e29b-41d4-a716-446655440000"
+                        },
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100,
+                          "description": "キャンペーンタイトル",
+                          "example": "新商品リリース記念キャンペーン"
+                        },
+                        "body": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1000,
+                          "description": "キャンペーン本文",
+                          "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
+                        },
+                        "imageUrl": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "uri",
+                          "description": "画像URL",
+                          "example": "https://example.com/image.jpg"
+                        },
+                        "scheduledAt": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "date-time",
+                          "description": "配信予定日時 (ISO 8601)",
+                          "example": "2025-01-15T10:00:00Z"
+                        },
+                        "sentAt": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "date-time",
+                          "description": "配信日時 (ISO 8601)",
+                          "example": "2025-01-15T10:00:00Z"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "draft",
+                            "scheduled",
+                            "sent",
+                            "failed"
+                          ],
+                          "description": "キャンペーンのステータス",
+                          "example": "draft"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "作成日時 (ISO 8601)",
+                          "example": "2025-01-10T09:00:00Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "更新日時 (ISO 8601)",
+                          "example": "2025-01-10T09:00:00Z"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "body",
+                        "imageUrl",
+                        "scheduledAt",
+                        "sentAt",
+                        "status",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "description": "キャンペーン情報",
+                      "example": {
+                        "id": "550e8400-e29b-41d4-a716-446655440000",
+                        "title": "新商品リリース記念キャンペーン",
+                        "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
+                        "imageUrl": "https://example.com/image.jpg",
+                        "scheduledAt": "2025-01-15T10:00:00Z",
+                        "sentAt": null,
+                        "status": "scheduled",
+                        "createdAt": "2025-01-10T09:00:00Z",
+                        "updatedAt": "2025-01-10T09:00:00Z"
+                      }
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data"
+                  ],
+                  "description": "キャンペーンレスポンス"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "キャンペーンが見つかりません",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "nullable": true
+                          }
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "description": "APIエラーレスポンス"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "キャンペーンを更新",
+        "summary": "キャンペーン更新",
+        "tags": [
+          "campaigns"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "キャンペーンID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject",
+                  "openapi": {
+                    "metadata": {
+                      "description": "キャンペーン更新リクエスト"
+                    }
+                  }
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "更新されたキャンペーン",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "キャンペーンID",
+                          "example": "550e8400-e29b-41d4-a716-446655440000"
+                        },
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 100,
+                          "description": "キャンペーンタイトル",
+                          "example": "新商品リリース記念キャンペーン"
+                        },
+                        "body": {
+                          "type": "string",
+                          "minLength": 1,
+                          "maxLength": 1000,
+                          "description": "キャンペーン本文",
+                          "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
+                        },
+                        "imageUrl": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "uri",
+                          "description": "画像URL",
+                          "example": "https://example.com/image.jpg"
+                        },
+                        "scheduledAt": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "date-time",
+                          "description": "配信予定日時 (ISO 8601)",
+                          "example": "2025-01-15T10:00:00Z"
+                        },
+                        "sentAt": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "date-time",
+                          "description": "配信日時 (ISO 8601)",
+                          "example": "2025-01-15T10:00:00Z"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "draft",
+                            "scheduled",
+                            "sent",
+                            "failed"
+                          ],
+                          "description": "キャンペーンのステータス",
+                          "example": "draft"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "作成日時 (ISO 8601)",
+                          "example": "2025-01-10T09:00:00Z"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "更新日時 (ISO 8601)",
+                          "example": "2025-01-10T09:00:00Z"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "body",
+                        "imageUrl",
+                        "scheduledAt",
+                        "sentAt",
+                        "status",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "description": "キャンペーン情報",
+                      "example": {
+                        "id": "550e8400-e29b-41d4-a716-446655440000",
+                        "title": "新商品リリース記念キャンペーン",
+                        "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
+                        "imageUrl": "https://example.com/image.jpg",
+                        "scheduledAt": "2025-01-15T10:00:00Z",
+                        "sentAt": null,
+                        "status": "scheduled",
+                        "createdAt": "2025-01-10T09:00:00Z",
+                        "updatedAt": "2025-01-10T09:00:00Z"
+                      }
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data"
+                  ],
+                  "description": "キャンペーンレスポンス"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "キャンペーンが見つかりません",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "nullable": true
+                          }
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "description": "APIエラーレスポンス"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "キャンペーンを削除",
+        "summary": "キャンペーン削除",
+        "tags": [
+          "campaigns"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "キャンペーンID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "削除成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "description": "API成功レスポンス"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "キャンペーンが見つかりません",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "nullable": true
+                          }
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "description": "APIエラーレスポンス"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fans": {
+      "get": {
+        "description": "ファン一覧を取得",
+        "summary": "ファン一覧取得",
+        "tags": [
+          "fans"
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "ページ番号",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "1ページあたりの件数",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ファン一覧",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "description": "ファンID",
+                            "example": "660e8400-e29b-41d4-a716-446655440000"
+                          },
+                          "lineUserId": {
+                            "type": "string",
+                            "description": "LINE ユーザーID",
+                            "example": "U1234567890abcdef1234567890abcdef"
+                          },
+                          "displayName": {
+                            "type": "string",
+                            "nullable": true,
+                            "description": "表示名",
+                            "example": "ファン太郎"
+                          },
+                          "pictureUrl": {
+                            "type": "string",
+                            "nullable": true,
+                            "format": "uri",
+                            "description": "プロフィール画像URL",
+                            "example": "https://profile.line-scdn.net/..."
+                          },
+                          "followedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "フォロー日時 (ISO 8601)",
+                            "example": "2025-01-01T00:00:00Z"
+                          },
+                          "lastInteractionAt": {
+                            "type": "string",
+                            "nullable": true,
+                            "format": "date-time",
+                            "description": "最終インタラクション日時 (ISO 8601)",
+                            "example": "2025-01-10T15:30:00Z"
+                          },
+                          "isBlocked": {
+                            "type": "boolean",
+                            "default": false,
+                            "description": "ブロック状態",
+                            "example": false
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "ファンタグ",
+                            "example": [
+                              "VIP",
+                              "アクティブ"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "lineUserId",
+                          "displayName",
+                          "pictureUrl",
+                          "followedAt",
+                          "lastInteractionAt",
+                          "tags"
+                        ],
+                        "description": "ファン情報"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "total": {
+                          "type": "number"
+                        },
+                        "page": {
+                          "type": "number"
+                        },
+                        "limit": {
+                          "type": "number"
+                        },
+                        "totalPages": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "total",
+                        "page",
+                        "limit",
+                        "totalPages"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data",
+                    "pagination"
+                  ],
+                  "description": "ファン一覧レスポンス"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fans/{id}": {
+      "get": {
+        "description": "ファン詳細を取得",
+        "summary": "ファン詳細取得",
+        "tags": [
+          "fans"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ファンID",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ファン詳細",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "description": "ファンID",
+                          "example": "660e8400-e29b-41d4-a716-446655440000"
+                        },
+                        "lineUserId": {
+                          "type": "string",
+                          "description": "LINE ユーザーID",
+                          "example": "U1234567890abcdef1234567890abcdef"
+                        },
+                        "displayName": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "表示名",
+                          "example": "ファン太郎"
+                        },
+                        "pictureUrl": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "uri",
+                          "description": "プロフィール画像URL",
+                          "example": "https://profile.line-scdn.net/..."
+                        },
+                        "followedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "description": "フォロー日時 (ISO 8601)",
+                          "example": "2025-01-01T00:00:00Z"
+                        },
+                        "lastInteractionAt": {
+                          "type": "string",
+                          "nullable": true,
+                          "format": "date-time",
+                          "description": "最終インタラクション日時 (ISO 8601)",
+                          "example": "2025-01-10T15:30:00Z"
+                        },
+                        "isBlocked": {
+                          "type": "boolean",
+                          "default": false,
+                          "description": "ブロック状態",
+                          "example": false
+                        },
+                        "tags": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          },
+                          "description": "ファンタグ",
+                          "example": [
+                            "VIP",
+                            "アクティブ"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "lineUserId",
+                        "displayName",
+                        "pictureUrl",
+                        "followedAt",
+                        "lastInteractionAt",
+                        "tags"
+                      ],
+                      "description": "ファン情報"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data"
+                  ],
+                  "description": "ファンレスポンス"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ファンが見つかりません",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "nullable": true
+                          }
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "description": "APIエラーレスポンス"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

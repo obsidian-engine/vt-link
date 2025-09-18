@@ -1,0 +1,27 @@
+{
+  "name": "@vt-link/schema-zod",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "gen:openapi": "tsx src/generate-openapi.ts",
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist openapi.yaml"
+  },
+  "dependencies": {
+    "zod": "^3.25.1",
+    "@asteasolutions/zod-to-openapi": "^7.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.13",
+    "tsx": "^4.20.0",
+    "typescript": "^5.7.2"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./schemas": "./src/schemas/index.ts"
+  }
+}

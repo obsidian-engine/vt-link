@@ -1,0 +1,25 @@
+{
+  "name": "vt-link",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm gen && pnpm -r build",
+    "gen:openapi": "pnpm -C packages/schema-zod gen:openapi",
+    "gen:types": "pnpm -C packages/api-client gen",
+    "gen": "pnpm gen:openapi && pnpm gen:types",
+    "lint": "pnpm -r lint",
+    "type-check": "pnpm -r type-check",
+    "format": "pnpm -r format",
+    "clean": "pnpm -r clean"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.13",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
