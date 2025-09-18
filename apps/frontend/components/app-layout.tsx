@@ -17,7 +17,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className="flex min-h-screen">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
 
-      <div className="flex-1 flex flex-col md:ml-64">
+      <div className="flex-1 flex flex-col">
         {/* Top bar */}
         <header className="h-16 flex items-center justify-between px-4 md:px-8 sticky top-0 bg-white/50 dark:bg-slate-800/50 backdrop-blur-lg border-b border-white/30 dark:border-slate-700/60 shadow-sm">
           <div className="flex items-center gap-2">
@@ -29,11 +29,14 @@ export function AppLayout({ children }: AppLayoutProps) {
             >
               <Menu className="h-5 w-5" />
             </button>
-            <h1 className="text-lg font-semibold drop-shadow">VT-Line</h1>
+            <h1 className="text-lg font-semibold drop-shadow">ダッシュボード</h1>
           </div>
 
           <div className="flex items-center gap-3">
-            <button type="button" className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground shadow-md hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">
+            <button 
+              type="button" 
+              className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground shadow-md hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
               新規メッセージ
             </button>
             <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold shadow-md">
