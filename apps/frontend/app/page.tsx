@@ -2,59 +2,87 @@ import Link from 'next/link'
 
 export default function HomePage() {
   return (
-    <div className="px-4 py-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">
-          VT-Link Manager ダッシュボード
-        </h1>
+    <div className="space-y-12">
+      {/* Stats Grid */}
+      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="rounded-lg border border-white/30 bg-white/55 backdrop-blur-md p-6 shadow-md hover:shadow-lg transition-shadow">
+          <p className="text-xs text-muted-foreground mb-1">友だち数</p>
+          <p className="text-2xl font-bold">12,340</p>
+        </div>
+        <div className="rounded-lg border border-white/30 bg-white/55 backdrop-blur-md p-6 shadow-md hover:shadow-lg transition-shadow">
+          <p className="text-xs text-muted-foreground mb-1">今月の送信</p>
+          <p className="text-2xl font-bold">8,900 / 15,000</p>
+        </div>
+        <div className="rounded-lg border border-white/30 bg-white/55 backdrop-blur-md p-6 shadow-md hover:shadow-lg transition-shadow">
+          <p className="text-xs text-muted-foreground mb-1">平均CTR</p>
+          <p className="text-2xl font-bold">4.8%</p>
+        </div>
+        <div className="rounded-lg border border-white/30 bg-white/55 backdrop-blur-md p-6 shadow-md hover:shadow-lg transition-shadow">
+          <p className="text-xs text-muted-foreground mb-1">今月の売上</p>
+          <p className="text-2xl font-bold">¥540,000</p>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              キャンペーン管理
-            </h2>
-            <p className="text-gray-600 text-sm mb-4">
-              LINE配信キャンペーンの作成・管理
-            </p>
-            <Link
-              href="/campaigns"
-              className="inline-block bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700"
-            >
-              キャンペーン管理
-            </Link>
+      {/* Recent Campaigns */}
+      <div className="rounded-lg border border-white/30 bg-white/55 backdrop-blur-md shadow-md overflow-hidden">
+        <div className="p-6 border-b border-white/30 font-medium flex items-center justify-between">
+          <span>最近のキャンペーン</span>
+          <div className="flex items-center gap-2">
+            <button className="text-xs px-3 py-1.5 rounded-md hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors">
+              更新
+            </button>
           </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              ファン管理
-            </h2>
-            <p className="text-gray-600 text-sm mb-4">
-              ファンリストの管理・分析
-            </p>
-            <Link
-              href="/fans"
-              className="inline-block bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700"
-            >
-              ファン一覧
-            </Link>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              分析レポート
-            </h2>
-            <p className="text-gray-600 text-sm mb-4">
-              エンゲージメント分析・レポート
-            </p>
-            <Link
-              href="/reports"
-              className="inline-block bg-purple-600 text-white px-4 py-2 rounded-md text-sm hover:bg-purple-700"
-            >
-              レポート表示
-            </Link>
-          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="text-muted-foreground bg-white/40 dark:bg-slate-800/30">
+              <tr>
+                <th className="px-6 py-3 text-left font-medium">キャンペーン名</th>
+                <th className="px-6 py-3 text-right font-medium">送信</th>
+                <th className="px-6 py-3 text-right font-medium">CTR</th>
+                <th className="px-6 py-3 text-right font-medium">CVR</th>
+                <th className="px-6 py-3 text-left font-medium">状態</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/20 dark:divide-slate-700/60">
+              <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
+                <td className="px-6 py-4">夏のセール告知</td>
+                <td className="px-6 py-4 text-right">5,000</td>
+                <td className="px-6 py-4 text-right">6.2%</td>
+                <td className="px-6 py-4 text-right">1.1%</td>
+                <td className="px-6 py-4">
+                  <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-700 dark:text-green-400">
+                    配信中
+                  </span>
+                </td>
+              </tr>
+              <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
+                <td className="px-6 py-4">新スタンプ発売</td>
+                <td className="px-6 py-4 text-right">7,800</td>
+                <td className="px-6 py-4 text-right">5.0%</td>
+                <td className="px-6 py-4 text-right">0.9%</td>
+                <td className="px-6 py-4">
+                  <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-700 dark:text-red-400">
+                    終了
+                  </span>
+                </td>
+              </tr>
+              <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
+                <td className="px-6 py-4">限定ライブ招待</td>
+                <td className="px-6 py-4 text-right">3,200</td>
+                <td className="px-6 py-4 text-right">7.4%</td>
+                <td className="px-6 py-4 text-right">2.4%</td>
+                <td className="px-6 py-4">
+                  <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-400/15 text-yellow-700 dark:text-yellow-300">
+                    一時停止
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
   )
 }
+
