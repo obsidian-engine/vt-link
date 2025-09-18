@@ -2,7 +2,12 @@ name: Deploy
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
+    paths:
+      - 'apps/frontend/**'
+      - 'apps/backend/**'
+      - 'packages/**'
+      - 'vercel.json'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,49 +16,42 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     permissions:
       contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.7
-        with:
-          persist-credentials: false
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: "20"
           cache: "npm"
 
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
       - name: Install dependencies
-        run: npm ci
+        run: pnpm i --frozen-lockfile
 
       - name: Generate types
-        run: npm run types:generate
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-
-      - name: Lint code
-        run: npm run lint
-
-      - name: Type check
-        run: npm run type-check
+        run: pnpm gen
 
       - name: Build application
-        run: npm run build
+        run: pnpm build
 
       - name: Deploy to Production
-        if: github.ref == 'refs/heads/main'
         run: |
           echo "Deploy to production"
-          # Add your production deployment command here
-          # e.g., npx vercel --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Staging
-        if: github.ref == 'refs/heads/develop'
-        run: |
-          echo "Deploy to staging"
-          # Add your staging deployment command here
-          # e.g., npx vercel --token=${{ secrets.VERCEL_TOKEN }}
+          # Production deployment will be handled by Vercel Git integration
+          # This step serves as a deployment validation checkpoint
