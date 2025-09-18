@@ -63,9 +63,11 @@ test-integration: ## Run integration tests
 	@echo "Running integration tests..."
 	@if [ -z "$(TEST_DATABASE_URL)" ]; then \
 		echo "ERROR: TEST_DATABASE_URL environment variable is required for integration tests"; \
+		echo "Example: export TEST_DATABASE_URL='postgres://user:pass@localhost:5432/test_db?sslmode=disable'"; \
 		exit 1; \
 	fi
-	$(GOTEST) -v -race $(INTEGRATION_TEST_PACKAGES)
+	@echo "Using database: $(shell echo $(TEST_DATABASE_URL) | sed 's/:[^:]*@/@***@/')"
+	$(GOTEST) -v -race -timeout=10m $(INTEGRATION_TEST_PACKAGES)
 
 .PHONY: test-e2e
 test-e2e: ## Run E2E tests

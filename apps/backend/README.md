@@ -165,11 +165,16 @@ make test-coverage
 
 ### TDD 開発フロー
 
-1. **モック生成**: `make generate`
-2. **テスト作成**: `tests/unit/`, `tests/integration/`, `tests/e2e/`
-3. **テスト実行**: `make test-unit`
-4. **実装**: 内部実装を行う
-5. **リファクタリング**: テストが通る状態でコードを改善
+1. **環境準備**: `make deps-dev` で開発依存関係をインストール
+2. **モック生成**: `make generate` でインターフェースのモックを生成
+3. **テスト作成**: Red - 失敗するテストを先に書く
+   - ユニット: `tests/unit/`
+   - 結合: `tests/integration/`
+   - E2E: `tests/e2e/`
+4. **テスト実行**: `make test-unit` - Red状態を確認
+5. **実装**: Green - テストが通る最小限の実装
+6. **リファクタリング**: Blue - テストが通る状態でコードを改善
+7. **品質チェック**: `make check` でlint/format/vetを実行
 
 ### テスト設定
 

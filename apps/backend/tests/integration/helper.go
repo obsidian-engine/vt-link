@@ -67,32 +67,42 @@ func (tdb *TestDB) TeardownTestDB() {
 func (tdb *TestDB) ClearAllTables(t *testing.T) {
 	ctx := context.Background()
 
-	// トランザクションでテーブルをクリア
+	// PostgreSQL用のクリーンアップ（CASCADE付きTRUNCATE）
+	tables := []string{
+		"campaigns", // 依存関係の順序に注意
+	}
+
 	tx, err := tdb.DB.BeginTxx(ctx, nil)
 	if err != nil {
 		t.Fatalf("Failed to begin transaction: %v", err)
 	}
-	defer tx.Rollback()
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		}
+	}()
 
-	// 外部キー制約を一時的に無効化
-	if _, err := tx.ExecContext(ctx, "SET FOREIGN_KEY_CHECKS = 0"); err != nil {
-		// PostgreSQLの場合は別の方法を使用
-		if _, err := tx.ExecContext(ctx, "TRUNCATE TABLE campaigns RESTART IDENTITY CASCADE"); err != nil {
-			t.Fatalf("Failed to truncate campaigns table: %v", err)
-		}
-	} else {
-		// MySQLの場合
-		if _, err := tx.ExecContext(ctx, "TRUNCATE TABLE campaigns"); err != nil {
-			t.Fatalf("Failed to truncate campaigns table: %v", err)
-		}
-		if _, err := tx.ExecContext(ctx, "SET FOREIGN_KEY_CHECKS = 1"); err != nil {
-			t.Fatalf("Failed to re-enable foreign key checks: %v", err)
+	// PostgreSQLでのクリーンアップ
+	for _, table := range tables {
+		query := fmt.Sprintf("TRUNCATE TABLE %s RESTART IDENTITY CASCADE", table)
+		if _, err := tx.ExecContext(ctx, query); err != nil {
+			t.Logf("Warning: Failed to truncate table %s: %v", table, err)
+			// 個別削除を試行
+			deleteQuery := fmt.Sprintf("DELETE FROM %s", table)
+			if _, err := tx.ExecContext(ctx, deleteQuery); err != nil {
+				t.Fatalf("Failed to delete from table %s: %v", table, err)
+			}
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err = tx.Commit(); err != nil {
 		t.Fatalf("Failed to commit transaction: %v", err)
 	}
+
+	t.Logf("Cleared %d tables for test isolation", len(tables))
 }
 
 // CreateTestCampaign テスト用のキャンペーンデータを作成
