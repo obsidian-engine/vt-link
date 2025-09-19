@@ -23,6 +23,7 @@ packages:
       outpkg: mocks
     interfaces:
       CampaignRepository:
+      TxManager:
 
   vt-link/backend/internal/domain/service:
     config:
