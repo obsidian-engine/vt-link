@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "zod": "^3.25.1",
-    "@asteasolutions/zod-to-openapi": "^7.3.0"
+    "@asteasolutions/zod-to-openapi": "^8.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.17.13",
