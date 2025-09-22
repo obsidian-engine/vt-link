@@ -12,7 +12,7 @@
     "clean": "rm -rf dist openapi.yaml"
   },
   "dependencies": {
-    "zod": "^3.25.1",
+    "zod": "^4.1.11",
     "@asteasolutions/zod-to-openapi": "^7.3.0"
   },
   "devDependencies": {
