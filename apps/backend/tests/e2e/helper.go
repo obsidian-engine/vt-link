@@ -63,19 +63,19 @@ func NewTestClient(config *TestConfig) *TestClient {
 	}
 }
 
-// CreateCampaignRequest キャンペーン作成リクエスト
-type CreateCampaignRequest struct {
+// CreateMessageRequest メッセージ作成リクエスト
+type CreateMessageRequest struct {
 	Title   string `json:"title"`
 	Message string `json:"message"`
 }
 
-// CreateCampaignResponse キャンペーン作成レスポンス
-type CreateCampaignResponse struct {
-	Campaign Campaign `json:"campaign"`
+// CreateMessageResponse メッセージ作成レスポンス
+type CreateMessageResponse struct {
+	Message Message `json:"message"`
 }
 
-// Campaign キャンペーンの構造体
-type Campaign struct {
+// Message メッセージの構造体
+type Message struct {
 	ID          string     `json:"id"`
 	Title       string     `json:"title"`
 	Message     string     `json:"message"`
@@ -86,9 +86,9 @@ type Campaign struct {
 	SentAt      *time.Time `json:"sent_at,omitempty"`
 }
 
-// ListCampaignsResponse キャンペーン一覧レスポンス
-type ListCampaignsResponse struct {
-	Campaigns []Campaign `json:"campaigns"`
+// ListMessagesResponse メッセージ一覧レスポンス
+type ListMessagesResponse struct {
+	Messages []Message `json:"messages"`
 }
 
 // ErrorResponse エラーレスポンス
@@ -98,15 +98,15 @@ type ErrorResponse struct {
 	Message string `json:"message,omitempty"`
 }
 
-// CreateCampaign キャンペーンを作成
-func (c *TestClient) CreateCampaign(t *testing.T, req *CreateCampaignRequest) (*CreateCampaignResponse, error) {
+// CreateMessage メッセージを作成
+func (c *TestClient) CreateMessage(t *testing.T, req *CreateMessageRequest) (*CreateMessageResponse, error) {
 	jsonData, err := json.Marshal(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
 	resp, err := c.httpClient.Post(
-		c.baseURL+"/api/campaigns",
+		c.baseURL+"/api/messages",
 		"application/json",
 		bytes.NewBuffer(jsonData),
 	)
@@ -128,7 +128,7 @@ func (c *TestClient) CreateCampaign(t *testing.T, req *CreateCampaignRequest) (*
 		return nil, fmt.Errorf("API error (%d): %s", resp.StatusCode, string(body))
 	}
 
-	var result CreateCampaignResponse
+	var result CreateMessageResponse
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
@@ -136,9 +136,9 @@ func (c *TestClient) CreateCampaign(t *testing.T, req *CreateCampaignRequest) (*
 	return &result, nil
 }
 
-// ListCampaigns キャンペーン一覧を取得
-func (c *TestClient) ListCampaigns(t *testing.T) (*ListCampaignsResponse, error) {
-	resp, err := c.httpClient.Get(c.baseURL + "/api/campaigns")
+// ListMessages メッセージ一覧を取得
+func (c *TestClient) ListMessages(t *testing.T) (*ListMessagesResponse, error) {
+	resp, err := c.httpClient.Get(c.baseURL + "/api/messages")
 	if err != nil {
 		return nil, fmt.Errorf("failed to send request: %w", err)
 	}
@@ -157,7 +157,7 @@ func (c *TestClient) ListCampaigns(t *testing.T) (*ListCampaignsResponse, error)
 		return nil, fmt.Errorf("API error (%d): %s", resp.StatusCode, string(body))
 	}
 
-	var result ListCampaignsResponse
+	var result ListMessagesResponse
 	if err := json.Unmarshal(body, &result); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
 	}
@@ -165,10 +165,10 @@ func (c *TestClient) ListCampaigns(t *testing.T) (*ListCampaignsResponse, error)
 	return &result, nil
 }
 
-// SendCampaign キャンペーンを送信
-func (c *TestClient) SendCampaign(t *testing.T, campaignID string) error {
+// SendMessage メッセージを送信
+func (c *TestClient) SendMessage(t *testing.T, messageID string) error {
 	resp, err := c.httpClient.Post(
-		fmt.Sprintf("%s/api/campaigns/send?id=%s", c.baseURL, campaignID),
+		fmt.Sprintf("%s/api/messages/send?id=%s", c.baseURL, messageID),
 		"application/json",
 		nil,
 	)

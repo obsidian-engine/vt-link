@@ -43,7 +43,7 @@ func (s *MessageRepositoryIntegrationTestSuite) TestCreate_Success() {
 	message := &model.Message{
 		ID:        uuid.New(),
 		Title:     "結合テストメッセージ",
-		Message:   "結合テストメッセージ",
+		Body:      "結合テストメッセージ",
 		Status:    model.MessageStatusDraft,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -150,7 +150,7 @@ func (s *MessageRepositoryIntegrationTestSuite) TestFindScheduledMessages_Succes
 	message := &model.Message{
 		ID:        uuid.New(),
 		Title:     "スケジュールテスト",
-		Message:   "スケジュールメッセージ",
+		Body:      "スケジュールメッセージ",
 		Status:    model.MessageStatusScheduled,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -165,7 +165,7 @@ func (s *MessageRepositoryIntegrationTestSuite) TestFindScheduledMessages_Succes
 	draftMessage := &model.Message{
 		ID:        uuid.New(),
 		Title:     "ドラフト",
-		Message:   "ドラフトメッセージ",
+		Body:      "ドラフトメッセージ",
 		Status:    model.MessageStatusDraft,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
