@@ -45,7 +45,7 @@ func (s *MessageAPIE2ETestSuite) TestCreateMessage_Success() {
 	assert.NotNil(s.T(), resp)
 	assert.NotEmpty(s.T(), resp.Message.ID)
 	assert.Equal(s.T(), req.Title, resp.Message.Title)
-	assert.Equal(s.T(), req.Message, resp.Message.Body)
+	assert.Equal(s.T(), req.Message, resp.Message.Message)
 	assert.Equal(s.T(), "draft", resp.Message.Status)
 	assert.False(s.T(), resp.Message.CreatedAt.IsZero())
 	assert.False(s.T(), resp.Message.UpdatedAt.IsZero())
