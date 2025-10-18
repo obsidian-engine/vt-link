@@ -2,11 +2,11 @@ import { OpenAPIRegistry, OpenApiGeneratorV3 } from '@asteasolutions/zod-to-open
 import { writeFileSync } from 'fs'
 import { join } from 'path'
 import { 
-  Campaign, 
-  CreateCampaignRequest, 
-  UpdateCampaignRequest,
-  CampaignListResponse,
-  CampaignResponse,
+  Message, 
+  CreateMessageRequest, 
+  UpdateMessageRequest,
+  MessageListResponse,
+  MessageResponse,
   Fan,
   FanListResponse,
   FanResponse,
@@ -17,11 +17,11 @@ import {
 const registry = new OpenAPIRegistry()
 
 // Schemas を登録
-registry.register('Campaign', Campaign)
-registry.register('CreateCampaignRequest', CreateCampaignRequest)
-registry.register('UpdateCampaignRequest', UpdateCampaignRequest)
-registry.register('CampaignListResponse', CampaignListResponse)
-registry.register('CampaignResponse', CampaignResponse)
+registry.register('Message', Message)
+registry.register('CreateMessageRequest', CreateMessageRequest)
+registry.register('UpdateMessageRequest', UpdateMessageRequest)
+registry.register('MessageListResponse', MessageListResponse)
+registry.register('MessageResponse', MessageResponse)
 registry.register('Fan', Fan)
 registry.register('FanListResponse', FanListResponse)
 registry.register('FanResponse', FanResponse)
@@ -31,10 +31,10 @@ registry.register('ApiSuccess', ApiSuccess)
 // API パスの定義
 registry.registerPath({
   method: 'get',
-  path: '/api/v1/campaigns',
-  description: 'キャンペーン一覧を取得',
-  summary: 'キャンペーン一覧取得',
-  tags: ['campaigns'],
+  path: '/api/v1/messages',
+  description: 'メッセージ一覧を取得',
+  summary: 'メッセージ一覧取得',
+  tags: ['messages'],
   parameters: [
     {
       name: 'page',
@@ -53,10 +53,10 @@ registry.registerPath({
   ],
   responses: {
     200: {
-      description: 'キャンペーン一覧',
+      description: 'メッセージ一覧',
       content: {
         'application/json': {
-          schema: CampaignListResponse
+          schema: MessageListResponse
         }
       }
     },
@@ -73,23 +73,23 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'post',
-  path: '/api/v1/campaigns',
-  description: 'キャンペーンを作成',
-  summary: 'キャンペーン作成',
-  tags: ['campaigns'],
+  path: '/api/v1/messages',
+  description: 'メッセージを作成',
+  summary: 'メッセージ作成',
+  tags: ['messages'],
   requestBody: {
     content: {
       'application/json': {
-        schema: CreateCampaignRequest
+        schema: CreateMessageRequest
       }
     }
   },
   responses: {
     201: {
-      description: '作成されたキャンペーン',
+      description: '作成されたメッセージ',
       content: {
         'application/json': {
-          schema: CampaignResponse
+          schema: MessageResponse
         }
       }
     },
@@ -106,30 +106,30 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'get',
-  path: '/api/v1/campaigns/{id}',
-  description: 'キャンペーン詳細を取得',
-  summary: 'キャンペーン詳細取得',
-  tags: ['campaigns'],
+  path: '/api/v1/messages/{id}',
+  description: 'メッセージ詳細を取得',
+  summary: 'メッセージ詳細取得',
+  tags: ['messages'],
   parameters: [
     {
       name: 'id',
       in: 'path',
-      description: 'キャンペーンID',
+      description: 'メッセージID',
       required: true,
       schema: { type: 'string', format: 'uuid' }
     }
   ],
   responses: {
     200: {
-      description: 'キャンペーン詳細',
+      description: 'メッセージ詳細',
       content: {
         'application/json': {
-          schema: CampaignResponse
+          schema: MessageResponse
         }
       }
     },
     404: {
-      description: 'キャンペーンが見つかりません',
+      description: 'メッセージが見つかりません',
       content: {
         'application/json': {
           schema: ApiError
@@ -141,15 +141,15 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'put',
-  path: '/api/v1/campaigns/{id}',
-  description: 'キャンペーンを更新',
-  summary: 'キャンペーン更新',
-  tags: ['campaigns'],
+  path: '/api/v1/messages/{id}',
+  description: 'メッセージを更新',
+  summary: 'メッセージ更新',
+  tags: ['messages'],
   parameters: [
     {
       name: 'id',
       in: 'path',
-      description: 'キャンペーンID',
+      description: 'メッセージID',
       required: true,
       schema: { type: 'string', format: 'uuid' }
     }
@@ -157,21 +157,21 @@ registry.registerPath({
   requestBody: {
     content: {
       'application/json': {
-        schema: UpdateCampaignRequest
+        schema: UpdateMessageRequest
       }
     }
   },
   responses: {
     200: {
-      description: '更新されたキャンペーン',
+      description: '更新されたメッセージ',
       content: {
         'application/json': {
-          schema: CampaignResponse
+          schema: MessageResponse
         }
       }
     },
     404: {
-      description: 'キャンペーンが見つかりません',
+      description: 'メッセージが見つかりません',
       content: {
         'application/json': {
           schema: ApiError
@@ -183,15 +183,15 @@ registry.registerPath({
 
 registry.registerPath({
   method: 'delete',
-  path: '/api/v1/campaigns/{id}',
-  description: 'キャンペーンを削除',
-  summary: 'キャンペーン削除',
-  tags: ['campaigns'],
+  path: '/api/v1/messages/{id}',
+  description: 'メッセージを削除',
+  summary: 'メッセージ削除',
+  tags: ['messages'],
   parameters: [
     {
       name: 'id',
       in: 'path',
-      description: 'キャンペーンID',
+      description: 'メッセージID',
       required: true,
       schema: { type: 'string', format: 'uuid' }
     }
@@ -206,7 +206,7 @@ registry.registerPath({
       }
     },
     404: {
-      description: 'キャンペーンが見つかりません',
+      description: 'メッセージが見つかりません',
       content: {
         'application/json': {
           schema: ApiError
@@ -310,8 +310,8 @@ const document = generator.generateDocument({
   ],
   tags: [
     {
-      name: 'campaigns',
-      description: 'キャンペーン管理API'
+      name: 'messages',
+      description: 'メッセージ配信管理API'
     },
     {
       name: 'fans',

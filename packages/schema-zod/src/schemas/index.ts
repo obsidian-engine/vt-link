@@ -1,4 +1,4 @@
-export * from './campaign.js'
+export * from './message.js'
 export * from './fan.js'
 
 // 共通レスポンス型

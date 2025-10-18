@@ -21,8 +21,8 @@
   ],
   "tags": [
     {
-      "name": "campaigns",
-      "description": "キャンペーン管理API"
+      "name": "messages",
+      "description": "メッセージ配信管理API"
     },
     {
       "name": "fans",
@@ -31,27 +31,27 @@
   ],
   "components": {
     "schemas": {
-      "Campaign": {
+      "Message": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "format": "uuid",
-            "description": "キャンペーンID",
+            "description": "メッセージID",
             "example": "550e8400-e29b-41d4-a716-446655440000"
           },
           "title": {
             "type": "string",
             "minLength": 1,
             "maxLength": 100,
-            "description": "キャンペーンタイトル",
-            "example": "新商品リリース記念キャンペーン"
+            "description": "メッセージタイトル",
+            "example": "新商品リリース記念"
           },
           "body": {
             "type": "string",
             "minLength": 1,
             "maxLength": 1000,
-            "description": "キャンペーン本文",
+            "description": "メッセージ本文",
             "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
           },
           "imageUrl": {
@@ -83,7 +83,7 @@
               "sent",
               "failed"
             ],
-            "description": "キャンペーンのステータス",
+            "description": "メッセージ配信のステータス",
             "example": "draft"
           },
           "createdAt": {
@@ -110,10 +110,10 @@
           "createdAt",
           "updatedAt"
         ],
-        "description": "キャンペーン情報",
+        "description": "メッセージ配信情報",
         "example": {
           "id": "550e8400-e29b-41d4-a716-446655440000",
-          "title": "新商品リリース記念キャンペーン",
+          "title": "新商品リリース記念",
           "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
           "imageUrl": "https://example.com/image.jpg",
           "scheduledAt": "2025-01-15T10:00:00Z",
@@ -123,7 +123,7 @@
           "updatedAt": "2025-01-10T09:00:00Z"
         }
       },
-      "CreateCampaignRequest": {
+      "CreateMessageRequest": {
         "type": "object",
         "properties": {
           "title": {
@@ -157,9 +157,9 @@
           "title",
           "body"
         ],
-        "description": "キャンペーン作成リクエスト"
+        "description": "メッセージ作成リクエスト"
       },
-      "UpdateCampaignRequest": {
+      "UpdateMessageRequest": {
         "type": "object",
         "properties": {
           "title": {
@@ -189,9 +189,9 @@
             "default": "draft"
           }
         },
-        "description": "キャンペーン更新リクエスト"
+        "description": "メッセージ更新リクエスト"
       },
-      "CampaignListResponse": {
+      "MessageListResponse": {
         "type": "object",
         "properties": {
           "ok": {
@@ -205,21 +205,21 @@
                 "id": {
                   "type": "string",
                   "format": "uuid",
-                  "description": "キャンペーンID",
+                  "description": "メッセージID",
                   "example": "550e8400-e29b-41d4-a716-446655440000"
                 },
                 "title": {
                   "type": "string",
                   "minLength": 1,
                   "maxLength": 100,
-                  "description": "キャンペーンタイトル",
-                  "example": "新商品リリース記念キャンペーン"
+                  "description": "メッセージタイトル",
+                  "example": "新商品リリース記念"
                 },
                 "body": {
                   "type": "string",
                   "minLength": 1,
                   "maxLength": 1000,
-                  "description": "キャンペーン本文",
+                  "description": "メッセージ本文",
                   "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
                 },
                 "imageUrl": {
@@ -251,7 +251,7 @@
                     "sent",
                     "failed"
                   ],
-                  "description": "キャンペーンのステータス",
+                  "description": "メッセージ配信のステータス",
                   "example": "draft"
                 },
                 "createdAt": {
@@ -278,10 +278,10 @@
                 "createdAt",
                 "updatedAt"
               ],
-              "description": "キャンペーン情報",
+              "description": "メッセージ配信情報",
               "example": {
                 "id": "550e8400-e29b-41d4-a716-446655440000",
-                "title": "新商品リリース記念キャンペーン",
+                "title": "新商品リリース記念",
                 "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
                 "imageUrl": "https://example.com/image.jpg",
                 "scheduledAt": "2025-01-15T10:00:00Z",
@@ -297,9 +297,9 @@
           "ok",
           "data"
         ],
-        "description": "キャンペーン一覧レスポンス"
+        "description": "メッセージ一覧レスポンス"
       },
-      "CampaignResponse": {
+      "MessageResponse": {
         "type": "object",
         "properties": {
           "ok": {
@@ -311,21 +311,21 @@
               "id": {
                 "type": "string",
                 "format": "uuid",
-                "description": "キャンペーンID",
+                "description": "メッセージID",
                 "example": "550e8400-e29b-41d4-a716-446655440000"
               },
               "title": {
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 100,
-                "description": "キャンペーンタイトル",
-                "example": "新商品リリース記念キャンペーン"
+                "description": "メッセージタイトル",
+                "example": "新商品リリース記念"
               },
               "body": {
                 "type": "string",
                 "minLength": 1,
                 "maxLength": 1000,
-                "description": "キャンペーン本文",
+                "description": "メッセージ本文",
                 "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
               },
               "imageUrl": {
@@ -357,7 +357,7 @@
                   "sent",
                   "failed"
                 ],
-                "description": "キャンペーンのステータス",
+                "description": "メッセージ配信のステータス",
                 "example": "draft"
               },
               "createdAt": {
@@ -384,10 +384,10 @@
               "createdAt",
               "updatedAt"
             ],
-            "description": "キャンペーン情報",
+            "description": "メッセージ配信情報",
             "example": {
               "id": "550e8400-e29b-41d4-a716-446655440000",
-              "title": "新商品リリース記念キャンペーン",
+              "title": "新商品リリース記念",
               "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
               "imageUrl": "https://example.com/image.jpg",
               "scheduledAt": "2025-01-15T10:00:00Z",
@@ -402,7 +402,7 @@
           "ok",
           "data"
         ],
-        "description": "キャンペーンレスポンス"
+        "description": "メッセージレスポンス"
       },
       "Fan": {
         "type": "object",
@@ -723,12 +723,12 @@
     "parameters": {}
   },
   "paths": {
-    "/api/v1/campaigns": {
+    "/api/v1/messages": {
       "get": {
-        "description": "キャンペーン一覧を取得",
-        "summary": "キャンペーン一覧取得",
+        "description": "メッセージ一覧を取得",
+        "summary": "メッセージ一覧取得",
         "tags": [
-          "campaigns"
+          "messages"
         ],
         "parameters": [
           {
@@ -757,7 +757,7 @@
         ],
         "responses": {
           "200": {
-            "description": "キャンペーン一覧",
+            "description": "メッセージ一覧",
             "content": {
               "application/json": {
                 "schema": {
@@ -774,21 +774,21 @@
                           "id": {
                             "type": "string",
                             "format": "uuid",
-                            "description": "キャンペーンID",
+                            "description": "メッセージID",
                             "example": "550e8400-e29b-41d4-a716-446655440000"
                           },
                           "title": {
                             "type": "string",
                             "minLength": 1,
                             "maxLength": 100,
-                            "description": "キャンペーンタイトル",
-                            "example": "新商品リリース記念キャンペーン"
+                            "description": "メッセージタイトル",
+                            "example": "新商品リリース記念"
                           },
                           "body": {
                             "type": "string",
                             "minLength": 1,
                             "maxLength": 1000,
-                            "description": "キャンペーン本文",
+                            "description": "メッセージ本文",
                             "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
                           },
                           "imageUrl": {
@@ -820,7 +820,7 @@
                               "sent",
                               "failed"
                             ],
-                            "description": "キャンペーンのステータス",
+                            "description": "メッセージ配信のステータス",
                             "example": "draft"
                           },
                           "createdAt": {
@@ -847,10 +847,10 @@
                           "createdAt",
                           "updatedAt"
                         ],
-                        "description": "キャンペーン情報",
+                        "description": "メッセージ配信情報",
                         "example": {
                           "id": "550e8400-e29b-41d4-a716-446655440000",
-                          "title": "新商品リリース記念キャンペーン",
+                          "title": "新商品リリース記念",
                           "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
                           "imageUrl": "https://example.com/image.jpg",
                           "scheduledAt": "2025-01-15T10:00:00Z",
@@ -866,7 +866,7 @@
                     "ok",
                     "data"
                   ],
-                  "description": "キャンペーン一覧レスポンス"
+                  "description": "メッセージ一覧レスポンス"
                 }
               }
             }
@@ -918,10 +918,10 @@
         }
       },
       "post": {
-        "description": "キャンペーンを作成",
-        "summary": "キャンペーン作成",
+        "description": "メッセージを作成",
+        "summary": "メッセージ作成",
         "tags": [
-          "campaigns"
+          "messages"
         ],
         "requestBody": {
           "content": {
@@ -941,7 +941,7 @@
                   "typeName": "ZodObject",
                   "openapi": {
                     "metadata": {
-                      "description": "キャンペーン作成リクエスト"
+                      "description": "メッセージ作成リクエスト"
                     }
                   }
                 },
@@ -956,7 +956,7 @@
         },
         "responses": {
           "201": {
-            "description": "作成されたキャンペーン",
+            "description": "作成されたメッセージ",
             "content": {
               "application/json": {
                 "schema": {
@@ -971,21 +971,21 @@
                         "id": {
                           "type": "string",
                           "format": "uuid",
-                          "description": "キャンペーンID",
+                          "description": "メッセージID",
                           "example": "550e8400-e29b-41d4-a716-446655440000"
                         },
                         "title": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 100,
-                          "description": "キャンペーンタイトル",
-                          "example": "新商品リリース記念キャンペーン"
+                          "description": "メッセージタイトル",
+                          "example": "新商品リリース記念"
                         },
                         "body": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 1000,
-                          "description": "キャンペーン本文",
+                          "description": "メッセージ本文",
                           "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
                         },
                         "imageUrl": {
@@ -1017,7 +1017,7 @@
                             "sent",
                             "failed"
                           ],
-                          "description": "キャンペーンのステータス",
+                          "description": "メッセージ配信のステータス",
                           "example": "draft"
                         },
                         "createdAt": {
@@ -1044,10 +1044,10 @@
                         "createdAt",
                         "updatedAt"
                       ],
-                      "description": "キャンペーン情報",
+                      "description": "メッセージ配信情報",
                       "example": {
                         "id": "550e8400-e29b-41d4-a716-446655440000",
-                        "title": "新商品リリース記念キャンペーン",
+                        "title": "新商品リリース記念",
                         "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
                         "imageUrl": "https://example.com/image.jpg",
                         "scheduledAt": "2025-01-15T10:00:00Z",
@@ -1062,7 +1062,7 @@
                     "ok",
                     "data"
                   ],
-                  "description": "キャンペーンレスポンス"
+                  "description": "メッセージレスポンス"
                 }
               }
             }
@@ -1114,18 +1114,18 @@
         }
       }
     },
-    "/api/v1/campaigns/{id}": {
+    "/api/v1/messages/{id}": {
       "get": {
-        "description": "キャンペーン詳細を取得",
-        "summary": "キャンペーン詳細取得",
+        "description": "メッセージ詳細を取得",
+        "summary": "メッセージ詳細取得",
         "tags": [
-          "campaigns"
+          "messages"
         ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "キャンペーンID",
+            "description": "メッセージID",
             "required": true,
             "schema": {
               "type": "string",
@@ -1135,7 +1135,7 @@
         ],
         "responses": {
           "200": {
-            "description": "キャンペーン詳細",
+            "description": "メッセージ詳細",
             "content": {
               "application/json": {
                 "schema": {
@@ -1150,21 +1150,21 @@
                         "id": {
                           "type": "string",
                           "format": "uuid",
-                          "description": "キャンペーンID",
+                          "description": "メッセージID",
                           "example": "550e8400-e29b-41d4-a716-446655440000"
                         },
                         "title": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 100,
-                          "description": "キャンペーンタイトル",
-                          "example": "新商品リリース記念キャンペーン"
+                          "description": "メッセージタイトル",
+                          "example": "新商品リリース記念"
                         },
                         "body": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 1000,
-                          "description": "キャンペーン本文",
+                          "description": "メッセージ本文",
                           "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
                         },
                         "imageUrl": {
@@ -1196,7 +1196,7 @@
                             "sent",
                             "failed"
                           ],
-                          "description": "キャンペーンのステータス",
+                          "description": "メッセージ配信のステータス",
                           "example": "draft"
                         },
                         "createdAt": {
@@ -1223,10 +1223,10 @@
                         "createdAt",
                         "updatedAt"
                       ],
-                      "description": "キャンペーン情報",
+                      "description": "メッセージ配信情報",
                       "example": {
                         "id": "550e8400-e29b-41d4-a716-446655440000",
-                        "title": "新商品リリース記念キャンペーン",
+                        "title": "新商品リリース記念",
                         "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
                         "imageUrl": "https://example.com/image.jpg",
                         "scheduledAt": "2025-01-15T10:00:00Z",
@@ -1241,13 +1241,13 @@
                     "ok",
                     "data"
                   ],
-                  "description": "キャンペーンレスポンス"
+                  "description": "メッセージレスポンス"
                 }
               }
             }
           },
           "404": {
-            "description": "キャンペーンが見つかりません",
+            "description": "メッセージが見つかりません",
             "content": {
               "application/json": {
                 "schema": {
@@ -1293,16 +1293,16 @@
         }
       },
       "put": {
-        "description": "キャンペーンを更新",
-        "summary": "キャンペーン更新",
+        "description": "メッセージを更新",
+        "summary": "メッセージ更新",
         "tags": [
-          "campaigns"
+          "messages"
         ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "キャンペーンID",
+            "description": "メッセージID",
             "required": true,
             "schema": {
               "type": "string",
@@ -1328,7 +1328,7 @@
                   "typeName": "ZodObject",
                   "openapi": {
                     "metadata": {
-                      "description": "キャンペーン更新リクエスト"
+                      "description": "メッセージ更新リクエスト"
                     }
                   }
                 },
@@ -1343,7 +1343,7 @@
         },
         "responses": {
           "200": {
-            "description": "更新されたキャンペーン",
+            "description": "更新されたメッセージ",
             "content": {
               "application/json": {
                 "schema": {
@@ -1358,21 +1358,21 @@
                         "id": {
                           "type": "string",
                           "format": "uuid",
-                          "description": "キャンペーンID",
+                          "description": "メッセージID",
                           "example": "550e8400-e29b-41d4-a716-446655440000"
                         },
                         "title": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 100,
-                          "description": "キャンペーンタイトル",
-                          "example": "新商品リリース記念キャンペーン"
+                          "description": "メッセージタイトル",
+                          "example": "新商品リリース記念"
                         },
                         "body": {
                           "type": "string",
                           "minLength": 1,
                           "maxLength": 1000,
-                          "description": "キャンペーン本文",
+                          "description": "メッセージ本文",
                           "example": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！"
                         },
                         "imageUrl": {
@@ -1404,7 +1404,7 @@
                             "sent",
                             "failed"
                           ],
-                          "description": "キャンペーンのステータス",
+                          "description": "メッセージ配信のステータス",
                           "example": "draft"
                         },
                         "createdAt": {
@@ -1431,10 +1431,10 @@
                         "createdAt",
                         "updatedAt"
                       ],
-                      "description": "キャンペーン情報",
+                      "description": "メッセージ配信情報",
                       "example": {
                         "id": "550e8400-e29b-41d4-a716-446655440000",
-                        "title": "新商品リリース記念キャンペーン",
+                        "title": "新商品リリース記念",
                         "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
                         "imageUrl": "https://example.com/image.jpg",
                         "scheduledAt": "2025-01-15T10:00:00Z",
@@ -1449,13 +1449,13 @@
                     "ok",
                     "data"
                   ],
-                  "description": "キャンペーンレスポンス"
+                  "description": "メッセージレスポンス"
                 }
               }
             }
           },
           "404": {
-            "description": "キャンペーンが見つかりません",
+            "description": "メッセージが見つかりません",
             "content": {
               "application/json": {
                 "schema": {
@@ -1501,16 +1501,16 @@
         }
       },
       "delete": {
-        "description": "キャンペーンを削除",
-        "summary": "キャンペーン削除",
+        "description": "メッセージを削除",
+        "summary": "メッセージ削除",
         "tags": [
-          "campaigns"
+          "messages"
         ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "キャンペーンID",
+            "description": "メッセージID",
             "required": true,
             "schema": {
               "type": "string",
@@ -1545,7 +1545,7 @@
             }
           },
           "404": {
-            "description": "キャンペーンが見つかりません",
+            "description": "メッセージが見つかりません",
             "content": {
               "application/json": {
                 "schema": {

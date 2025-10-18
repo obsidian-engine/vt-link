@@ -4,7 +4,7 @@ import (
 	"log"
 	"sync"
 
-	"vt-link/backend/internal/application/campaign"
+	"vt-link/backend/internal/application/message"
 	"vt-link/backend/internal/infrastructure/db"
 	"vt-link/backend/internal/infrastructure/db/pg"
 	"vt-link/backend/internal/infrastructure/external"
@@ -12,8 +12,8 @@ import (
 )
 
 type Container struct {
-	CampaignUsecase campaign.Usecase
-	DB              *db.DB
+	MessageUsecase message.Usecase
+	DB             *db.DB
 }
 
 var (
@@ -41,7 +41,7 @@ func newContainer() (*Container, error) {
 	}
 
 	// Repository
-	campaignRepo := pg.NewCampaignRepository(database)
+	messageRepo := pg.NewMessageRepository(database)
 
 	// Transaction Manager
 	txManager := db.NewTxManager(database)
@@ -55,15 +55,15 @@ func newContainer() (*Container, error) {
 	clock := clock.NewRealClock()
 
 	// Usecase
-	campaignUsecase := campaign.NewInteractor(
-		campaignRepo,
+	messageUsecase := message.NewInteractor(
+		messageRepo,
 		txManager,
 		pusher,
 		clock,
 	)
 
 	return &Container{
-		CampaignUsecase: campaignUsecase,
-		DB:              database,
+		MessageUsecase: messageUsecase,
+		DB:             database,
 	}, nil
 }

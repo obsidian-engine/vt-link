@@ -12,7 +12,9 @@
     "clean": "rm -rf dist src/__generated__"
   },
   "dependencies": {
-    "openapi-fetch": "^0.14.0"
+    "openapi-fetch": "^0.14.0",
+    "swr": "^2.2.5",
+    "@vt-link/schema-zod": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.17.13",

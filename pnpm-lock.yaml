@@ -108,9 +108,15 @@ importers:
 
   packages/api-client:
     dependencies:
+      '@vt-link/schema-zod':
+        specifier: workspace:*
+        version: link:../schema-zod
       openapi-fetch:
         specifier: ^0.14.0
         version: 0.14.0
+      swr:
+        specifier: ^2.2.5
+        version: 2.3.6(react@19.1.1)
     devDependencies:
       '@types/node':
         specifier: ^20.17.13
