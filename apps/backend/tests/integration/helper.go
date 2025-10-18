@@ -95,8 +95,8 @@ func (tdb *TestDB) ClearAllTables(t *testing.T) {
 	t.Logf("Cleared %d tables for test isolation", len(tables))
 }
 
-// CreateTestCampaign テスト用のキャンペーンデータを作成
-func (tdb *TestDB) CreateTestCampaign(t *testing.T, title, message string) string {
+// CreateTestMessage テスト用のメッセージデータを作成
+func (tdb *TestDB) CreateTestMessage(t *testing.T, title, message string) string {
 	ctx := context.Background()
 
 	query := `

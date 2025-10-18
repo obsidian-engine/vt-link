@@ -6,8 +6,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
-
-	"vt-link/backend/internal/application/message"
 )
 
 type MessageAPIE2ETestSuite struct {
@@ -35,9 +33,9 @@ func (s *MessageAPIE2ETestSuite) TestHealthCheck() {
 
 func (s *MessageAPIE2ETestSuite) TestCreateMessage_Success() {
 	// メッセージ作成の正常系テスト
-	req := &message.CreateMessageInput{
-		Title: "E2Eテストメッセージ",
-		Body:  "E2Eテストメッセージ",
+	req := &CreateMessageRequest{
+		Title:   "E2Eテストメッセージ",
+		Message: "E2Eテストメッセージ",
 	}
 
 	resp, err := s.client.CreateMessage(s.T(), req)
@@ -55,9 +53,9 @@ func (s *MessageAPIE2ETestSuite) TestCreateMessage_Success() {
 
 func (s *MessageAPIE2ETestSuite) TestCreateMessage_InvalidInput() {
 	// 無効な入力でのメッセージ作成テスト
-	req := &message.CreateMessageInput{
-		Title: "", // 空のタイトル
-		Body:  "テストメッセージ",
+	req := &CreateMessageRequest{
+		Title:   "", // 空のタイトル
+		Message: "テストメッセージ",
 	}
 
 	resp, err := s.client.CreateMessage(s.T(), req)
@@ -82,9 +80,9 @@ func (s *MessageAPIE2ETestSuite) TestListMessages_Empty() {
 func (s *MessageAPIE2ETestSuite) TestCreateAndListMessages() {
 	// メッセージ作成後の一覧取得テスト
 	// 1. メッセージを作成
-	createReq := &message.CreateMessageInput{
-		Title: "一覧テストメッセージ",
-		Body:  "一覧テストメッセージ",
+	createReq := &CreateMessageRequest{
+		Title:   "一覧テストメッセージ",
+		Message: "一覧テストメッセージ",
 	}
 
 	createResp, err := s.client.CreateMessage(s.T(), createReq)
@@ -113,9 +111,9 @@ func (s *MessageAPIE2ETestSuite) TestCreateAndListMessages() {
 func (s *MessageAPIE2ETestSuite) TestSendMessage_Success() {
 	// メッセージ送信の正常系テスト
 	// 1. メッセージを作成
-	createReq := &message.CreateMessageInput{
-		Title: "送信テストメッセージ",
-		Body:  "送信テストメッセージ",
+	createReq := &CreateMessageRequest{
+		Title:   "送信テストメッセージ",
+		Message: "送信テストメッセージ",
 	}
 
 	createResp, err := s.client.CreateMessage(s.T(), createReq)
@@ -164,9 +162,9 @@ func (s *MessageAPIE2ETestSuite) TestSendMessage_NotFound() {
 func (s *MessageAPIE2ETestSuite) TestSendMessage_AlreadySent() {
 	// 既に送信済みのメッセージの再送信テスト
 	// 1. メッセージを作成
-	createReq := &message.CreateMessageInput{
-		Title: "再送信テストメッセージ",
-		Body:  "再送信テストメッセージ",
+	createReq := &CreateMessageRequest{
+		Title:   "再送信テストメッセージ",
+		Message: "再送信テストメッセージ",
 	}
 
 	createResp, err := s.client.CreateMessage(s.T(), createReq)
@@ -186,7 +184,7 @@ func (s *MessageAPIE2ETestSuite) TestSendMessage_AlreadySent() {
 
 func (s *MessageAPIE2ETestSuite) TestCompleteWorkflow() {
 	// 完全なワークフローのテスト（作成→一覧→送信→確認）
-	messages := []message.CreateMessageInput{
+	messages := []CreateMessageRequest{
 		{Title: "ワークフローテスト1", Body: "メッセージ1"},
 		{Title: "ワークフローテスト2", Body: "メッセージ2"},
 		{Title: "ワークフローテスト3", Body: "メッセージ3"},
