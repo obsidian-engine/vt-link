@@ -43,12 +43,12 @@ func (s *MessageAPIE2ETestSuite) TestCreateMessage_Success() {
 	// アサーション
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
-	assert.NotEmpty(s.T(), resp.Body.ID)
-	assert.Equal(s.T(), req.Title, resp.Body.Title)
-	assert.Equal(s.T(), req.Body, resp.Body.Body)
-	assert.Equal(s.T(), "draft", resp.Body.Status)
-	assert.False(s.T(), resp.Body.CreatedAt.IsZero())
-	assert.False(s.T(), resp.Body.UpdatedAt.IsZero())
+	assert.NotEmpty(s.T(), resp.Message.ID)
+	assert.Equal(s.T(), req.Title, resp.Message.Title)
+	assert.Equal(s.T(), req.Body, resp.Message.Body)
+	assert.Equal(s.T(), "draft", resp.Message.Status)
+	assert.False(s.T(), resp.Message.CreatedAt.IsZero())
+	assert.False(s.T(), resp.Message.UpdatedAt.IsZero())
 }
 
 func (s *MessageAPIE2ETestSuite) TestCreateMessage_InvalidInput() {
@@ -74,7 +74,7 @@ func (s *MessageAPIE2ETestSuite) TestListMessages_Empty() {
 	assert.NoError(s.T(), err)
 	assert.NotNil(s.T(), resp)
 	// 初期状態では空である可能性が高い
-	assert.IsType(s.T(), []Message{}, resp.Bodys)
+	assert.IsType(s.T(), []Message{}, resp.Messages)
 }
 
 func (s *MessageAPIE2ETestSuite) TestCreateAndListMessages() {
@@ -96,7 +96,7 @@ func (s *MessageAPIE2ETestSuite) TestCreateAndListMessages() {
 
 	// 3. 作成したメッセージが一覧に含まれていることを確認
 	found := false
-	for _, message := range listResp.Bodys {
+	for _, message := range listResp.Messages {
 		if message.ID == createResp.Body.ID {
 			found = true
 			assert.Equal(s.T(), createReq.Title, message.Title)
@@ -130,7 +130,7 @@ func (s *MessageAPIE2ETestSuite) TestSendMessage_Success() {
 
 	// 送信したメッセージのステータスが変更されていることを確認
 	found := false
-	for _, message := range listResp.Bodys {
+	for _, message := range listResp.Messages {
 		if message.ID == createResp.Body.ID {
 			found = true
 			assert.Equal(s.T(), "sent", message.Status)
@@ -197,13 +197,13 @@ func (s *MessageAPIE2ETestSuite) TestCompleteWorkflow() {
 		resp, err := s.client.CreateMessage(s.T(), &req)
 		assert.NoError(s.T(), err)
 		assert.NotNil(s.T(), resp)
-		createdIDs = append(createdIDs, resp.Body.ID)
+		createdIDs = append(createdIDs, resp.Message.ID)
 	}
 
 	// 2. 一覧で作成されたメッセージを確認
 	listResp, err := s.client.ListMessages(s.T())
 	assert.NoError(s.T(), err)
-	assert.GreaterOrEqual(s.T(), len(listResp.Bodys), len(messages))
+	assert.GreaterOrEqual(s.T(), len(listResp.Messages), len(messages))
 
 	// 3. 一部のメッセージを送信
 	for i, id := range createdIDs {
@@ -219,7 +219,7 @@ func (s *MessageAPIE2ETestSuite) TestCompleteWorkflow() {
 
 	sentCount := 0
 	draftCount := 0
-	for _, message := range finalListResp.Bodys {
+	for _, message := range finalListResp.Messages {
 		for i, id := range createdIDs {
 			if message.ID == id {
 				if i%2 == 0 {
