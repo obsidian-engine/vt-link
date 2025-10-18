@@ -6,6 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+
+	"vt-link/backend/internal/application/message"
 )
 
 type MessageAPIE2ETestSuite struct {
@@ -33,7 +35,7 @@ func (s *MessageAPIE2ETestSuite) TestHealthCheck() {
 
 func (s *MessageAPIE2ETestSuite) TestCreateMessage_Success() {
 	// メッセージ作成の正常系テスト
-	req := &CreateMessageRequest{
+	req := &message.CreateMessageInput{
 		Title: "E2Eテストメッセージ",
 		Body:  "E2Eテストメッセージ",
 	}
@@ -53,7 +55,7 @@ func (s *MessageAPIE2ETestSuite) TestCreateMessage_Success() {
 
 func (s *MessageAPIE2ETestSuite) TestCreateMessage_InvalidInput() {
 	// 無効な入力でのメッセージ作成テスト
-	req := &CreateMessageRequest{
+	req := &message.CreateMessageInput{
 		Title: "", // 空のタイトル
 		Body:  "テストメッセージ",
 	}
@@ -80,7 +82,7 @@ func (s *MessageAPIE2ETestSuite) TestListMessages_Empty() {
 func (s *MessageAPIE2ETestSuite) TestCreateAndListMessages() {
 	// メッセージ作成後の一覧取得テスト
 	// 1. メッセージを作成
-	createReq := &CreateMessageRequest{
+	createReq := &message.CreateMessageInput{
 		Title: "一覧テストメッセージ",
 		Body:  "一覧テストメッセージ",
 	}
@@ -111,7 +113,7 @@ func (s *MessageAPIE2ETestSuite) TestCreateAndListMessages() {
 func (s *MessageAPIE2ETestSuite) TestSendMessage_Success() {
 	// メッセージ送信の正常系テスト
 	// 1. メッセージを作成
-	createReq := &CreateMessageRequest{
+	createReq := &message.CreateMessageInput{
 		Title: "送信テストメッセージ",
 		Body:  "送信テストメッセージ",
 	}
@@ -162,7 +164,7 @@ func (s *MessageAPIE2ETestSuite) TestSendMessage_NotFound() {
 func (s *MessageAPIE2ETestSuite) TestSendMessage_AlreadySent() {
 	// 既に送信済みのメッセージの再送信テスト
 	// 1. メッセージを作成
-	createReq := &CreateMessageRequest{
+	createReq := &message.CreateMessageInput{
 		Title: "再送信テストメッセージ",
 		Body:  "再送信テストメッセージ",
 	}
@@ -184,7 +186,7 @@ func (s *MessageAPIE2ETestSuite) TestSendMessage_AlreadySent() {
 
 func (s *MessageAPIE2ETestSuite) TestCompleteWorkflow() {
 	// 完全なワークフローのテスト（作成→一覧→送信→確認）
-	messages := []CreateMessageRequest{
+	messages := []message.CreateMessageInput{
 		{Title: "ワークフローテスト1", Body: "メッセージ1"},
 		{Title: "ワークフローテスト2", Body: "メッセージ2"},
 		{Title: "ワークフローテスト3", Body: "メッセージ3"},

@@ -18,7 +18,7 @@ import (
 type MessageRepositoryIntegrationTestSuite struct {
 	suite.Suite
 	testDB *TestDB
-	repo   repository.BodyRepository
+	repo   repository.MessageRepository
 	ctx    context.Context
 }
 
