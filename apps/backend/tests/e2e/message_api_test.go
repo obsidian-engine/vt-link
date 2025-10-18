@@ -97,7 +97,7 @@ func (s *MessageAPIE2ETestSuite) TestCreateAndListMessages() {
 	// 3. 作成したメッセージが一覧に含まれていることを確認
 	found := false
 	for _, message := range listResp.Messages {
-		if message.ID == createResp.Body.ID {
+		if message.ID == createResp.Message.ID {
 			found = true
 			assert.Equal(s.T(), createReq.Title, message.Title)
 			assert.Equal(s.T(), createReq.Body, message.Body)
@@ -121,7 +121,7 @@ func (s *MessageAPIE2ETestSuite) TestSendMessage_Success() {
 	assert.NotNil(s.T(), createResp)
 
 	// 2. メッセージを送信
-	err = s.client.SendMessage(s.T(), createResp.Body.ID)
+	err = s.client.SendMessage(s.T(), createResp.Message.ID)
 	assert.NoError(s.T(), err)
 
 	// 3. 送信後の状態を確認
@@ -131,7 +131,7 @@ func (s *MessageAPIE2ETestSuite) TestSendMessage_Success() {
 	// 送信したメッセージのステータスが変更されていることを確認
 	found := false
 	for _, message := range listResp.Messages {
-		if message.ID == createResp.Body.ID {
+		if message.ID == createResp.Message.ID {
 			found = true
 			assert.Equal(s.T(), "sent", message.Status)
 			assert.NotNil(s.T(), message.SentAt)
@@ -171,11 +171,11 @@ func (s *MessageAPIE2ETestSuite) TestSendMessage_AlreadySent() {
 	assert.NoError(s.T(), err)
 
 	// 2. 初回送信
-	err = s.client.SendMessage(s.T(), createResp.Body.ID)
+	err = s.client.SendMessage(s.T(), createResp.Message.ID)
 	assert.NoError(s.T(), err)
 
 	// 3. 再送信を試行
-	err = s.client.SendMessage(s.T(), createResp.Body.ID)
+	err = s.client.SendMessage(s.T(), createResp.Message.ID)
 
 	// アサーション
 	assert.Error(s.T(), err)
