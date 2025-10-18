@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"vt-link/backend/internal/application/campaign"
+	"vt-link/backend/internal/application/message"
 	"vt-link/backend/internal/infrastructure/di"
 	httphelper "vt-link/backend/internal/infrastructure/http"
 )
@@ -50,12 +50,12 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	now := time.Now()
-	input := &campaign.SchedulerInput{
+	input := &message.SchedulerInput{
 		Now:   now,
 		Limit: 30, // Vercel Functions環境での安全な処理数
 	}
 
-	processedCount, err := container.CampaignUsecase.RunScheduler(ctx, input)
+	processedCount, err := container.MessageUsecase.RunScheduler(ctx, input)
 	if err != nil {
 		httphelper.WriteError(w, err)
 		return

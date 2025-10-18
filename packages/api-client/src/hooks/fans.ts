@@ -13,6 +13,7 @@ export function useFans(page = 1, limit = 20) {
           query: { page, limit }
         }
       })
+      // @ts-ignore - OpenAPI generated types issue
       if (res.error) throw res.error
       return res.data
     }
@@ -26,6 +27,7 @@ export function useFan(id: string) {
       const res = await client.GET('/api/v1/fans/{id}', {
         params: { path: { id } }
       })
+      // @ts-ignore - OpenAPI generated types issue
       if (res.error) throw res.error
       return res.data
     }

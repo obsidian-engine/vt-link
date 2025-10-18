@@ -59,7 +59,7 @@ func (tdb *TestDB) ClearAllTables(t *testing.T) {
 
 	// PostgreSQL用のクリーンアップ（CASCADE付きTRUNCATE）
 	tables := []string{
-		"campaigns", // 依存関係の順序に注意
+		"messages", // 依存関係の順序に注意
 	}
 
 	tx, err := tdb.DB.BeginTxx(ctx, nil)
@@ -95,23 +95,23 @@ func (tdb *TestDB) ClearAllTables(t *testing.T) {
 	t.Logf("Cleared %d tables for test isolation", len(tables))
 }
 
-// CreateTestCampaign テスト用のキャンペーンデータを作成
-func (tdb *TestDB) CreateTestCampaign(t *testing.T, title, message string) string {
+// CreateTestMessage テスト用のメッセージデータを作成
+func (tdb *TestDB) CreateTestMessage(t *testing.T, title, message string) string {
 	ctx := context.Background()
 
 	query := `
-		INSERT INTO campaigns (id, title, message, status, created_at, updated_at)
+		INSERT INTO messages (id, title, message, status, created_at, updated_at)
 		VALUES (gen_random_uuid(), $1, $2, 'draft', NOW(), NOW())
 		RETURNING id
 	`
 
-	var campaignID string
-	err := tdb.DB.GetContext(ctx, &campaignID, query, title, message)
+	var messageID string
+	err := tdb.DB.GetContext(ctx, &messageID, query, title, message)
 	if err != nil {
-		t.Fatalf("Failed to create test campaign: %v", err)
+		t.Fatalf("Failed to create test message: %v", err)
 	}
 
-	return campaignID
+	return messageID
 }
 
 // TestContainer 結合テスト用のDIコンテナを作成

@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/v1/campaigns": {
+    "/api/v1/messages": {
         parameters: {
             query?: never;
             header?: never;
@@ -12,8 +12,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * キャンペーン一覧取得
-         * @description キャンペーン一覧を取得
+         * メッセージ一覧取得
+         * @description メッセージ一覧を取得
          */
         get: {
             parameters: {
@@ -29,7 +29,7 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description キャンペーン一覧 */
+                /** @description メッセージ一覧 */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -40,17 +40,17 @@ export interface paths {
                             data: {
                                 /**
                                  * Format: uuid
-                                 * @description キャンペーンID
+                                 * @description メッセージID
                                  * @example 550e8400-e29b-41d4-a716-446655440000
                                  */
                                 id: string;
                                 /**
-                                 * @description キャンペーンタイトル
-                                 * @example 新商品リリース記念キャンペーン
+                                 * @description メッセージタイトル
+                                 * @example 新商品リリース記念
                                  */
                                 title: string;
                                 /**
-                                 * @description キャンペーン本文
+                                 * @description メッセージ本文
                                  * @example 新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！
                                  */
                                 body: string;
@@ -73,7 +73,7 @@ export interface paths {
                                  */
                                 sentAt: string | null;
                                 /**
-                                 * @description キャンペーンのステータス
+                                 * @description メッセージ配信のステータス
                                  * @example draft
                                  * @enum {string}
                                  */
@@ -117,8 +117,8 @@ export interface paths {
         };
         put?: never;
         /**
-         * キャンペーン作成
-         * @description キャンペーンを作成
+         * メッセージ作成
+         * @description メッセージを作成
          */
         post: {
             parameters: {
@@ -133,7 +133,7 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description 作成されたキャンペーン */
+                /** @description 作成されたメッセージ */
                 201: {
                     headers: {
                         [name: string]: unknown;
@@ -142,10 +142,10 @@ export interface paths {
                         "application/json": {
                             ok: boolean;
                             /**
-                             * @description キャンペーン情報
+                             * @description メッセージ配信情報
                              * @example {
                              *       "id": "550e8400-e29b-41d4-a716-446655440000",
-                             *       "title": "新商品リリース記念キャンペーン",
+                             *       "title": "新商品リリース記念",
                              *       "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
                              *       "imageUrl": "https://example.com/image.jpg",
                              *       "scheduledAt": "2025-01-15T10:00:00Z",
@@ -158,17 +158,17 @@ export interface paths {
                             data: {
                                 /**
                                  * Format: uuid
-                                 * @description キャンペーンID
+                                 * @description メッセージID
                                  * @example 550e8400-e29b-41d4-a716-446655440000
                                  */
                                 id: string;
                                 /**
-                                 * @description キャンペーンタイトル
-                                 * @example 新商品リリース記念キャンペーン
+                                 * @description メッセージタイトル
+                                 * @example 新商品リリース記念
                                  */
                                 title: string;
                                 /**
-                                 * @description キャンペーン本文
+                                 * @description メッセージ本文
                                  * @example 新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！
                                  */
                                 body: string;
@@ -191,7 +191,7 @@ export interface paths {
                                  */
                                 sentAt: string | null;
                                 /**
-                                 * @description キャンペーンのステータス
+                                 * @description メッセージ配信のステータス
                                  * @example draft
                                  * @enum {string}
                                  */
@@ -239,7 +239,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/campaigns/{id}": {
+    "/api/v1/messages/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -247,22 +247,22 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * キャンペーン詳細取得
-         * @description キャンペーン詳細を取得
+         * メッセージ詳細取得
+         * @description メッセージ詳細を取得
          */
         get: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description キャンペーンID */
+                    /** @description メッセージID */
                     id: string;
                 };
                 cookie?: never;
             };
             requestBody?: never;
             responses: {
-                /** @description キャンペーン詳細 */
+                /** @description メッセージ詳細 */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -271,10 +271,10 @@ export interface paths {
                         "application/json": {
                             ok: boolean;
                             /**
-                             * @description キャンペーン情報
+                             * @description メッセージ配信情報
                              * @example {
                              *       "id": "550e8400-e29b-41d4-a716-446655440000",
-                             *       "title": "新商品リリース記念キャンペーン",
+                             *       "title": "新商品リリース記念",
                              *       "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
                              *       "imageUrl": "https://example.com/image.jpg",
                              *       "scheduledAt": "2025-01-15T10:00:00Z",
@@ -287,17 +287,17 @@ export interface paths {
                             data: {
                                 /**
                                  * Format: uuid
-                                 * @description キャンペーンID
+                                 * @description メッセージID
                                  * @example 550e8400-e29b-41d4-a716-446655440000
                                  */
                                 id: string;
                                 /**
-                                 * @description キャンペーンタイトル
-                                 * @example 新商品リリース記念キャンペーン
+                                 * @description メッセージタイトル
+                                 * @example 新商品リリース記念
                                  */
                                 title: string;
                                 /**
-                                 * @description キャンペーン本文
+                                 * @description メッセージ本文
                                  * @example 新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！
                                  */
                                 body: string;
@@ -320,7 +320,7 @@ export interface paths {
                                  */
                                 sentAt: string | null;
                                 /**
-                                 * @description キャンペーンのステータス
+                                 * @description メッセージ配信のステータス
                                  * @example draft
                                  * @enum {string}
                                  */
@@ -341,7 +341,7 @@ export interface paths {
                         };
                     };
                 };
-                /** @description キャンペーンが見つかりません */
+                /** @description メッセージが見つかりません */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -363,15 +363,15 @@ export interface paths {
             };
         };
         /**
-         * キャンペーン更新
-         * @description キャンペーンを更新
+         * メッセージ更新
+         * @description メッセージを更新
          */
         put: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description キャンペーンID */
+                    /** @description メッセージID */
                     id: string;
                 };
                 cookie?: never;
@@ -382,7 +382,7 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description 更新されたキャンペーン */
+                /** @description 更新されたメッセージ */
                 200: {
                     headers: {
                         [name: string]: unknown;
@@ -391,10 +391,10 @@ export interface paths {
                         "application/json": {
                             ok: boolean;
                             /**
-                             * @description キャンペーン情報
+                             * @description メッセージ配信情報
                              * @example {
                              *       "id": "550e8400-e29b-41d4-a716-446655440000",
-                             *       "title": "新商品リリース記念キャンペーン",
+                             *       "title": "新商品リリース記念",
                              *       "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
                              *       "imageUrl": "https://example.com/image.jpg",
                              *       "scheduledAt": "2025-01-15T10:00:00Z",
@@ -407,17 +407,17 @@ export interface paths {
                             data: {
                                 /**
                                  * Format: uuid
-                                 * @description キャンペーンID
+                                 * @description メッセージID
                                  * @example 550e8400-e29b-41d4-a716-446655440000
                                  */
                                 id: string;
                                 /**
-                                 * @description キャンペーンタイトル
-                                 * @example 新商品リリース記念キャンペーン
+                                 * @description メッセージタイトル
+                                 * @example 新商品リリース記念
                                  */
                                 title: string;
                                 /**
-                                 * @description キャンペーン本文
+                                 * @description メッセージ本文
                                  * @example 新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！
                                  */
                                 body: string;
@@ -440,7 +440,7 @@ export interface paths {
                                  */
                                 sentAt: string | null;
                                 /**
-                                 * @description キャンペーンのステータス
+                                 * @description メッセージ配信のステータス
                                  * @example draft
                                  * @enum {string}
                                  */
@@ -461,7 +461,7 @@ export interface paths {
                         };
                     };
                 };
-                /** @description キャンペーンが見つかりません */
+                /** @description メッセージが見つかりません */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -484,15 +484,15 @@ export interface paths {
         };
         post?: never;
         /**
-         * キャンペーン削除
-         * @description キャンペーンを削除
+         * メッセージ削除
+         * @description メッセージを削除
          */
         delete: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
-                    /** @description キャンペーンID */
+                    /** @description メッセージID */
                     id: string;
                 };
                 cookie?: never;
@@ -512,7 +512,7 @@ export interface paths {
                         };
                     };
                 };
-                /** @description キャンペーンが見つかりません */
+                /** @description メッセージが見つかりません */
                 404: {
                     headers: {
                         [name: string]: unknown;
@@ -759,10 +759,10 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
-         * @description キャンペーン情報
+         * @description メッセージ配信情報
          * @example {
          *       "id": "550e8400-e29b-41d4-a716-446655440000",
-         *       "title": "新商品リリース記念キャンペーン",
+         *       "title": "新商品リリース記念",
          *       "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
          *       "imageUrl": "https://example.com/image.jpg",
          *       "scheduledAt": "2025-01-15T10:00:00Z",
@@ -772,20 +772,20 @@ export interface components {
          *       "updatedAt": "2025-01-10T09:00:00Z"
          *     }
          */
-        Campaign: {
+        Message: {
             /**
              * Format: uuid
-             * @description キャンペーンID
+             * @description メッセージID
              * @example 550e8400-e29b-41d4-a716-446655440000
              */
             id: string;
             /**
-             * @description キャンペーンタイトル
-             * @example 新商品リリース記念キャンペーン
+             * @description メッセージタイトル
+             * @example 新商品リリース記念
              */
             title: string;
             /**
-             * @description キャンペーン本文
+             * @description メッセージ本文
              * @example 新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！
              */
             body: string;
@@ -808,7 +808,7 @@ export interface components {
              */
             sentAt: string | null;
             /**
-             * @description キャンペーンのステータス
+             * @description メッセージ配信のステータス
              * @example draft
              * @enum {string}
              */
@@ -826,8 +826,8 @@ export interface components {
              */
             updatedAt: string;
         };
-        /** @description キャンペーン作成リクエスト */
-        CreateCampaignRequest: {
+        /** @description メッセージ作成リクエスト */
+        CreateMessageRequest: {
             title: string;
             body: string;
             /** Format: uri */
@@ -840,8 +840,8 @@ export interface components {
              */
             status: "draft" | "scheduled";
         };
-        /** @description キャンペーン更新リクエスト */
-        UpdateCampaignRequest: {
+        /** @description メッセージ更新リクエスト */
+        UpdateMessageRequest: {
             title?: string;
             body?: string;
             /** Format: uri */
@@ -854,23 +854,23 @@ export interface components {
              */
             status: "draft" | "scheduled";
         };
-        /** @description キャンペーン一覧レスポンス */
-        CampaignListResponse: {
+        /** @description メッセージ一覧レスポンス */
+        MessageListResponse: {
             ok: boolean;
             data: {
                 /**
                  * Format: uuid
-                 * @description キャンペーンID
+                 * @description メッセージID
                  * @example 550e8400-e29b-41d4-a716-446655440000
                  */
                 id: string;
                 /**
-                 * @description キャンペーンタイトル
-                 * @example 新商品リリース記念キャンペーン
+                 * @description メッセージタイトル
+                 * @example 新商品リリース記念
                  */
                 title: string;
                 /**
-                 * @description キャンペーン本文
+                 * @description メッセージ本文
                  * @example 新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！
                  */
                 body: string;
@@ -893,7 +893,7 @@ export interface components {
                  */
                 sentAt: string | null;
                 /**
-                 * @description キャンペーンのステータス
+                 * @description メッセージ配信のステータス
                  * @example draft
                  * @enum {string}
                  */
@@ -912,14 +912,14 @@ export interface components {
                 updatedAt: string;
             }[];
         };
-        /** @description キャンペーンレスポンス */
-        CampaignResponse: {
+        /** @description メッセージレスポンス */
+        MessageResponse: {
             ok: boolean;
             /**
-             * @description キャンペーン情報
+             * @description メッセージ配信情報
              * @example {
              *       "id": "550e8400-e29b-41d4-a716-446655440000",
-             *       "title": "新商品リリース記念キャンペーン",
+             *       "title": "新商品リリース記念",
              *       "body": "新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！",
              *       "imageUrl": "https://example.com/image.jpg",
              *       "scheduledAt": "2025-01-15T10:00:00Z",
@@ -932,17 +932,17 @@ export interface components {
             data: {
                 /**
                  * Format: uuid
-                 * @description キャンペーンID
+                 * @description メッセージID
                  * @example 550e8400-e29b-41d4-a716-446655440000
                  */
                 id: string;
                 /**
-                 * @description キャンペーンタイトル
-                 * @example 新商品リリース記念キャンペーン
+                 * @description メッセージタイトル
+                 * @example 新商品リリース記念
                  */
                 title: string;
                 /**
-                 * @description キャンペーン本文
+                 * @description メッセージ本文
                  * @example 新商品のリリースを記念して、先着100名様に限定グッズをプレゼント！
                  */
                 body: string;
@@ -965,7 +965,7 @@ export interface components {
                  */
                 sentAt: string | null;
                 /**
-                 * @description キャンペーンのステータス
+                 * @description メッセージ配信のステータス
                  * @example draft
                  * @enum {string}
                  */
