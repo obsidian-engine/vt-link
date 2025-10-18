@@ -100,7 +100,7 @@ func (s *MessageAPIE2ETestSuite) TestCreateAndListMessages() {
 		if message.ID == createResp.Message.ID {
 			found = true
 			assert.Equal(s.T(), createReq.Title, message.Title)
-			assert.Equal(s.T(), createReq.Body, message.Body)
+			assert.Equal(s.T(), createReq.Message, message.Message)
 			assert.Equal(s.T(), "draft", message.Status)
 			break
 		}
