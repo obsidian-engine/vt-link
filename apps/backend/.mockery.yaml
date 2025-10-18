@@ -22,7 +22,7 @@ packages:
       mockname: "Mock{{.InterfaceName}}"
       outpkg: mocks
     interfaces:
-      CampaignRepository:
+      MessageRepository:
       TxManager:
 
   vt-link/backend/internal/domain/service:
@@ -35,7 +35,7 @@ packages:
     interfaces:
       Pusher:
 
-  vt-link/backend/internal/application/campaign:
+  vt-link/backend/internal/application/message:
     config:
       all: false
       dir: "{{.InterfaceDir}}/mocks"

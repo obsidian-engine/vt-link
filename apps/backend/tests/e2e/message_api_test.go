@@ -34,8 +34,8 @@ func (s *MessageAPIE2ETestSuite) TestHealthCheck() {
 func (s *MessageAPIE2ETestSuite) TestCreateMessage_Success() {
 	// メッセージ作成の正常系テスト
 	req := &CreateMessageRequest{
-		Title:   "E2Eテストメッセージ",
-		Body: "E2Eテストメッセージ",
+		Title: "E2Eテストメッセージ",
+		Body:  "E2Eテストメッセージ",
 	}
 
 	resp, err := s.client.CreateMessage(s.T(), req)
@@ -54,8 +54,8 @@ func (s *MessageAPIE2ETestSuite) TestCreateMessage_Success() {
 func (s *MessageAPIE2ETestSuite) TestCreateMessage_InvalidInput() {
 	// 無効な入力でのメッセージ作成テスト
 	req := &CreateMessageRequest{
-		Title:   "", // 空のタイトル
-		Body: "テストメッセージ",
+		Title: "", // 空のタイトル
+		Body:  "テストメッセージ",
 	}
 
 	resp, err := s.client.CreateMessage(s.T(), req)
@@ -81,8 +81,8 @@ func (s *MessageAPIE2ETestSuite) TestCreateAndListMessages() {
 	// メッセージ作成後の一覧取得テスト
 	// 1. メッセージを作成
 	createReq := &CreateMessageRequest{
-		Title:   "一覧テストメッセージ",
-		Body: "一覧テストメッセージ",
+		Title: "一覧テストメッセージ",
+		Body:  "一覧テストメッセージ",
 	}
 
 	createResp, err := s.client.CreateMessage(s.T(), createReq)
@@ -112,8 +112,8 @@ func (s *MessageAPIE2ETestSuite) TestSendMessage_Success() {
 	// メッセージ送信の正常系テスト
 	// 1. メッセージを作成
 	createReq := &CreateMessageRequest{
-		Title:   "送信テストメッセージ",
-		Body: "送信テストメッセージ",
+		Title: "送信テストメッセージ",
+		Body:  "送信テストメッセージ",
 	}
 
 	createResp, err := s.client.CreateMessage(s.T(), createReq)
@@ -163,8 +163,8 @@ func (s *MessageAPIE2ETestSuite) TestSendMessage_AlreadySent() {
 	// 既に送信済みのメッセージの再送信テスト
 	// 1. メッセージを作成
 	createReq := &CreateMessageRequest{
-		Title:   "再送信テストメッセージ",
-		Body: "再送信テストメッセージ",
+		Title: "再送信テストメッセージ",
+		Body:  "再送信テストメッセージ",
 	}
 
 	createResp, err := s.client.CreateMessage(s.T(), createReq)

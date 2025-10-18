@@ -24,7 +24,7 @@ func (s *MessageModelTestSuite) SetupTest() {
 	s.campaign = &model.Message{
 		ID:        uuid.New(),
 		Title:     "テストメッセージ",
-		Body:   "これはテストメッセージです",
+		Body:      "これはテストメッセージです",
 		Status:    model.MessageStatusDraft,
 		CreatedAt: s.fixedTime,
 		UpdatedAt: s.fixedTime,
@@ -164,7 +164,7 @@ func (s *MessageModelTestSuite) TestStatusTransitions() {
 			campaign := &model.Message{
 				ID:        uuid.New(),
 				Title:     "ステータステスト",
-				Body:   "テストメッセージ",
+				Body:      "テストメッセージ",
 				Status:    tc.initialStatus,
 				CreatedAt: s.fixedTime,
 				UpdatedAt: s.fixedTime,

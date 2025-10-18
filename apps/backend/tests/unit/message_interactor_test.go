@@ -40,8 +40,8 @@ func (s *MessageInteractorTestSuite) SetupTest() {
 func (s *MessageInteractorTestSuite) TestCreateMessage_Success() {
 	// 正常なメッセージ作成のテスト
 	input := &message.CreateMessageInput{
-		Title:   "テストメッセージ",
-		Body: "テストメッセージ",
+		Title: "テストメッセージ",
+		Body:  "テストメッセージ",
 	}
 
 	// Mockの期待値を設定（任意のMessageを受け取る）
@@ -61,8 +61,8 @@ func (s *MessageInteractorTestSuite) TestCreateMessage_Success() {
 func (s *MessageInteractorTestSuite) TestCreateMessage_EmptyTitle() {
 	// 空のタイトルでのメッセージ作成テスト
 	input := &message.CreateMessageInput{
-		Title:   "",
-		Body: "テストメッセージ",
+		Title: "",
+		Body:  "テストメッセージ",
 	}
 
 	// テスト実行
@@ -82,10 +82,10 @@ func (s *MessageInteractorTestSuite) TestSendMessage_Success() {
 	// テストデータ準備
 	messageID := uuid.New()
 	existingMessage := &model.Message{
-		ID:      messageID,
-		Title:   "テストメッセージ",
-		Body: "テストメッセージ",
-		Status:  model.MessageStatusDraft,
+		ID:     messageID,
+		Title:  "テストメッセージ",
+		Body:   "テストメッセージ",
+		Status: model.MessageStatusDraft,
 	}
 
 	input := &message.SendMessageInput{
@@ -147,10 +147,10 @@ func (s *MessageInteractorTestSuite) TestSendMessage_AlreadySent() {
 	// テストデータ準備（既に送信済みのメッセージ）
 	messageID := uuid.New()
 	alreadySentMessage := &model.Message{
-		ID:      messageID,
-		Title:   "既に送信済みメッセージ",
-		Body: "テストメッセージ",
-		Status:  model.MessageStatusSent, // 既に送信済み
+		ID:     messageID,
+		Title:  "既に送信済みメッセージ",
+		Body:   "テストメッセージ",
+		Status: model.MessageStatusSent, // 既に送信済み
 	}
 
 	input := &message.SendMessageInput{
@@ -181,10 +181,10 @@ func (s *MessageInteractorTestSuite) TestSendMessage_PushServiceFailure() {
 	// テストデータ準備
 	messageID := uuid.New()
 	existingMessage := &model.Message{
-		ID:      messageID,
-		Title:   "プッシュ失敗テストメッセージ",
-		Body: "テストメッセージ",
-		Status:  model.MessageStatusDraft,
+		ID:     messageID,
+		Title:  "プッシュ失敗テストメッセージ",
+		Body:   "テストメッセージ",
+		Status: model.MessageStatusDraft,
 	}
 
 	input := &message.SendMessageInput{
@@ -228,7 +228,7 @@ func (s *MessageInteractorTestSuite) TestListMessages_Success() {
 		{
 			ID:        uuid.New(),
 			Title:     "メッセージ1",
-			Body:   "メッセージ1",
+			Body:      "メッセージ1",
 			Status:    model.MessageStatusDraft,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
@@ -236,7 +236,7 @@ func (s *MessageInteractorTestSuite) TestListMessages_Success() {
 		{
 			ID:        uuid.New(),
 			Title:     "メッセージ2",
-			Body:   "メッセージ2",
+			Body:      "メッセージ2",
 			Status:    model.MessageStatusSent,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
