@@ -17,7 +17,7 @@
     "@vt-link/schema-zod": "workspace:*"
   },
   "devDependencies": {
-    "@types/node": "^20.17.13",
+    "@types/node": "^24.8.1",
     "openapi-typescript": "^7.5.0",
     "typescript": "^5.7.2"
   },
