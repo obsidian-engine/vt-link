@@ -1,68 +1,65 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { setTokens } from '@/lib/auth'
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/lib/auth";
 
 export default function AuthCallbackPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [error, setError] = useState<string | null>(null)
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [error, setError] = useState<string | null>(null);
+  const { login } = useAuth();
 
   useEffect(() => {
     const handleCallback = async () => {
-      const code = searchParams.get('code')
-      const state = searchParams.get('state')
-      const errorParam = searchParams.get('error')
+      const code = searchParams.get("code");
+      const state = searchParams.get("state");
+      const errorParam = searchParams.get("error");
 
       if (errorParam) {
-        setError('認証に失敗しました')
-        setTimeout(() => router.push('/login?error=auth_failed'), 2000)
-        return
+        setError("認証に失敗しました");
+        setTimeout(() => router.push("/login?error=auth_failed"), 2000);
+        return;
       }
 
       if (!code || !state) {
-        setError('認証パラメータが不足しています')
-        setTimeout(() => router.push('/login?error=invalid_params'), 2000)
-        return
+        setError("認証パラメータが不足しています");
+        setTimeout(() => router.push("/login?error=invalid_params"), 2000);
+        return;
       }
 
       try {
-        const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'
+        const apiBase =
+          process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
         const response = await fetch(`${apiBase}/auth/login`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ code, state }),
-        })
+        });
 
         if (!response.ok) {
-          throw new Error('認証リクエストに失敗しました')
+          throw new Error("認証リクエストに失敗しました");
         }
 
-        const data = await response.json()
+        const data = await response.json();
 
-        if (!data.accessToken || !data.refreshToken) {
-          throw new Error('トークンが取得できませんでした')
+        if (!data.accessToken || !data.refreshToken || !data.user) {
+          throw new Error("トークンまたはユーザー情報が取得できませんでした");
         }
 
-        // Store tokens (this will dispatch tokenUpdate event)
-        setTokens(data.accessToken, data.refreshToken)
-
-        // Small delay to ensure event is processed, then navigate
-        setTimeout(() => {
-          router.replace('/')
-        }, 100)
+        // Login with tokens (this will automatically redirect)
+        login(data.accessToken, data.refreshToken, data.user);
       } catch (err) {
-        console.error('認証エラー:', err)
-        setError('認証処理中にエラーが発生しました')
-        setTimeout(() => router.push('/login?error=auth_error'), 2000)
+        console.error("認証エラー:", err);
+        setError("認証処理中にエラーが発生しました");
+        setTimeout(() => router.push("/login?error=auth_error"), 2000);
       }
-    }
+    };
 
-    handleCallback()
-  }, [router, searchParams])
+    handleCallback();
+  }, [router, searchParams, login]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -95,12 +92,10 @@ export default function AuthCallbackPage() {
             <h2 className="mt-4 text-xl font-semibold text-gray-900">
               認証処理中...
             </h2>
-            <p className="text-sm text-gray-600">
-              しばらくお待ちください
-            </p>
+            <p className="text-sm text-gray-600">しばらくお待ちください</p>
           </>
         )}
       </div>
     </div>
-  )
+  );
 }
