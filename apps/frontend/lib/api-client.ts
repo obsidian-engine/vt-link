@@ -1,5 +1,4 @@
-import { makeClient as createClient } from '@vt-link/api-client'
-import { getAccessToken } from './auth'
+import { getCsrfToken } from './auth'
 
 export interface Message {
   id: string
@@ -96,6 +95,131 @@ export interface ApiClient {
 }
 
 export function makeClient(): ApiClient {
-  const accessToken = getAccessToken()
-  return createClient({ accessToken: accessToken || undefined }) as unknown as ApiClient
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'
+
+  /**
+   * トークンリフレッシュ
+   */
+  async function refreshToken(): Promise<boolean> {
+    try {
+      const res = await fetch(`${apiBase}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'X-CSRF-Token': getCsrfToken() || '',
+        },
+      })
+      return res.ok
+    } catch {
+      return false
+    }
+  }
+
+  /**
+   * 認証付きリクエストラッパー（401時自動リトライ）
+   */
+  async function requestWithAuth<T>(
+    method: string,
+    path: string,
+    body?: unknown
+  ): Promise<ApiResponse<T>> {
+    const makeRequest = async (): Promise<Response> => {
+      return fetch(`${apiBase}${path}`, {
+        method,
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': getCsrfToken() || '',
+        },
+        body: body ? JSON.stringify(body) : undefined,
+      })
+    }
+
+    let response = await makeRequest()
+
+    // 401エラー時はリフレッシュを試みる
+    if (response.status === 401) {
+      const refreshed = await refreshToken()
+      if (refreshed) {
+        // リトライ
+        response = await makeRequest()
+      } else {
+        return {
+          error: {
+            message: 'Session expired',
+            status: 401,
+          },
+        }
+      }
+    }
+
+    if (!response.ok) {
+      return {
+        error: {
+          message: `Request failed: ${response.statusText}`,
+          status: response.status,
+        },
+      }
+    }
+
+    try {
+      const data = await response.json()
+      return { data }
+    } catch {
+      return {
+        error: {
+          message: 'Invalid JSON response',
+          status: response.status,
+        },
+      }
+    }
+  }
+
+  return {
+    async GET<T = unknown>(
+      path: string,
+      options?: { params?: { path?: Record<string, string> } }
+    ): Promise<ApiResponse<T>> {
+      let finalPath = path
+      if (options?.params?.path) {
+        Object.entries(options.params.path).forEach(([key, value]) => {
+          finalPath = finalPath.replace(`:${key}`, value)
+        })
+      }
+      return requestWithAuth<T>('GET', finalPath)
+    },
+
+    async POST<T = unknown>(
+      path: string,
+      options?: { body?: unknown }
+    ): Promise<ApiResponse<T>> {
+      return requestWithAuth<T>('POST', path, options?.body)
+    },
+
+    async PUT<T = unknown>(
+      path: string,
+      options?: { params?: { path?: Record<string, string> }; body?: unknown }
+    ): Promise<ApiResponse<T>> {
+      let finalPath = path
+      if (options?.params?.path) {
+        Object.entries(options.params.path).forEach(([key, value]) => {
+          finalPath = finalPath.replace(`:${key}`, value)
+        })
+      }
+      return requestWithAuth<T>('PUT', finalPath, options?.body)
+    },
+
+    async DELETE<T = unknown>(
+      path: string,
+      options?: { params?: { path?: Record<string, string> } }
+    ): Promise<ApiResponse<T>> {
+      let finalPath = path
+      if (options?.params?.path) {
+        Object.entries(options.params.path).forEach(([key, value]) => {
+          finalPath = finalPath.replace(`:${key}`, value)
+        })
+      }
+      return requestWithAuth<T>('DELETE', finalPath)
+    },
+  }
 }

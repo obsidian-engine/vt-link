@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/lib/auth";
+import { useAuth, validateState } from "@/lib/auth";
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -22,6 +22,13 @@ function AuthCallbackContent() {
       const state = searchParams.get("state");
       const errorParam = searchParams.get("error");
 
+      // state検証
+      if (state && !validateState(state)) {
+        setError("認証セッションが無効です");
+        setTimeout(() => router.push("/login?error=invalid_state"), 2000);
+        return;
+      }
+
       if (errorParam) {
         setError("認証に失敗しました");
         setTimeout(() => router.push("/login?error=auth_failed"), 2000);
@@ -39,6 +46,7 @@ function AuthCallbackContent() {
           process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8080";
         const response = await fetch(`${apiBase}/auth/login`, {
           method: "POST",
+          credentials: "include",
           headers: {
             "Content-Type": "application/json",
           },
@@ -51,12 +59,12 @@ function AuthCallbackContent() {
 
         const data = await response.json();
 
-        if (!data.accessToken || !data.refreshToken || !data.user) {
-          throw new Error("トークンまたはユーザー情報が取得できませんでした");
+        if (!data.user) {
+          throw new Error("ユーザー情報が取得できませんでした");
         }
 
-        // Login with tokens
-        login(data.accessToken, data.refreshToken, data.user);
+        // Login with user info (tokens stored in HttpOnly cookies)
+        login(data.user);
         
         // Redirect to home page
         router.push('/');

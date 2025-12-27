@@ -1,60 +1,43 @@
 /**
  * Authentication Service
- * トークン管理とLINE認証フローを提供
+ * HttpOnly Cookie認証とLINE認証フローを提供
  */
 
 const LINE_CLIENT_ID = process.env.NEXT_PUBLIC_LINE_CLIENT_ID!;
 const REDIRECT_URI = process.env.NEXT_PUBLIC_LINE_REDIRECT_URI!;
 
 /**
- * アクセストークンを取得
- * @returns アクセストークン、存在しない場合はnull
+ * CSRFトークンを取得（Cookieから）
  */
-export function getAccessToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("accessToken");
+export function getCsrfToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|; )csrf_token=([^;]*)/);
+  return match ? decodeURIComponent(match[1]) : null;
 }
 
 /**
- * リフレッシュトークンを取得
- * @returns リフレッシュトークン、存在しない場合はnull
+ * OAuth state生成・保存
  */
-export function getRefreshToken(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem("refreshToken");
+export function generateAndStoreState(): string {
+  const state = crypto.randomUUID();
+  sessionStorage.setItem('oauth_state', state);
+  return state;
 }
 
 /**
- * トークンを保存
- * @param accessToken - アクセストークン
- * @param refreshToken - リフレッシュトークン
+ * OAuth state検証
  */
-export function setTokens(accessToken: string, refreshToken: string): void {
-  localStorage.setItem("accessToken", accessToken);
-  localStorage.setItem("refreshToken", refreshToken);
-}
-
-/**
- * トークンを削除
- */
-export function clearTokens(): void {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-}
-
-/**
- * 認証状態を確認
- * @returns 認証済みの場合true
- */
-export function isAuthenticated(): boolean {
-  return getAccessToken() !== null;
+export function validateState(state: string): boolean {
+  const stored = sessionStorage.getItem('oauth_state');
+  sessionStorage.removeItem('oauth_state');
+  return stored === state;
 }
 
 /**
  * LINE認証ページへリダイレクト
  */
 export function redirectToLineLogin(): void {
-  const state = Math.random().toString(36).substring(7);
+  const state = generateAndStoreState();
   const url = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${state}&scope=profile%20openid%20email`;
   window.location.href = url;
 }
