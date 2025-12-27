@@ -14,7 +14,8 @@ type AuthHandler struct {
 }
 
 type LoginRequest struct {
-	Code string `json:"code" validate:"required"`
+	Code  string `json:"code" validate:"required"`
+	State string `json:"state" validate:"required"`
 }
 
 type LoginResponse struct {
@@ -48,6 +49,9 @@ func (h *AuthHandler) Login(c echo.Context) error {
 			"error": "invalid request body",
 		})
 	}
+
+	// Note: state validation is performed on the frontend side using sessionStorage.
+	// Backend only receives the state for API consistency and potential future use.
 
 	// 1. Exchange authorization code for tokens
 	tokenResp, err := h.oauthClient.ExchangeCode(c.Request().Context(), req.Code)
