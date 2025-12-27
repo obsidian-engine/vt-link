@@ -32,8 +32,8 @@ type LineText struct {
 
 func NewLinePusher() service.Pusher {
 	return &LinePusher{
-		channelAccessToken: os.Getenv("LINE_ACCESS_TOKEN"),
-		channelID:          os.Getenv("LINE_CHANNEL_ID"),
+		channelAccessToken: os.Getenv("LINE_MESSAGING_ACCESS_TOKEN"),
+		channelID:          os.Getenv("LINE_MESSAGING_CHANNEL_ID"),
 		httpClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
