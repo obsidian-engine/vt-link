@@ -7,8 +7,14 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 GOMOD=$(GOCMD) mod
+GORUN=$(GOCMD) run
 BINARY_NAME=vt-link-backend
 COVERAGE_FILE=coverage.out
+LOG_FILE=/tmp/backend.log
+PID_FILE=/tmp/backend.pid
+
+# Default target
+.DEFAULT_GOAL := run
 
 # Test parameters
 UNIT_TEST_PACKAGES=./tests/unit/...
@@ -31,6 +37,10 @@ deps: ## Download and install dependencies
 	$(GOMOD) download
 	$(GOMOD) tidy
 
+.PHONY: vendor
+vendor: deps ## Sync vendor directory
+	$(GOMOD) vendor
+
 .PHONY: deps-dev
 deps-dev: deps ## Install development dependencies
 	$(GOGET) github.com/vektra/mockery/v2@latest
@@ -44,11 +54,66 @@ generate: ## Generate mocks and other generated code
 build: deps ## Build the application
 	$(GOBUILD) $(LDFLAGS) -o $(BINARY_NAME) -v ./cmd/server
 
+.PHONY: run
+run: vendor ## Run the server (foreground)
+	$(GORUN) cmd/server/main.go
+
+.PHONY: run-bg
+run-bg: vendor ## Run the server in background
+	@echo "Starting server in background..."
+	@nohup $(GORUN) cmd/server/main.go > $(LOG_FILE) 2>&1 & echo $$! > $(PID_FILE)
+	@echo "Server started with PID $$(cat $(PID_FILE))"
+	@echo "Logs: $(LOG_FILE)"
+
+.PHONY: stop
+stop: ## Stop the background server
+	@if [ -f $(PID_FILE) ]; then \
+		PID=$$(cat $(PID_FILE)); \
+		if ps -p $$PID > /dev/null 2>&1; then \
+			echo "Stopping server (PID: $$PID)..."; \
+			kill $$PID; \
+			rm -f $(PID_FILE); \
+			echo "Server stopped"; \
+		else \
+			echo "Server not running (stale PID file removed)"; \
+			rm -f $(PID_FILE); \
+		fi \
+	else \
+		echo "No PID file found. Server may not be running."; \
+	fi
+
+.PHONY: restart
+restart: stop run-bg ## Restart the server
+
+.PHONY: logs
+logs: ## View server logs
+	@if [ -f $(LOG_FILE) ]; then \
+		tail -f $(LOG_FILE); \
+	else \
+		echo "Log file not found: $(LOG_FILE)"; \
+	fi
+
+.PHONY: status
+status: ## Check server status
+	@if [ -f $(PID_FILE) ]; then \
+		PID=$$(cat $(PID_FILE)); \
+		if ps -p $$PID > /dev/null 2>&1; then \
+			echo "Server is running (PID: $$PID)"; \
+			curl -s http://localhost:8080/health || echo "Health check failed"; \
+		else \
+			echo "Server is not running (stale PID file)"; \
+			rm -f $(PID_FILE); \
+		fi \
+	else \
+		echo "Server is not running"; \
+	fi
+
 .PHONY: clean
 clean: ## Clean build artifacts
 	$(GOCLEAN)
 	rm -f $(BINARY_NAME)
 	rm -f $(COVERAGE_FILE)
+	rm -f $(PID_FILE)
 
 .PHONY: test
 test: test-unit ## Run all tests (default: unit tests only)
@@ -107,9 +172,9 @@ vet: ## Run go vet
 check: fmt vet lint ## Run all checks (format, vet, lint)
 
 .PHONY: dev
-dev: deps generate ## Setup development environment
+dev: deps vendor generate ## Setup development environment
 	@echo "Development environment setup complete"
-	@echo "Run 'vercel dev' to start the development server"
+	@echo "Run 'make run' to start the server"
 
 .PHONY: dev-db
 dev-db: ## Start development database (requires Docker)

@@ -8,3 +8,4 @@ node_modules
 pnpm-lock.yaml
 apps/backend/vendor
 /docs/
+apps/backend/backend.log

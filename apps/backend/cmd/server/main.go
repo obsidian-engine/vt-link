@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	"vt-link/backend/internal/infrastructure/auth"
 	"vt-link/backend/internal/infrastructure/di"
 	"vt-link/backend/internal/infrastructure/external"
@@ -11,6 +12,11 @@ import (
 )
 
 func main() {
+	// .envファイルを読み込み
+	if err := godotenv.Load(); err != nil {
+		log.Println("Warning: .env file not found, using environment variables")
+	}
+
 	log.Println("VT-Link Backend Server starting...")
 
 	// DI Container初期化

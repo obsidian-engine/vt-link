@@ -20,7 +20,7 @@ export default function SettingsPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <label htmlFor="displayName" className="block text-sm">表示名</label>
-              <input id="displayName" className="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary" placeholder="チャンネル名" defaultValue="長月 朔（サンプル）" />
+              <input id="displayName" className="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary" placeholder="チャンネル名" defaultValue="サンプルチャンネル" />
             </div>
             <div className="space-y-2">
               <label htmlFor="timezone" className="block text-sm">タイムゾーン</label>
@@ -34,7 +34,7 @@ export default function SettingsPage() {
 
           <div className="space-y-2">
             <label htmlFor="description" className="block text-sm">プロフィール説明</label>
-            <textarea id="description" className="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary" placeholder="アカウントの説明を入力..." defaultValue="VTuber活動をしている長月朔です。ゲーム配信やイベント情報をお届けします！" />
+            <textarea id="description" className="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary" placeholder="アカウントの説明を入力..." defaultValue="ゲーム配信やイベント情報をお届けします！" />
           </div>
 
           <div className="space-y-2">
