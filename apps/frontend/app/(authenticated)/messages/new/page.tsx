@@ -1,11 +1,11 @@
 'use client'
 import * as React from 'react'
 import { useCreateMessageForm, type FormValues } from './useCreateMessageForm'
-import { makeClient } from '../../../lib/api-client'
+import { makeClient } from '@/lib/api-client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { MessagePreview } from '../../../components/message-preview'
-import { ConfirmDialog } from '../../../components/confirm-dialog'
+import { MessagePreview } from '@/components/message-preview'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 
 const client = makeClient()
 

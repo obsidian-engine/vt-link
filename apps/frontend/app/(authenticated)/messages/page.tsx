@@ -1,6 +1,6 @@
 'use client'
-import { useMessages } from '../../lib/hooks/useMessages'
-import { type Message } from '../../lib/api-client'
+import { useMessages } from '@/lib/hooks/useMessages'
+import { type Message } from '@/lib/api-client'
 import Link from 'next/link'
 
 export default function MessagesPage() {
