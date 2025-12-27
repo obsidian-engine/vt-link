@@ -1,43 +1,107 @@
 /**
- * Authentication Service
- * HttpOnly Cookie認証とLINE認証フローを提供
+ * 認証サービス - localStorage操作の抽象化
+ *
+ * テスト可能な設計:
+ * - StorageAdapter インターフェースでストレージを抽象化
+ * - createAuthService でDI可能なファクトリ関数を提供
+ * - デフォルトはlocalStorageを使用
  */
 
-const LINE_CLIENT_ID = process.env.NEXT_PUBLIC_LINE_CLIENT_ID!;
-const REDIRECT_URI = process.env.NEXT_PUBLIC_LINE_REDIRECT_URI!;
+// ストレージ抽象化インターフェース
+export interface StorageAdapter {
+  getItem(key: string): string | null
+  setItem(key: string, value: string): void
+  removeItem(key: string): void
+}
+
+// トークン型定義
+export interface AuthTokens {
+  accessToken: string
+  refreshToken: string
+}
+
+// 認証サービスインターフェース
+export interface AuthService {
+  getAccessToken(): string | null
+  getRefreshToken(): string | null
+  setTokens(tokens: AuthTokens): void
+  clearTokens(): void
+  isAuthenticated(): boolean
+}
+
+// ストレージキー定数
+const STORAGE_KEYS = {
+  ACCESS_TOKEN: 'accessToken',
+  REFRESH_TOKEN: 'refreshToken',
+} as const
+
+// デフォルトのlocalStorageアダプター
+const createLocalStorageAdapter = (): StorageAdapter => ({
+  getItem: (key: string) => {
+    if (typeof window === 'undefined') return null
+    return localStorage.getItem(key)
+  },
+  setItem: (key: string, value: string) => {
+    if (typeof window === 'undefined') return
+    localStorage.setItem(key, value)
+  },
+  removeItem: (key: string) => {
+    if (typeof window === 'undefined') return
+    localStorage.removeItem(key)
+  },
+})
 
 /**
- * CSRFトークンを取得（Cookieから）
+ * 認証サービスファクトリ
+ * @param storage - ストレージアダプター（デフォルト: localStorage）
  */
-export function getCsrfToken(): string | null {
-  if (typeof document === 'undefined') return null;
-  const match = document.cookie.match(/(?:^|; )csrf_token=([^;]*)/);
-  return match ? decodeURIComponent(match[1]) : null;
+export function createAuthService(
+  storage: StorageAdapter = createLocalStorageAdapter()
+): AuthService {
+  return {
+    getAccessToken(): string | null {
+      return storage.getItem(STORAGE_KEYS.ACCESS_TOKEN)
+    },
+
+    getRefreshToken(): string | null {
+      return storage.getItem(STORAGE_KEYS.REFRESH_TOKEN)
+    },
+
+    setTokens(tokens: AuthTokens): void {
+      storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken)
+      storage.setItem(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken)
+    },
+
+    clearTokens(): void {
+      storage.removeItem(STORAGE_KEYS.ACCESS_TOKEN)
+      storage.removeItem(STORAGE_KEYS.REFRESH_TOKEN)
+    },
+
+    isAuthenticated(): boolean {
+      return this.getAccessToken() !== null
+    },
+  }
+}
+
+// デフォルトのauthServiceインスタンス
+export const authService = createAuthService()
+
+// LINE OAuth関連
+const LINE_CLIENT_ID = process.env.NEXT_PUBLIC_LINE_CLIENT_ID ?? ''
+const REDIRECT_URI = process.env.NEXT_PUBLIC_LINE_REDIRECT_URI ?? ''
+
+/**
+ * LINE OAuth認証URLを生成
+ */
+export function getLineLoginUrl(): string {
+  const state = Math.random().toString(36).substring(7)
+  return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${state}&scope=profile%20openid%20email`
 }
 
 /**
- * OAuth state生成・保存
- */
-export function generateAndStoreState(): string {
-  const state = crypto.randomUUID();
-  sessionStorage.setItem('oauth_state', state);
-  return state;
-}
-
-/**
- * OAuth state検証
- */
-export function validateState(state: string): boolean {
-  const stored = sessionStorage.getItem('oauth_state');
-  sessionStorage.removeItem('oauth_state');
-  return stored === state;
-}
-
-/**
- * LINE認証ページへリダイレクト
+ * LINE認証ページにリダイレクト
  */
 export function redirectToLineLogin(): void {
-  const state = generateAndStoreState();
-  const url = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${state}&scope=profile%20openid%20email`;
-  window.location.href = url;
+  if (typeof window === 'undefined') return
+  window.location.href = getLineLoginUrl()
 }

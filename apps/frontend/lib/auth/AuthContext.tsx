@@ -1,101 +1,80 @@
 'use client'
 
-import { createContext, useEffect, useState, type ReactNode } from 'react'
-import { getCsrfToken } from './authService'
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react'
+import {
+  authService as defaultAuthService,
+  redirectToLineLogin as defaultRedirectToLineLogin,
+  type AuthService,
+  type AuthTokens,
+} from './authService'
 
-// User型定義（バックエンドのauth_handler.goのUser型と一致）
-export interface User {
-  id: string
-  displayName: string
-  pictureUrl?: string
-  email?: string
-}
-
-// AuthContextValue型定義
-export interface AuthContextValue {
-  user: User | null
-  isLoading: boolean
+// 認証状態の型定義
+export interface AuthState {
   isAuthenticated: boolean
-  login: (user: User) => void
-  logout: () => Promise<void>
+  isLoading: boolean
 }
 
-// AuthContext作成
+// Contextの値の型定義
+export interface AuthContextValue extends AuthState {
+  login: () => void
+  logout: () => void
+  setTokens: (tokens: AuthTokens) => void
+}
+
+// Context作成（undefinedで初期化してProvider外での使用を検出）
 export const AuthContext = createContext<AuthContextValue | undefined>(
   undefined
 )
 
-const USER_STORAGE_KEY = 'vt-link-user'
-
+// Provider Props
 interface AuthProviderProps {
   children: ReactNode
+  // テスト用DI
+  authService?: AuthService
+  redirectToLineLogin?: () => void
 }
 
-// AuthProvider実装
-export function AuthProvider({ children }: AuthProviderProps): React.ReactElement {
-  const [user, setUser] = useState<User | null>(null)
+/**
+ * 認証プロバイダー
+ *
+ * 責務:
+ * - 認証状態の管理（isAuthenticated, isLoading）
+ * - トークンの保存・削除
+ * - ログイン・ログアウト処理
+ *
+ * 設計原則:
+ * - カスタムイベントを使わず、React状態で管理
+ * - テスト可能なDI設計
+ */
+export function AuthProvider({
+  children,
+  authService = defaultAuthService,
+  redirectToLineLogin = defaultRedirectToLineLogin,
+}: AuthProviderProps) {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  // login関数：ユーザー情報を保存
-  const login = (userData: User): void => {
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData))
-    setUser(userData)
-  }
-
-  // logout関数：バックエンドにログアウトリクエストを送信
-  const logout = async (): Promise<void> => {
-    try {
-      const csrfToken = getCsrfToken()
-      await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'X-CSRF-Token': csrfToken || '',
-        },
-      })
-    } catch (error) {
-      console.error('Logout error:', error)
-    } finally {
-      localStorage.removeItem(USER_STORAGE_KEY)
-      setUser(null)
-    }
-  }
-
-  // 初期チェック：localStorageからユーザー情報を復元
+  // 初期化: トークンの存在をチェック
   useEffect(() => {
-    const initAuth = async (): Promise<void> => {
-      try {
-        // Cookie から認証状態を判定するため、localStorageからユーザー情報を取得
-        const storedUser = localStorage.getItem(USER_STORAGE_KEY)
-        if (storedUser) {
-          const userData = JSON.parse(storedUser) as User
-          setUser(userData)
-        }
-      } catch (error) {
-        console.error('Auth initialization error:', error)
-        await logout()
-      } finally {
-        setIsLoading(false)
-      }
+    const checkAuth = () => {
+      const authenticated = authService.isAuthenticated()
+      setIsAuthenticated(authenticated)
+      setIsLoading(false)
     }
 
-    void initAuth()
-  }, [])
+    checkAuth()
 
-  // storageイベント監視：他タブでのログイン/ログアウトを検知
-  useEffect(() => {
-    const handleStorageChange = (event: StorageEvent): void => {
-      if (event.key === USER_STORAGE_KEY) {
-        const storedUser = localStorage.getItem(USER_STORAGE_KEY)
-
-        if (storedUser) {
-          // 他タブでログインした
-          const userData = JSON.parse(storedUser) as User
-          setUser(userData)
-        } else {
-          // 他タブでログアウトした
-          setUser(null)
-        }
+    // 他タブでのログイン/ログアウトを検知
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'accessToken') {
+        checkAuth()
       }
     }
 
@@ -103,15 +82,39 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
     return () => {
       window.removeEventListener('storage', handleStorageChange)
     }
-  }, [])
+  }, [authService])
 
-  const value: AuthContextValue = {
-    user,
-    isLoading,
-    isAuthenticated: user !== null,
-    login,
-    logout,
-  }
+  // ログイン処理（LINE OAuth）
+  const login = useCallback(() => {
+    redirectToLineLogin()
+  }, [redirectToLineLogin])
+
+  // ログアウト処理
+  const logout = useCallback(() => {
+    authService.clearTokens()
+    setIsAuthenticated(false)
+  }, [authService])
+
+  // トークン保存（OAuth callbackから呼ばれる）
+  const setTokens = useCallback(
+    (tokens: AuthTokens) => {
+      authService.setTokens(tokens)
+      setIsAuthenticated(true)
+    },
+    [authService]
+  )
+
+  // Context値をメモ化
+  const value = useMemo<AuthContextValue>(
+    () => ({
+      isAuthenticated,
+      isLoading,
+      login,
+      logout,
+      setTokens,
+    }),
+    [isAuthenticated, isLoading, login, logout, setTokens]
+  )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
