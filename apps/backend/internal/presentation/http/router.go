@@ -7,12 +7,13 @@ import (
 )
 
 type Router struct {
-	echo        *echo.Echo
-	authHandler *AuthHandler
-	jwtManager  *auth.JWTManager
+	echo             *echo.Echo
+	authHandler      *AuthHandler
+	autoReplyHandler *AutoReplyHandler
+	jwtManager       *auth.JWTManager
 }
 
-func NewRouter(authHandler *AuthHandler, jwtManager *auth.JWTManager) *Router {
+func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, jwtManager *auth.JWTManager) *Router {
 	e := echo.New()
 
 	// Middleware
@@ -21,9 +22,10 @@ func NewRouter(authHandler *AuthHandler, jwtManager *auth.JWTManager) *Router {
 	e.Use(middleware.CORS())
 
 	return &Router{
-		echo:        e,
-		authHandler: authHandler,
-		jwtManager:  jwtManager,
+		echo:             e,
+		authHandler:      authHandler,
+		autoReplyHandler: autoReplyHandler,
+		jwtManager:       jwtManager,
 	}
 }
 
@@ -42,13 +44,18 @@ func (r *Router) Setup() *echo.Echo {
 	authProtected.Use(JWTMiddleware(r.jwtManager))
 	authProtected.GET("/me", r.authHandler.Me)
 
+	// Webhook route (public, signature verified inside handler)
+	r.echo.POST("/webhook", r.autoReplyHandler.HandleWebhook)
+
 	// Protected API routes
-	api := r.echo.Group("/api")
+	api := r.echo.Group("/api/v1")
 	api.Use(JWTMiddleware(r.jwtManager))
-	// TODO: Add message routes here
-	// api.POST("/messages", messageHandler.Create)
-	// api.GET("/messages", messageHandler.List)
-	// etc.
+
+	// AutoReply routes
+	api.POST("/autoreply/rules", r.autoReplyHandler.CreateRule)
+	api.GET("/autoreply/rules", r.autoReplyHandler.ListRules)
+	api.PUT("/autoreply/rules/:id", r.autoReplyHandler.UpdateRule)
+	api.DELETE("/autoreply/rules/:id", r.autoReplyHandler.DeleteRule)
 
 	return r.echo
 }

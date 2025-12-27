@@ -10,6 +10,11 @@ import {
   Fan,
   FanListResponse,
   FanResponse,
+  AutoReplyRule,
+  CreateAutoReplyRuleRequest,
+  UpdateAutoReplyRuleRequest,
+  AutoReplyRuleListResponse,
+  AutoReplyRuleResponse,
   ApiError,
   ApiSuccess
 } from './schemas/index.js'
@@ -25,6 +30,11 @@ registry.register('MessageResponse', MessageResponse)
 registry.register('Fan', Fan)
 registry.register('FanListResponse', FanListResponse)
 registry.register('FanResponse', FanResponse)
+registry.register('AutoReplyRule', AutoReplyRule)
+registry.register('CreateAutoReplyRuleRequest', CreateAutoReplyRuleRequest)
+registry.register('UpdateAutoReplyRuleRequest', UpdateAutoReplyRuleRequest)
+registry.register('AutoReplyRuleListResponse', AutoReplyRuleListResponse)
+registry.register('AutoReplyRuleResponse', AutoReplyRuleResponse)
 registry.register('ApiError', ApiError)
 registry.register('ApiSuccess', ApiSuccess)
 
@@ -316,6 +326,10 @@ const document = generator.generateDocument({
     {
       name: 'fans',
       description: 'ファン管理API'
+    },
+    {
+      name: 'auto-reply-rules',
+      description: '自動返信ルール管理API'
     }
   ]
 })

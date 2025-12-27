@@ -2,8 +2,10 @@ package di
 
 import (
 	"log"
+	"os"
 	"sync"
 
+	"vt-link/backend/internal/application/autoreply"
 	"vt-link/backend/internal/application/message"
 	"vt-link/backend/internal/infrastructure/db"
 	"vt-link/backend/internal/infrastructure/db/pg"
@@ -12,8 +14,9 @@ import (
 )
 
 type Container struct {
-	MessageUsecase message.Usecase
-	DB             *db.DB
+	MessageUsecase   message.Usecase
+	AutoReplyUsecase autoreply.Usecase
+	DB               *db.DB
 }
 
 var (
@@ -42,6 +45,7 @@ func newContainer() (*Container, error) {
 
 	// Repository
 	messageRepo := pg.NewMessageRepository(database)
+	autoReplyRuleRepo := pg.NewAutoReplyRuleRepository(database)
 
 	// Transaction Manager
 	txManager := db.NewTxManager(database)
@@ -50,6 +54,8 @@ func newContainer() (*Container, error) {
 	pusher := external.NewLinePusher()
 	// 開発時はDummyPusherを使用する場合
 	// pusher := external.NewDummyPusher()
+
+	lineReplier := external.NewLineReplier(os.Getenv("LINE_ACCESS_TOKEN"))
 
 	// Clock
 	clock := clock.NewRealClock()
@@ -62,8 +68,14 @@ func newContainer() (*Container, error) {
 		clock,
 	)
 
+	autoReplyUsecase := autoreply.NewInteractor(
+		autoReplyRuleRepo,
+		lineReplier,
+	)
+
 	return &Container{
-		MessageUsecase: messageUsecase,
-		DB:             database,
+		MessageUsecase:   messageUsecase,
+		AutoReplyUsecase: autoReplyUsecase,
+		DB:               database,
 	}, nil
 }

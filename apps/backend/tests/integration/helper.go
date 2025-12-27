@@ -6,9 +6,12 @@ import (
 	"os"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 
+	"vt-link/backend/internal/domain/model"
 	"vt-link/backend/internal/infrastructure/db"
 	"vt-link/backend/internal/infrastructure/di"
 )
@@ -59,7 +62,8 @@ func (tdb *TestDB) ClearAllTables(t *testing.T) {
 
 	// PostgreSQL用のクリーンアップ（CASCADE付きTRUNCATE）
 	tables := []string{
-		"messages", // 依存関係の順序に注意
+		"auto_reply_rules", // 依存関係の順序に注意
+		"messages",
 	}
 
 	tx, err := tdb.DB.BeginTxx(ctx, nil)
@@ -192,4 +196,56 @@ func (m *MockPusher) AssertPushMessageCalled(t *testing.T, expectedTitle, expect
 	if !found {
 		t.Errorf("Expected PushMessage to be called with title=%q, body=%q, but it wasn't", expectedTitle, expectedBody)
 	}
+}
+
+// CreateTestAutoReplyRule テスト用の自動返信ルールを作成
+func (tdb *TestDB) CreateTestAutoReplyRule(t *testing.T, userID uuid.UUID, name string, ruleType model.AutoReplyRuleType, keywords []string, matchType *model.MatchType, replyMessage string, priority int) string {
+	ctx := context.Background()
+
+	query := `
+		INSERT INTO auto_reply_rules (id, user_id, type, name, keywords, match_type, reply_message, is_enabled, priority, created_at, updated_at)
+		VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, true, $7, NOW(), NOW())
+		RETURNING id
+	`
+
+	var ruleID string
+	err := tdb.DB.GetContext(ctx, &ruleID, query, userID, ruleType, name, pq.Array(keywords), matchType, replyMessage, priority)
+	if err != nil {
+		t.Fatalf("Failed to create test auto reply rule: %v", err)
+	}
+
+	return ruleID
+}
+
+// ClearAutoReplyRules auto_reply_rulesテーブルをクリア
+func (tdb *TestDB) ClearAutoReplyRules(t *testing.T) {
+	ctx := context.Background()
+
+	tx, err := tdb.DB.BeginTxx(ctx, nil)
+	if err != nil {
+		t.Fatalf("Failed to begin transaction: %v", err)
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	query := "TRUNCATE TABLE auto_reply_rules RESTART IDENTITY CASCADE"
+	if _, err := tx.ExecContext(ctx, query); err != nil {
+		// TRUNCATEが失敗した場合はDELETEを試行
+		deleteQuery := "DELETE FROM auto_reply_rules"
+		if _, err := tx.ExecContext(ctx, deleteQuery); err != nil {
+			t.Fatalf("Failed to clear auto_reply_rules table: %v", err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		t.Fatalf("Failed to commit transaction: %v", err)
+	}
+
+	t.Log("Cleared auto_reply_rules table for test isolation")
 }

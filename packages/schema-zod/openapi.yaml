@@ -27,6 +27,10 @@
     {
       "name": "fans",
       "description": "ファン管理API"
+    },
+    {
+      "name": "auto-reply-rules",
+      "description": "自動返信ルール管理API"
     }
   ],
   "components": {
@@ -663,6 +667,442 @@
           "data"
         ],
         "description": "ファンレスポンス"
+      },
+      "AutoReplyRule": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "ルールID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "follow",
+              "keyword"
+            ],
+            "description": "ルール種別",
+            "example": "follow"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "ルール名",
+            "example": "フォロー時の自動返信"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "description": "キーワード配列（最大10個、keyword typeの場合のみ）",
+            "example": [
+              "こんにちは",
+              "お問い合わせ"
+            ]
+          },
+          "matchType": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "partial"
+            ],
+            "description": "マッチ条件（keyword typeの場合のみ）",
+            "example": "partial"
+          },
+          "replyMessage": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000,
+            "description": "返信メッセージ",
+            "example": "フォローありがとうございます！今後ともよろしくお願いいたします。"
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "description": "有効フラグ",
+            "example": true
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "description": "優先度（1-5）",
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "作成日時 (ISO 8601)",
+            "example": "2025-01-10T09:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "更新日時 (ISO 8601)",
+            "example": "2025-01-10T09:00:00Z"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "name",
+          "replyMessage",
+          "isEnabled",
+          "priority",
+          "createdAt",
+          "updatedAt"
+        ],
+        "description": "自動返信ルール",
+        "example": {
+          "id": "550e8400-e29b-41d4-a716-446655440000",
+          "type": "follow",
+          "name": "フォロー時の自動返信",
+          "replyMessage": "フォローありがとうございます！今後ともよろしくお願いいたします。",
+          "isEnabled": true,
+          "priority": 1,
+          "createdAt": "2025-01-10T09:00:00Z",
+          "updatedAt": "2025-01-10T09:00:00Z"
+        }
+      },
+      "CreateAutoReplyRuleRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "follow",
+              "keyword"
+            ],
+            "description": "ルール種別",
+            "example": "follow"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10
+          },
+          "matchType": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "partial"
+            ],
+            "description": "キーワードマッチ条件",
+            "example": "partial"
+          },
+          "replyMessage": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "default": 1
+          }
+        },
+        "required": [
+          "type",
+          "name",
+          "replyMessage"
+        ],
+        "description": "自動返信ルール作成リクエスト"
+      },
+      "UpdateAutoReplyRuleRequest": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "follow",
+              "keyword"
+            ],
+            "description": "ルール種別",
+            "example": "follow"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10
+          },
+          "matchType": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "partial"
+            ],
+            "description": "キーワードマッチ条件",
+            "example": "partial"
+          },
+          "replyMessage": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          },
+          "isEnabled": {
+            "type": "boolean",
+            "default": true
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "default": 1
+          }
+        },
+        "description": "自動返信ルール更新リクエスト"
+      },
+      "AutoReplyRuleListResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid",
+                  "description": "ルールID",
+                  "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "follow",
+                    "keyword"
+                  ],
+                  "description": "ルール種別",
+                  "example": "follow"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 50,
+                  "description": "ルール名",
+                  "example": "フォロー時の自動返信"
+                },
+                "keywords": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 10,
+                  "description": "キーワード配列（最大10個、keyword typeの場合のみ）",
+                  "example": [
+                    "こんにちは",
+                    "お問い合わせ"
+                  ]
+                },
+                "matchType": {
+                  "type": "string",
+                  "enum": [
+                    "exact",
+                    "partial"
+                  ],
+                  "description": "マッチ条件（keyword typeの場合のみ）",
+                  "example": "partial"
+                },
+                "replyMessage": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1000,
+                  "description": "返信メッセージ",
+                  "example": "フォローありがとうございます！今後ともよろしくお願いいたします。"
+                },
+                "isEnabled": {
+                  "type": "boolean",
+                  "description": "有効フラグ",
+                  "example": true
+                },
+                "priority": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5,
+                  "description": "優先度（1-5）",
+                  "example": 1
+                },
+                "createdAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "作成日時 (ISO 8601)",
+                  "example": "2025-01-10T09:00:00Z"
+                },
+                "updatedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "更新日時 (ISO 8601)",
+                  "example": "2025-01-10T09:00:00Z"
+                }
+              },
+              "required": [
+                "id",
+                "type",
+                "name",
+                "replyMessage",
+                "isEnabled",
+                "priority",
+                "createdAt",
+                "updatedAt"
+              ],
+              "description": "自動返信ルール",
+              "example": {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "type": "follow",
+                "name": "フォロー時の自動返信",
+                "replyMessage": "フォローありがとうございます！今後ともよろしくお願いいたします。",
+                "isEnabled": true,
+                "priority": 1,
+                "createdAt": "2025-01-10T09:00:00Z",
+                "updatedAt": "2025-01-10T09:00:00Z"
+              }
+            }
+          }
+        },
+        "required": [
+          "ok",
+          "data"
+        ],
+        "description": "自動返信ルール一覧レスポンス"
+      },
+      "AutoReplyRuleResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "description": "ルールID",
+                "example": "550e8400-e29b-41d4-a716-446655440000"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "follow",
+                  "keyword"
+                ],
+                "description": "ルール種別",
+                "example": "follow"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 50,
+                "description": "ルール名",
+                "example": "フォロー時の自動返信"
+              },
+              "keywords": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "description": "キーワード配列（最大10個、keyword typeの場合のみ）",
+                "example": [
+                  "こんにちは",
+                  "お問い合わせ"
+                ]
+              },
+              "matchType": {
+                "type": "string",
+                "enum": [
+                  "exact",
+                  "partial"
+                ],
+                "description": "マッチ条件（keyword typeの場合のみ）",
+                "example": "partial"
+              },
+              "replyMessage": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000,
+                "description": "返信メッセージ",
+                "example": "フォローありがとうございます！今後ともよろしくお願いいたします。"
+              },
+              "isEnabled": {
+                "type": "boolean",
+                "description": "有効フラグ",
+                "example": true
+              },
+              "priority": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5,
+                "description": "優先度（1-5）",
+                "example": 1
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "作成日時 (ISO 8601)",
+                "example": "2025-01-10T09:00:00Z"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time",
+                "description": "更新日時 (ISO 8601)",
+                "example": "2025-01-10T09:00:00Z"
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "name",
+              "replyMessage",
+              "isEnabled",
+              "priority",
+              "createdAt",
+              "updatedAt"
+            ],
+            "description": "自動返信ルール",
+            "example": {
+              "id": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "follow",
+              "name": "フォロー時の自動返信",
+              "replyMessage": "フォローありがとうございます！今後ともよろしくお願いいたします。",
+              "isEnabled": true,
+              "priority": 1,
+              "createdAt": "2025-01-10T09:00:00Z",
+              "updatedAt": "2025-01-10T09:00:00Z"
+            }
+          }
+        },
+        "required": [
+          "ok",
+          "data"
+        ],
+        "description": "自動返信ルールレスポンス"
       },
       "ApiError": {
         "type": "object",

@@ -12,6 +12,39 @@ export interface Message {
   updatedAt: string
 }
 
+export interface AutoReplyRule {
+  id: string
+  type: 'follow' | 'keyword'
+  name: string
+  keywords?: string[]
+  matchType?: 'exact' | 'partial'
+  replyMessage: string
+  priority: number
+  isEnabled: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateAutoReplyRuleRequest {
+  type: 'follow' | 'keyword'
+  name: string
+  keywords?: string[]
+  matchType?: 'exact' | 'partial'
+  replyMessage: string
+  priority: number
+  isEnabled?: boolean
+}
+
+export interface UpdateAutoReplyRuleRequest {
+  type?: 'follow' | 'keyword'
+  name?: string
+  keywords?: string[]
+  matchType?: 'exact' | 'partial'
+  replyMessage?: string
+  priority?: number
+  isEnabled?: boolean
+}
+
 export interface ApiResponse<T> {
   data?: T
   error?: {

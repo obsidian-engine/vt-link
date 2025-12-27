@@ -1150,6 +1150,264 @@ export interface components {
                 tags: string[];
             };
         };
+        /**
+         * @description 自動返信ルール
+         * @example {
+         *       "id": "550e8400-e29b-41d4-a716-446655440000",
+         *       "type": "follow",
+         *       "name": "フォロー時の自動返信",
+         *       "replyMessage": "フォローありがとうございます！今後ともよろしくお願いいたします。",
+         *       "isEnabled": true,
+         *       "priority": 1,
+         *       "createdAt": "2025-01-10T09:00:00Z",
+         *       "updatedAt": "2025-01-10T09:00:00Z"
+         *     }
+         */
+        AutoReplyRule: {
+            /**
+             * Format: uuid
+             * @description ルールID
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            id: string;
+            /**
+             * @description ルール種別
+             * @example follow
+             * @enum {string}
+             */
+            type: "follow" | "keyword";
+            /**
+             * @description ルール名
+             * @example フォロー時の自動返信
+             */
+            name: string;
+            /**
+             * @description キーワード配列（最大10個、keyword typeの場合のみ）
+             * @example [
+             *       "こんにちは",
+             *       "お問い合わせ"
+             *     ]
+             */
+            keywords?: string[];
+            /**
+             * @description マッチ条件（keyword typeの場合のみ）
+             * @example partial
+             * @enum {string}
+             */
+            matchType?: "exact" | "partial";
+            /**
+             * @description 返信メッセージ
+             * @example フォローありがとうございます！今後ともよろしくお願いいたします。
+             */
+            replyMessage: string;
+            /**
+             * @description 有効フラグ
+             * @example true
+             */
+            isEnabled: boolean;
+            /**
+             * @description 優先度（1-5）
+             * @example 1
+             */
+            priority: number;
+            /**
+             * Format: date-time
+             * @description 作成日時 (ISO 8601)
+             * @example 2025-01-10T09:00:00Z
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description 更新日時 (ISO 8601)
+             * @example 2025-01-10T09:00:00Z
+             */
+            updatedAt: string;
+        };
+        /** @description 自動返信ルール作成リクエスト */
+        CreateAutoReplyRuleRequest: {
+            /**
+             * @description ルール種別
+             * @example follow
+             * @enum {string}
+             */
+            type: "follow" | "keyword";
+            name: string;
+            keywords?: string[];
+            /**
+             * @description キーワードマッチ条件
+             * @example partial
+             * @enum {string}
+             */
+            matchType?: "exact" | "partial";
+            replyMessage: string;
+            /** @default true */
+            isEnabled: boolean;
+            /** @default 1 */
+            priority: number;
+        };
+        /** @description 自動返信ルール更新リクエスト */
+        UpdateAutoReplyRuleRequest: {
+            /**
+             * @description ルール種別
+             * @example follow
+             * @enum {string}
+             */
+            type?: "follow" | "keyword";
+            name?: string;
+            keywords?: string[];
+            /**
+             * @description キーワードマッチ条件
+             * @example partial
+             * @enum {string}
+             */
+            matchType?: "exact" | "partial";
+            replyMessage?: string;
+            /** @default true */
+            isEnabled: boolean;
+            /** @default 1 */
+            priority: number;
+        };
+        /** @description 自動返信ルール一覧レスポンス */
+        AutoReplyRuleListResponse: {
+            ok: boolean;
+            data: {
+                /**
+                 * Format: uuid
+                 * @description ルールID
+                 * @example 550e8400-e29b-41d4-a716-446655440000
+                 */
+                id: string;
+                /**
+                 * @description ルール種別
+                 * @example follow
+                 * @enum {string}
+                 */
+                type: "follow" | "keyword";
+                /**
+                 * @description ルール名
+                 * @example フォロー時の自動返信
+                 */
+                name: string;
+                /**
+                 * @description キーワード配列（最大10個、keyword typeの場合のみ）
+                 * @example [
+                 *       "こんにちは",
+                 *       "お問い合わせ"
+                 *     ]
+                 */
+                keywords?: string[];
+                /**
+                 * @description マッチ条件（keyword typeの場合のみ）
+                 * @example partial
+                 * @enum {string}
+                 */
+                matchType?: "exact" | "partial";
+                /**
+                 * @description 返信メッセージ
+                 * @example フォローありがとうございます！今後ともよろしくお願いいたします。
+                 */
+                replyMessage: string;
+                /**
+                 * @description 有効フラグ
+                 * @example true
+                 */
+                isEnabled: boolean;
+                /**
+                 * @description 優先度（1-5）
+                 * @example 1
+                 */
+                priority: number;
+                /**
+                 * Format: date-time
+                 * @description 作成日時 (ISO 8601)
+                 * @example 2025-01-10T09:00:00Z
+                 */
+                createdAt: string;
+                /**
+                 * Format: date-time
+                 * @description 更新日時 (ISO 8601)
+                 * @example 2025-01-10T09:00:00Z
+                 */
+                updatedAt: string;
+            }[];
+        };
+        /** @description 自動返信ルールレスポンス */
+        AutoReplyRuleResponse: {
+            ok: boolean;
+            /**
+             * @description 自動返信ルール
+             * @example {
+             *       "id": "550e8400-e29b-41d4-a716-446655440000",
+             *       "type": "follow",
+             *       "name": "フォロー時の自動返信",
+             *       "replyMessage": "フォローありがとうございます！今後ともよろしくお願いいたします。",
+             *       "isEnabled": true,
+             *       "priority": 1,
+             *       "createdAt": "2025-01-10T09:00:00Z",
+             *       "updatedAt": "2025-01-10T09:00:00Z"
+             *     }
+             */
+            data: {
+                /**
+                 * Format: uuid
+                 * @description ルールID
+                 * @example 550e8400-e29b-41d4-a716-446655440000
+                 */
+                id: string;
+                /**
+                 * @description ルール種別
+                 * @example follow
+                 * @enum {string}
+                 */
+                type: "follow" | "keyword";
+                /**
+                 * @description ルール名
+                 * @example フォロー時の自動返信
+                 */
+                name: string;
+                /**
+                 * @description キーワード配列（最大10個、keyword typeの場合のみ）
+                 * @example [
+                 *       "こんにちは",
+                 *       "お問い合わせ"
+                 *     ]
+                 */
+                keywords?: string[];
+                /**
+                 * @description マッチ条件（keyword typeの場合のみ）
+                 * @example partial
+                 * @enum {string}
+                 */
+                matchType?: "exact" | "partial";
+                /**
+                 * @description 返信メッセージ
+                 * @example フォローありがとうございます！今後ともよろしくお願いいたします。
+                 */
+                replyMessage: string;
+                /**
+                 * @description 有効フラグ
+                 * @example true
+                 */
+                isEnabled: boolean;
+                /**
+                 * @description 優先度（1-5）
+                 * @example 1
+                 */
+                priority: number;
+                /**
+                 * Format: date-time
+                 * @description 作成日時 (ISO 8601)
+                 * @example 2025-01-10T09:00:00Z
+                 */
+                createdAt: string;
+                /**
+                 * Format: date-time
+                 * @description 更新日時 (ISO 8601)
+                 * @example 2025-01-10T09:00:00Z
+                 */
+                updatedAt: string;
+            };
+        };
         /** @description APIエラーレスポンス */
         ApiError: {
             /** @enum {boolean} */
