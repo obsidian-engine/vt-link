@@ -1,12 +1,19 @@
 package http
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"vt-link/backend/internal/application/message"
+)
+
+const (
+	DefaultLimit  = 10
+	DefaultOffset = 0
+	MaxLimit      = 100
 )
 
 // MessageHandler handles HTTP requests for message management
@@ -39,14 +46,14 @@ func (h *MessageHandler) ListMessages(c echo.Context) error {
 	limitStr := c.QueryParam("limit")
 	offsetStr := c.QueryParam("offset")
 
-	limit := 10 // default
-	offset := 0 // default
+	limit := DefaultLimit
+	offset := DefaultOffset
 
 	if limitStr != "" {
 		parsedLimit, err := strconv.Atoi(limitStr)
-		if err != nil {
+		if err != nil || parsedLimit < 0 || parsedLimit > MaxLimit {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
-				"error": "invalid limit parameter",
+				"error": "invalid limit parameter (0-100)",
 			})
 		}
 		limit = parsedLimit
@@ -54,7 +61,7 @@ func (h *MessageHandler) ListMessages(c echo.Context) error {
 
 	if offsetStr != "" {
 		parsedOffset, err := strconv.Atoi(offsetStr)
-		if err != nil {
+		if err != nil || parsedOffset < 0 {
 			return c.JSON(http.StatusBadRequest, map[string]interface{}{
 				"error": "invalid offset parameter",
 			})
@@ -69,8 +76,9 @@ func (h *MessageHandler) ListMessages(c echo.Context) error {
 
 	messages, err := h.usecase.ListMessages(c.Request().Context(), input)
 	if err != nil {
+		log.Printf("Failed to list messages: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": err.Error(),
+			"error": "failed to retrieve messages",
 		})
 	}
 
@@ -86,6 +94,13 @@ func (h *MessageHandler) CreateMessage(c echo.Context) error {
 		})
 	}
 
+	// バリデーション
+	if req.Title == "" || req.Body == "" {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": "title and body are required",
+		})
+	}
+
 	input := &message.CreateMessageInput{
 		Title: req.Title,
 		Body:  req.Body,
@@ -93,8 +108,9 @@ func (h *MessageHandler) CreateMessage(c echo.Context) error {
 
 	msg, err := h.usecase.CreateMessage(c.Request().Context(), input)
 	if err != nil {
+		log.Printf("Failed to create message: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": err.Error(),
+			"error": "failed to create message",
 		})
 	}
 
@@ -113,8 +129,9 @@ func (h *MessageHandler) GetMessage(c echo.Context) error {
 
 	msg, err := h.usecase.GetMessage(c.Request().Context(), id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": err.Error(),
+		log.Printf("Failed to get message: %v", err)
+		return c.JSON(http.StatusNotFound, map[string]interface{}{
+			"error": "message not found",
 		})
 	}
 
@@ -138,7 +155,6 @@ func (h *MessageHandler) UpdateMessage(c echo.Context) error {
 		})
 	}
 
-	// Note: UpdateMessageInput will be defined by dev3 in usecase.go
 	input := &message.UpdateMessageInput{
 		ID:    id,
 		Title: req.Title,
@@ -147,8 +163,9 @@ func (h *MessageHandler) UpdateMessage(c echo.Context) error {
 
 	msg, err := h.usecase.UpdateMessage(c.Request().Context(), input)
 	if err != nil {
+		log.Printf("Failed to update message: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": err.Error(),
+			"error": "failed to update message",
 		})
 	}
 
@@ -167,8 +184,9 @@ func (h *MessageHandler) DeleteMessage(c echo.Context) error {
 
 	err = h.usecase.DeleteMessage(c.Request().Context(), id)
 	if err != nil {
+		log.Printf("Failed to delete message: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": err.Error(),
+			"error": "failed to delete message",
 		})
 	}
 
@@ -191,10 +209,11 @@ func (h *MessageHandler) SendMessage(c echo.Context) error {
 
 	err = h.usecase.SendMessage(c.Request().Context(), input)
 	if err != nil {
+		log.Printf("Failed to send message: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": err.Error(),
+			"error": "failed to send message",
 		})
 	}
 
-	return c.NoContent(http.StatusOK)
+	return c.NoContent(http.StatusNoContent)
 }

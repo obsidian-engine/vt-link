@@ -1,6 +1,8 @@
 package http
 
 import (
+	"crypto/subtle"
+	"log"
 	"net/http"
 	"time"
 
@@ -30,9 +32,9 @@ func NewSchedulerHandler(usecase message.Usecase, schedulerSecret string) *Sched
 
 // Run handles POST /api/scheduler/run
 func (h *SchedulerHandler) Run(c echo.Context) error {
-	// 認証: X-Scheduler-Secret ヘッダーの検証
+	// 認証: X-Scheduler-Secret ヘッダーの検証（タイミング攻撃対策）
 	secret := c.Request().Header.Get("X-Scheduler-Secret")
-	if secret == "" || secret != h.schedulerSecret {
+	if secret == "" || subtle.ConstantTimeCompare([]byte(secret), []byte(h.schedulerSecret)) != 1 {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"error": "unauthorized",
 		})
@@ -57,8 +59,9 @@ func (h *SchedulerHandler) Run(c echo.Context) error {
 
 	processedCount, err := h.usecase.RunScheduler(c.Request().Context(), input)
 	if err != nil {
+		log.Printf("Failed to run scheduler: %v", err)
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": err.Error(),
+			"error": "failed to run scheduler",
 		})
 	}
 
