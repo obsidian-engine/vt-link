@@ -47,11 +47,13 @@ export default function AuthCallbackPage() {
           throw new Error('トークンが取得できませんでした')
         }
 
-        // Store tokens
+        // Store tokens (this will dispatch tokenUpdate event)
         setTokens(data.accessToken, data.refreshToken)
 
-        // Force reload to update auth state
-        window.location.href = '/'
+        // Small delay to ensure event is processed, then navigate
+        setTimeout(() => {
+          router.replace('/')
+        }, 100)
       } catch (err) {
         console.error('認証エラー:', err)
         setError('認証処理中にエラーが発生しました')

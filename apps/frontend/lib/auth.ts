@@ -14,11 +14,21 @@ export function getRefreshToken(): string | null {
 export function setTokens(accessToken: string, refreshToken: string): void {
   localStorage.setItem('accessToken', accessToken)
   localStorage.setItem('refreshToken', refreshToken)
+
+  // Dispatch custom event to notify auth state change
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('tokenUpdate'))
+  }
 }
 
 export function clearTokens(): void {
   localStorage.removeItem('accessToken')
   localStorage.removeItem('refreshToken')
+
+  // Dispatch custom event to notify auth state change
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('tokenUpdate'))
+  }
 }
 
 export function isAuthenticated(): boolean {

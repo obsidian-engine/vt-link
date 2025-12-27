@@ -33,6 +33,24 @@ export function AppLayout({ children }: AppLayoutProps) {
     }
 
     checkAuth()
+
+    // Listen for storage changes (when tokens are set from another tab/window)
+    const handleStorageChange = () => {
+      checkAuth()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+
+    // Custom event for same-window token updates
+    const handleTokenUpdate = () => {
+      checkAuth()
+    }
+    window.addEventListener('tokenUpdate', handleTokenUpdate)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('tokenUpdate', handleTokenUpdate)
+    }
   }, [pathname, router])
 
   const handleLogout = () => {
