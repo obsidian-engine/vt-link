@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 
@@ -9,9 +9,15 @@ function AuthCallbackContent() {
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
+  const hasProcessed = useRef(false);
 
   useEffect(() => {
+    // Prevent double execution in React Strict Mode
+    if (hasProcessed.current) return;
+
     const handleCallback = async () => {
+      hasProcessed.current = true;
+
       const code = searchParams.get("code");
       const state = searchParams.get("state");
       const errorParam = searchParams.get("error");
@@ -59,7 +65,8 @@ function AuthCallbackContent() {
     };
 
     handleCallback();
-  }, [router, searchParams, login]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty deps - run once on mount
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
