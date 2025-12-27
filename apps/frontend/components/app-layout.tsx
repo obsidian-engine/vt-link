@@ -13,6 +13,14 @@ interface AppLayoutProps {
 export function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken')
+      localStorage.removeItem('refreshToken')
+      window.location.href = '/login'
+    }
+  }
+
   return (
     <div className="flex min-h-screen">
       <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
@@ -38,6 +46,13 @@ export function AppLayout({ children }: AppLayoutProps) {
               className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground shadow-md hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               新規メッセージ
+            </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600 text-white shadow-md hover:bg-red-700 hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+            >
+              ログアウト
             </button>
             <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold shadow-md">
               SA

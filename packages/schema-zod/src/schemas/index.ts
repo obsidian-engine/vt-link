@@ -1,5 +1,6 @@
 export * from './message.js'
 export * from './fan.js'
+export * from './auth.js'
 
 // 共通レスポンス型
 import { z } from 'zod'

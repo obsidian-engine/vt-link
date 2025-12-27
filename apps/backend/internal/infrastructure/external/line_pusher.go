@@ -102,6 +102,133 @@ func (p *LinePusher) sendMessage(ctx context.Context, message LineMessage) error
 	return nil
 }
 
+// PushWithRetry 指数バックオフでリトライしながらメッセージを送信
+func (p *LinePusher) PushWithRetry(ctx context.Context, message string, maxRetries int) error {
+	if maxRetries <= 0 {
+		maxRetries = 3 // デフォルト3回
+	}
+
+	var lastErr error
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		err := p.PushText(ctx, message)
+		if err == nil {
+			return nil
+		}
+
+		lastErr = err
+		log.Printf("Retry attempt %d/%d failed: %v", attempt+1, maxRetries, err)
+
+		// 最後のリトライでなければ待機
+		if attempt < maxRetries-1 {
+			// 指数バックオフ: 1s, 2s, 4s, ...
+			backoffDuration := time.Duration(1<<uint(attempt)) * time.Second
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-time.After(backoffDuration):
+				// 次のリトライへ
+			}
+		}
+	}
+
+	return fmt.Errorf("all %d retry attempts failed: %w", maxRetries, lastErr)
+}
+
+// Broadcast 全ユーザーにブロードキャスト
+func (p *LinePusher) Broadcast(ctx context.Context, message string) error {
+	if p.channelAccessToken == "" {
+		log.Println("LINE credentials not configured, skipping broadcast")
+		return nil
+	}
+
+	payload := map[string]interface{}{
+		"messages": []LineText{
+			{
+				Type: "text",
+				Text: message,
+			},
+		},
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal broadcast message: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", "https://api.line.me/v2/bot/message/broadcast", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return fmt.Errorf("failed to create broadcast request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+p.channelAccessToken)
+
+	resp, err := p.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send broadcast request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		log.Printf("LINE Broadcast API error: status=%d, body=%s", resp.StatusCode, string(body))
+		return fmt.Errorf("LINE Broadcast API error: status %d", resp.StatusCode)
+	}
+
+	log.Printf("Successfully sent LINE broadcast message")
+	return nil
+}
+
+// MulticastByAudience オーディエンスIDのリストでマルチキャスト
+func (p *LinePusher) MulticastByAudience(ctx context.Context, audienceIDs []string, message string) error {
+	if p.channelAccessToken == "" {
+		log.Println("LINE credentials not configured, skipping multicast")
+		return nil
+	}
+
+	if len(audienceIDs) == 0 {
+		return fmt.Errorf("audienceIDs must not be empty")
+	}
+
+	payload := map[string]interface{}{
+		"to": audienceIDs,
+		"messages": []LineText{
+			{
+				Type: "text",
+				Text: message,
+			},
+		},
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("failed to marshal multicast message: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", "https://api.line.me/v2/bot/message/multicast", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return fmt.Errorf("failed to create multicast request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+p.channelAccessToken)
+
+	resp, err := p.httpClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send multicast request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		log.Printf("LINE Multicast API error: status=%d, body=%s", resp.StatusCode, string(body))
+		return fmt.Errorf("LINE Multicast API error: status %d", resp.StatusCode)
+	}
+
+	log.Printf("Successfully sent LINE multicast message to %d audiences", len(audienceIDs))
+	return nil
+}
+
 // DummyPusher テスト・開発用のダミー実装
 type DummyPusher struct{}
 
@@ -116,5 +243,20 @@ func (p *DummyPusher) PushText(ctx context.Context, text string) error {
 
 func (p *DummyPusher) PushMessage(ctx context.Context, title, body string) error {
 	log.Printf("[DUMMY] Push message - Title: %s, Body: %s", title, body)
+	return nil
+}
+
+func (p *DummyPusher) PushWithRetry(ctx context.Context, message string, maxRetries int) error {
+	log.Printf("[DUMMY] Push with retry (max: %d): %s", maxRetries, message)
+	return nil
+}
+
+func (p *DummyPusher) Broadcast(ctx context.Context, message string) error {
+	log.Printf("[DUMMY] Broadcast: %s", message)
+	return nil
+}
+
+func (p *DummyPusher) MulticastByAudience(ctx context.Context, audienceIDs []string, message string) error {
+	log.Printf("[DUMMY] Multicast to %d audiences: %s", len(audienceIDs), message)
 	return nil
 }

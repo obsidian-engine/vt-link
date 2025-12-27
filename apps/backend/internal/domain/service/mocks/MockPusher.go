@@ -116,6 +116,149 @@ func (_c *MockPusher_PushText_Call) RunAndReturn(run func(context.Context, strin
 	return _c
 }
 
+// PushWithRetry provides a mock function with given fields: ctx, message, maxRetries
+func (_m *MockPusher) PushWithRetry(ctx context.Context, message string, maxRetries int) error {
+	ret := _m.Called(ctx, message, maxRetries)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PushWithRetry")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, int) error); ok {
+		r0 = rf(ctx, message, maxRetries)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockPusher_PushWithRetry_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PushWithRetry'
+type MockPusher_PushWithRetry_Call struct {
+	*mock.Call
+}
+
+// PushWithRetry is a helper method to define mock.On call
+//   - ctx context.Context
+//   - message string
+//   - maxRetries int
+func (_e *MockPusher_Expecter) PushWithRetry(ctx interface{}, message interface{}, maxRetries interface{}) *MockPusher_PushWithRetry_Call {
+	return &MockPusher_PushWithRetry_Call{Call: _e.mock.On("PushWithRetry", ctx, message, maxRetries)}
+}
+
+func (_c *MockPusher_PushWithRetry_Call) Run(run func(ctx context.Context, message string, maxRetries int)) *MockPusher_PushWithRetry_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(int))
+	})
+	return _c
+}
+
+func (_c *MockPusher_PushWithRetry_Call) Return(_a0 error) *MockPusher_PushWithRetry_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockPusher_PushWithRetry_Call) RunAndReturn(run func(context.Context, string, int) error) *MockPusher_PushWithRetry_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// Broadcast provides a mock function with given fields: ctx, message
+func (_m *MockPusher) Broadcast(ctx context.Context, message string) error {
+	ret := _m.Called(ctx, message)
+
+	if len(ret) == 0 {
+		panic("no return value specified for Broadcast")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, message)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockPusher_Broadcast_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Broadcast'
+type MockPusher_Broadcast_Call struct {
+	*mock.Call
+}
+
+// Broadcast is a helper method to define mock.On call
+//   - ctx context.Context
+//   - message string
+func (_e *MockPusher_Expecter) Broadcast(ctx interface{}, message interface{}) *MockPusher_Broadcast_Call {
+	return &MockPusher_Broadcast_Call{Call: _e.mock.On("Broadcast", ctx, message)}
+}
+
+func (_c *MockPusher_Broadcast_Call) Run(run func(ctx context.Context, message string)) *MockPusher_Broadcast_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *MockPusher_Broadcast_Call) Return(_a0 error) *MockPusher_Broadcast_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockPusher_Broadcast_Call) RunAndReturn(run func(context.Context, string) error) *MockPusher_Broadcast_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// MulticastByAudience provides a mock function with given fields: ctx, audienceIDs, message
+func (_m *MockPusher) MulticastByAudience(ctx context.Context, audienceIDs []string, message string) error {
+	ret := _m.Called(ctx, audienceIDs, message)
+
+	if len(ret) == 0 {
+		panic("no return value specified for MulticastByAudience")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, []string, string) error); ok {
+		r0 = rf(ctx, audienceIDs, message)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// MockPusher_MulticastByAudience_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'MulticastByAudience'
+type MockPusher_MulticastByAudience_Call struct {
+	*mock.Call
+}
+
+// MulticastByAudience is a helper method to define mock.On call
+//   - ctx context.Context
+//   - audienceIDs []string
+//   - message string
+func (_e *MockPusher_Expecter) MulticastByAudience(ctx interface{}, audienceIDs interface{}, message interface{}) *MockPusher_MulticastByAudience_Call {
+	return &MockPusher_MulticastByAudience_Call{Call: _e.mock.On("MulticastByAudience", ctx, audienceIDs, message)}
+}
+
+func (_c *MockPusher_MulticastByAudience_Call) Run(run func(ctx context.Context, audienceIDs []string, message string)) *MockPusher_MulticastByAudience_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].([]string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *MockPusher_MulticastByAudience_Call) Return(_a0 error) *MockPusher_MulticastByAudience_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *MockPusher_MulticastByAudience_Call) RunAndReturn(run func(context.Context, []string, string) error) *MockPusher_MulticastByAudience_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewMockPusher creates a new instance of MockPusher. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewMockPusher(t interface {
