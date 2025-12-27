@@ -11,10 +11,12 @@ type Router struct {
 	authHandler      *AuthHandler
 	autoReplyHandler *AutoReplyHandler
 	richMenuHandler  *RichMenuHandler
+	messageHandler   *MessageHandler
+	schedulerHandler *SchedulerHandler
 	jwtManager       *auth.JWTManager
 }
 
-func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, richMenuHandler *RichMenuHandler, jwtManager *auth.JWTManager) *Router {
+func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, richMenuHandler *RichMenuHandler, messageHandler *MessageHandler, schedulerHandler *SchedulerHandler, jwtManager *auth.JWTManager) *Router {
 	e := echo.New()
 
 	// Middleware
@@ -27,6 +29,8 @@ func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, ric
 		authHandler:      authHandler,
 		autoReplyHandler: autoReplyHandler,
 		richMenuHandler:  richMenuHandler,
+		messageHandler:   messageHandler,
+		schedulerHandler: schedulerHandler,
 		jwtManager:       jwtManager,
 	}
 }
@@ -65,6 +69,17 @@ func (r *Router) Setup() *echo.Echo {
 	api.PUT("/richmenu/:id", r.richMenuHandler.UpdateRichMenu)
 	api.DELETE("/richmenu/:id", r.richMenuHandler.DeleteRichMenu)
 	api.POST("/richmenu/:id/publish", r.richMenuHandler.PublishToLINE)
+
+	// Message routes
+	api.GET("/messages", r.messageHandler.ListMessages)
+	api.POST("/messages", r.messageHandler.CreateMessage)
+	api.GET("/messages/:id", r.messageHandler.GetMessage)
+	api.PUT("/messages/:id", r.messageHandler.UpdateMessage)
+	api.DELETE("/messages/:id", r.messageHandler.DeleteMessage)
+	api.POST("/messages/:id/send", r.messageHandler.SendMessage)
+
+	// Scheduler route (public, no JWT authentication)
+	r.echo.POST("/api/scheduler/run", r.schedulerHandler.Run)
 
 	return r.echo
 }

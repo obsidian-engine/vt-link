@@ -27,6 +27,13 @@ type SchedulerInput struct {
 	Limit int       `json:"limit"`
 }
 
+type UpdateMessageInput struct {
+	ID          uuid.UUID  `json:"id"`
+	Title       *string    `json:"title,omitempty"`
+	Body        *string    `json:"body,omitempty"`
+	ScheduledAt *time.Time `json:"scheduled_at,omitempty"`
+}
+
 type Usecase interface {
 	// CreateMessage メッセージを作成
 	CreateMessage(ctx context.Context, input *CreateMessageInput) (*model.Message, error)
@@ -42,4 +49,10 @@ type Usecase interface {
 
 	// RunScheduler スケジューラ実行（スケジュール済み配信の処理）
 	RunScheduler(ctx context.Context, input *SchedulerInput) (int, error)
+
+	// UpdateMessage メッセージを更新（部分更新対応）
+	UpdateMessage(ctx context.Context, input *UpdateMessageInput) (*model.Message, error)
+
+	// DeleteMessage メッセージを削除
+	DeleteMessage(ctx context.Context, id uuid.UUID) error
 }

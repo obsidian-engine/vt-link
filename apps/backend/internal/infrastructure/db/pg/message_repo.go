@@ -139,3 +139,28 @@ func (r *MessageRepository) FindScheduledMessages(ctx context.Context, until tim
 
 	return messages, nil
 }
+
+func (r *MessageRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	query := `
+		DELETE FROM messages
+		WHERE id = $1
+	`
+
+	executor := db.GetExecutor(ctx, r.db)
+	result, err := executor.ExecContext(ctx, query, id)
+
+	if err != nil {
+		return fmt.Errorf("failed to delete message: %w", err)
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to get rows affected: %w", err)
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("message not found")
+	}
+
+	return nil
+}

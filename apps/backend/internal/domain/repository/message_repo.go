@@ -23,6 +23,9 @@ type MessageRepository interface {
 
 	// FindScheduledMessages スケジュール済みメッセージを取得
 	FindScheduledMessages(ctx context.Context, until time.Time, limit int) ([]*model.Message, error)
+
+	// Delete メッセージを削除
+	Delete(ctx context.Context, id uuid.UUID) error
 }
 
 type TxManager interface {

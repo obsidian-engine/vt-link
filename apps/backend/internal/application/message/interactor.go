@@ -140,3 +140,46 @@ func (i *Interactor) RunScheduler(ctx context.Context, input *SchedulerInput) (i
 	log.Printf("Scheduler processed %d messages, sent %d successfully", len(messages), sentCount)
 	return sentCount, nil
 }
+
+func (i *Interactor) UpdateMessage(ctx context.Context, input *UpdateMessageInput) (*model.Message, error) {
+	// 既存メッセージを取得
+	message, err := i.messageRepo.FindByID(ctx, input.ID)
+	if err != nil {
+		log.Printf("Failed to find message for update: %v", err)
+		return nil, errx.ErrNotFound
+	}
+
+	// 部分更新（nilでない項目のみ更新）
+	if input.Title != nil {
+		message.Title = *input.Title
+	}
+	if input.Body != nil {
+		message.Body = *input.Body
+	}
+	if input.ScheduledAt != nil {
+		message.ScheduledAt = input.ScheduledAt
+	}
+
+	// 更新日時を現在時刻に設定
+	message.UpdatedAt = i.clock.Now()
+
+	// リポジトリの Update 呼び出し
+	err = i.messageRepo.Update(ctx, message)
+	if err != nil {
+		log.Printf("Failed to update message: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	return message, nil
+}
+
+func (i *Interactor) DeleteMessage(ctx context.Context, id uuid.UUID) error {
+	// リポジトリの Delete 呼び出し
+	err := i.messageRepo.Delete(ctx, id)
+	if err != nil {
+		log.Printf("Failed to delete message: %v", err)
+		return errx.ErrNotFound
+	}
+
+	return nil
+}
