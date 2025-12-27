@@ -1,20 +1,22 @@
 import React from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AutoReplyPage from '../page'
 import type { AutoReplyRule } from '@/lib/api-client'
+import { useAutoReplyRules } from '@/lib/hooks/use-auto-reply-rules'
 
 // SWRフックのモック
 vi.mock('@/lib/hooks/use-auto-reply-rules', () => ({
   useAutoReplyRules: vi.fn(() => ({
     rules: [],
     isLoading: false,
-    error: null,
-    createRule: vi.fn(),
-    updateRule: vi.fn(),
-    deleteRule: vi.fn(),
+    isError: false,
+    mutate: vi.fn(),
   })),
+  createRule: vi.fn(),
+  updateRule: vi.fn(),
+  deleteRule: vi.fn(),
 }))
 
 describe('AutoReplyPage', () => {
@@ -45,164 +47,161 @@ describe('AutoReplyPage', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // window.confirmとalertをモック
+    global.confirm = vi.fn(() => true)
+    global.alert = vi.fn()
   })
 
   it('should render page title', () => {
     render(<AutoReplyPage />)
-    expect(screen.getByText('自動返信設定')).toBeInTheDocument()
+    expect(screen.getByText('自動返信ルール')).toBeInTheDocument()
   })
 
   it('should display loading state', () => {
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
-    useAutoReplyRules.mockReturnValue({
+    (useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: [],
       isLoading: true,
-      error: null,
+      isError: false,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
-    expect(screen.getByText(/読み込み中/)).toBeInTheDocument()
+    expect(screen.getByText('読み込み中...')).toBeInTheDocument()
   })
 
   it('should display error state', () => {
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
-    useAutoReplyRules.mockReturnValue({
+    (useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: [],
       isLoading: false,
-      error: new Error('Failed to fetch'),
+      isError: true,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
-    expect(screen.getByText(/エラー/)).toBeInTheDocument()
+    expect(screen.getByText('データの取得に失敗しました')).toBeInTheDocument()
   })
 
   it('should display rules list', () => {
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
-    useAutoReplyRules.mockReturnValue({
+    (useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: mockRules,
       isLoading: false,
-      error: null,
+      isError: false,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
-    expect(screen.getByText('フォロー返信')).toBeInTheDocument()
-    expect(screen.getByText('料金案内')).toBeInTheDocument()
+    expect(screen.getByText('フォロー時メッセージ')).toBeInTheDocument()
+    expect(screen.getByText('キーワード返信')).toBeInTheDocument()
   })
 
   it('should display rules sorted by priority', () => {
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
     const unsortedRules = [...mockRules].reverse()
-    useAutoReplyRules.mockReturnValue({
+    ;(useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: unsortedRules,
       isLoading: false,
-      error: null,
+      isError: false,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
 
     const ruleCards = screen.getAllByText(/優先度:/)
-    expect(ruleCards[0]).toHaveTextContent('優先度: 1')
-    expect(ruleCards[1]).toHaveTextContent('優先度: 2')
+    expect(ruleCards[0]).toHaveTextContent('優先度: 2')
+    expect(ruleCards[1]).toHaveTextContent('優先度: 1')
   })
 
   it('should show create button when rules count is less than 5', () => {
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
-    useAutoReplyRules.mockReturnValue({
+    (useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: mockRules,
       isLoading: false,
-      error: null,
+      isError: false,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
-    expect(screen.getByRole('button', { name: /新規作成/ })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /新規ルール追加/ })).toBeInTheDocument()
   })
 
   it('should disable create button when rules count is 5 or more', () => {
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
-    const maxRules: AutoReplyRule[] = Array(5)
-      .fill(null)
-      .map((_, i) => ({
-        ...mockRules[0],
-        id: `${i + 1}`,
-        name: `ルール${i + 1}`,
-        priority: i + 1,
-      }))
+    const maxRules = Array.from({ length: 5 }, (_, i) => ({
+      ...mockRules[0],
+      id: String(i + 1),
+      name: `ルール${i + 1}`,
+      priority: i + 1,
+    })) as AutoReplyRule[]
 
-    useAutoReplyRules.mockReturnValue({
+    (useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: maxRules,
       isLoading: false,
-      error: null,
+      isError: false,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
-    const createButton = screen.getByRole('button', { name: /新規作成/ })
+    const createButton = screen.getByRole('button', { name: /新規ルール追加/ })
     expect(createButton).toBeDisabled()
   })
 
   it('should display warning message when rules count is 5 or more', () => {
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
-    const maxRules: AutoReplyRule[] = Array(5)
-      .fill(null)
-      .map((_, i) => ({
-        ...mockRules[0],
-        id: `${i + 1}`,
-        name: `ルール${i + 1}`,
-        priority: i + 1,
-      }))
+    const maxRules = Array.from({ length: 5 }, (_, i) => ({
+      ...mockRules[0],
+      id: String(i + 1),
+      name: `ルール${i + 1}`,
+      priority: i + 1,
+    })) as AutoReplyRule[]
 
-    useAutoReplyRules.mockReturnValue({
+    (useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: maxRules,
       isLoading: false,
-      error: null,
+      isError: false,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
-    expect(screen.getByText(/ルールは最大5件/)).toBeInTheDocument()
+    expect(screen.getByText('5/5件のルールが登録されています')).toBeInTheDocument()
   })
 
   it('should have toggle all switch', () => {
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
-    useAutoReplyRules.mockReturnValue({
+    (useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: mockRules,
       isLoading: false,
-      error: null,
+      isError: false,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
-    expect(screen.getByRole('switch')).toBeInTheDocument()
+    expect(screen.getByRole('checkbox')).toBeInTheDocument()
   })
 
   it('should call createRule when create button is clicked', async () => {
-    const user = userEvent.setup()
-    const mockCreateRule = vi.fn()
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
-    useAutoReplyRules.mockReturnValue({
+    (useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: mockRules,
       isLoading: false,
-      error: null,
-      createRule: mockCreateRule,
+      isError: false,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
 
-    const createButton = screen.getByRole('button', { name: /新規作成/ })
-    await user.click(createButton)
+    const createButton = screen.getByRole('button', { name: /新規ルール追加/ })
+    fireEvent.click(createButton)
 
     // フォームが表示されることを確認
     await waitFor(() => {
-      expect(screen.getByText('新しいルールを作成')).toBeInTheDocument()
+      expect(screen.getByRole('heading', { name: '新規ルール追加' })).toBeInTheDocument()
     })
   })
 
   it('should call deleteRule when delete button is clicked', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.default?.setup() ?? userEvent.setup()
     const mockDeleteRule = vi.fn()
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
-    useAutoReplyRules.mockReturnValue({
+    const { deleteRule } = await import('@/lib/hooks/use-auto-reply-rules')
+    ;(deleteRule as ReturnType<typeof vi.fn>).mockImplementation(mockDeleteRule)
+    ;(useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: mockRules,
       isLoading: false,
-      error: null,
-      deleteRule: mockDeleteRule,
+      isError: false,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
@@ -211,19 +210,20 @@ describe('AutoReplyPage', () => {
     await user.click(deleteButtons[0])
 
     await waitFor(() => {
-      expect(mockDeleteRule).toHaveBeenCalledWith('1')
+      expect(mockDeleteRule).toHaveBeenCalledWith('2')
     })
   })
 
   it('should call updateRule when toggle button is clicked', async () => {
-    const user = userEvent.setup()
+    const user = userEvent.default?.setup() ?? userEvent.setup()
     const mockUpdateRule = vi.fn()
-    const { useAutoReplyRules } = require('@/lib/hooks/use-auto-reply-rules')
-    useAutoReplyRules.mockReturnValue({
+    const { updateRule } = await import('@/lib/hooks/use-auto-reply-rules')
+    ;(updateRule as ReturnType<typeof vi.fn>).mockImplementation(mockUpdateRule)
+    ;(useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: mockRules,
       isLoading: false,
-      error: null,
-      updateRule: mockUpdateRule,
+      isError: false,
+      mutate: vi.fn(),
     })
 
     render(<AutoReplyPage />)
@@ -232,7 +232,7 @@ describe('AutoReplyPage', () => {
     await user.click(toggleButtons[0])
 
     await waitFor(() => {
-      expect(mockUpdateRule).toHaveBeenCalledWith('1', { isEnabled: false })
+      expect(mockUpdateRule).toHaveBeenCalledWith('2', { isEnabled: false })
     })
   })
 })
