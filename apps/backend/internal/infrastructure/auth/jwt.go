@@ -61,12 +61,12 @@ func (m *JWTManager) ValidateToken(tokenString string) (*Claims, error) {
 	return nil, fmt.Errorf("invalid token")
 }
 
-// GenerateRefreshToken generates a refresh token with 7 days expiration
+// GenerateRefreshToken generates a refresh token with 30 days expiration
 func (m *JWTManager) GenerateRefreshToken(userID string) (string, error) {
 	claims := &Claims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(7 * 24 * time.Hour)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * 24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}

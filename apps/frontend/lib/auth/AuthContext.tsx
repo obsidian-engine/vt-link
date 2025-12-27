@@ -1,8 +1,7 @@
 'use client'
 
 import { createContext, useEffect, useState, type ReactNode } from 'react'
-import { setTokens, clearTokens, getAccessToken } from './authService'
-import { makeClient } from '../api-client'
+import { getCsrfToken } from './authService'
 
 // User型定義（バックエンドのauth_handler.goのUser型と一致）
 export interface User {
@@ -17,8 +16,8 @@ export interface AuthContextValue {
   user: User | null
   isLoading: boolean
   isAuthenticated: boolean
-  login: (accessToken: string, refreshToken: string, user: User) => void
-  logout: () => void
+  login: (user: User) => void
+  logout: () => Promise<void>
 }
 
 // AuthContext作成
@@ -37,61 +36,44 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
-  // login関数：トークンとユーザー情報を保存
-  const login = (
-    accessToken: string,
-    refreshToken: string,
-    userData: User
-  ): void => {
-    setTokens(accessToken, refreshToken)
+  // login関数：ユーザー情報を保存
+  const login = (userData: User): void => {
     localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData))
     setUser(userData)
   }
 
-  // logout関数：トークンとユーザー情報を削除
-  const logout = (): void => {
-    clearTokens()
-    localStorage.removeItem(USER_STORAGE_KEY)
-    setUser(null)
+  // logout関数：バックエンドにログアウトリクエストを送信
+  const logout = async (): Promise<void> => {
+    try {
+      const csrfToken = getCsrfToken()
+      await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'X-CSRF-Token': csrfToken || '',
+        },
+      })
+    } catch (error) {
+      console.error('Logout error:', error)
+    } finally {
+      localStorage.removeItem(USER_STORAGE_KEY)
+      setUser(null)
+    }
   }
 
   // 初期チェック：localStorageからユーザー情報を復元
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
       try {
-        const token = getAccessToken()
-        if (!token) {
-          setIsLoading(false)
-          return
-        }
-
-        // localStorageからユーザー情報を取得
+        // Cookie から認証状態を判定するため、localStorageからユーザー情報を取得
         const storedUser = localStorage.getItem(USER_STORAGE_KEY)
         if (storedUser) {
           const userData = JSON.parse(storedUser) as User
           setUser(userData)
-        } else {
-          // ユーザー情報がない場合、/auth/meを呼び出して取得を試みる
-          const client = makeClient()
-          const response = await client.GET<{ user_id: string }>('/auth/me')
-
-          if (response.data?.user_id) {
-            // 現在のバックエンド実装ではuser_idのみ返すため、最小限のUser情報を設定
-            const userData: User = {
-              id: response.data.user_id,
-              displayName: 'User', // 暫定値
-            }
-            localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData))
-            setUser(userData)
-          } else {
-            // 認証エラー時はクリア
-            logout()
-          }
         }
       } catch (error) {
-        // エラー時はログアウト状態にする
         console.error('Auth initialization error:', error)
-        logout()
+        await logout()
       } finally {
         setIsLoading(false)
       }
@@ -103,12 +85,10 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
   // storageイベント監視：他タブでのログイン/ログアウトを検知
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent): void => {
-      // tokenUpdateイベントは既存のauth.tsから発火される
-      if (event.key === 'accessToken' || event.key === USER_STORAGE_KEY) {
-        const token = getAccessToken()
+      if (event.key === USER_STORAGE_KEY) {
         const storedUser = localStorage.getItem(USER_STORAGE_KEY)
 
-        if (token && storedUser) {
+        if (storedUser) {
           // 他タブでログインした
           const userData = JSON.parse(storedUser) as User
           setUser(userData)

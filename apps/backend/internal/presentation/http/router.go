@@ -1,6 +1,9 @@
 package http
 
 import (
+	"net/http"
+	"os"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"vt-link/backend/internal/infrastructure/auth"
@@ -22,7 +25,12 @@ func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, ric
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{os.Getenv("FRONTEND_URL")},
+		AllowCredentials: true,
+		AllowHeaders:     []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, "X-CSRF-Token"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+	}))
 
 	return &Router{
 		echo:             e,
@@ -48,6 +56,7 @@ func (r *Router) Setup() *echo.Echo {
 	// Protected auth routes
 	authProtected := r.echo.Group("/auth")
 	authProtected.Use(JWTMiddleware(r.jwtManager))
+	authProtected.Use(CSRFMiddleware())
 	authProtected.GET("/me", r.authHandler.Me)
 
 	// Webhook route (public, signature verified inside handler)
@@ -56,6 +65,7 @@ func (r *Router) Setup() *echo.Echo {
 	// Protected API routes
 	api := r.echo.Group("/api/v1")
 	api.Use(JWTMiddleware(r.jwtManager))
+	api.Use(CSRFMiddleware())
 
 	// AutoReply routes
 	api.POST("/autoreply/rules", r.autoReplyHandler.CreateRule)
