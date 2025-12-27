@@ -1,5 +1,5 @@
 import useSWR from 'swr'
-import { makeClient } from '../client.js'
+import { makeClient } from '../client'
 import type { Message, CreateMessageRequest, UpdateMessageRequest } from '@vt-link/schema-zod'
 
 const client = makeClient()
