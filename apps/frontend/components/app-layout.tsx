@@ -1,10 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter, usePathname } from "next/navigation"
 import { Menu } from "lucide-react"
 // shadcn削除: Buttonをプレーン要素へ置換
 import { Sidebar } from "./sidebar"
+import { isAuthenticated, clearTokens } from "@/lib/auth"
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -12,13 +14,52 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = () => {
+      const authenticated = isAuthenticated()
+      setIsLoggedIn(authenticated)
+      setIsLoading(false)
+
+      // Redirect to login if not authenticated and not on login/auth pages
+      if (!authenticated && !pathname.startsWith('/login') && !pathname.startsWith('/auth')) {
+        router.push('/login')
+      }
+    }
+
+    checkAuth()
+  }, [pathname, router])
 
   const handleLogout = () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('accessToken')
-      localStorage.removeItem('refreshToken')
-      window.location.href = '/login'
+      clearTokens()
+      setIsLoggedIn(false)
+      router.push('/login')
     }
+  }
+
+  // Don't show layout for login/auth pages
+  if (pathname.startsWith('/login') || pathname.startsWith('/auth')) {
+    return <>{children}</>
+  }
+
+  // Show loading state while checking auth
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+      </div>
+    )
+  }
+
+  // Don't show layout if not logged in (will redirect)
+  if (!isLoggedIn) {
+    return null
   }
 
   return (

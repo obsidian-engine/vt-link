@@ -42,13 +42,16 @@ export default function AuthCallbackPage() {
         }
 
         const data = await response.json()
-        
+
         if (!data.accessToken || !data.refreshToken) {
           throw new Error('トークンが取得できませんでした')
         }
 
+        // Store tokens
         setTokens(data.accessToken, data.refreshToken)
-        router.push('/')
+
+        // Force reload to update auth state
+        window.location.href = '/'
       } catch (err) {
         console.error('認証エラー:', err)
         setError('認証処理中にエラーが発生しました')
