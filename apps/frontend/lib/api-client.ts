@@ -1,5 +1,3 @@
-import { getCsrfToken } from './auth'
-
 export interface Message {
   id: string
   title: string
@@ -98,6 +96,15 @@ export function makeClient(): ApiClient {
   const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'
 
   /**
+   * CookieからCSRFトークンを取得
+   */
+  function getCsrfTokenFromCookie(): string {
+    if (typeof document === 'undefined') return ''
+    const match = document.cookie.match(/csrf_token=([^;]+)/)
+    return match ? match[1] : ''
+  }
+
+  /**
    * トークンリフレッシュ
    */
   async function refreshToken(): Promise<boolean> {
@@ -106,7 +113,7 @@ export function makeClient(): ApiClient {
         method: 'POST',
         credentials: 'include',
         headers: {
-          'X-CSRF-Token': getCsrfToken() || '',
+          'X-CSRF-Token': getCsrfTokenFromCookie(),
         },
       })
       return res.ok
@@ -129,7 +136,7 @@ export function makeClient(): ApiClient {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
-          'X-CSRF-Token': getCsrfToken() || '',
+          'X-CSRF-Token': getCsrfTokenFromCookie(),
         },
         body: body ? JSON.stringify(body) : undefined,
       })

@@ -7,13 +7,13 @@ import { redirectToLineLogin } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (user) {
+    if (isAuthenticated) {
       router.push("/");
     }
-  }, [router, user]);
+  }, [router, isAuthenticated]);
 
   const handleLineLogin = () => {
     redirectToLineLogin();

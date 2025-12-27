@@ -2,13 +2,12 @@
 
 import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth, validateState } from "@/lib/auth";
+import { useAuth } from "@/lib/auth";
 
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
-  const { login } = useAuth();
   const hasProcessed = useRef(false);
 
   useEffect(() => {
@@ -21,13 +20,6 @@ function AuthCallbackContent() {
       const code = searchParams.get("code");
       const state = searchParams.get("state");
       const errorParam = searchParams.get("error");
-
-      // state検証
-      if (state && !validateState(state)) {
-        setError("認証セッションが無効です");
-        setTimeout(() => router.push("/login?error=invalid_state"), 2000);
-        return;
-      }
 
       if (errorParam) {
         setError("認証に失敗しました");
@@ -57,16 +49,7 @@ function AuthCallbackContent() {
           throw new Error("認証リクエストに失敗しました");
         }
 
-        const data = await response.json();
-
-        if (!data.user) {
-          throw new Error("ユーザー情報が取得できませんでした");
-        }
-
-        // Login with user info (tokens stored in HttpOnly cookies)
-        login(data.user);
-        
-        // Redirect to home page
+        // Tokens stored in HttpOnly cookies, redirect to home page
         router.push('/');
       } catch (err) {
         console.error("認証エラー:", err);

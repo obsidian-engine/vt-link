@@ -15,14 +15,14 @@ interface ProtectedRouteProps {
  * @returns {React.ReactElement} 認証状態に応じたコンテンツ
  */
 export function ProtectedRoute({ children }: ProtectedRouteProps): React.ReactElement {
-  const { user, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!isLoading && !isAuthenticated) {
       router.push("/login");
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, isAuthenticated, router]);
 
   if (isLoading) {
     return (
@@ -32,7 +32,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps): React.ReactEl
     );
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900" />
