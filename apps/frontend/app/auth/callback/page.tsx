@@ -55,8 +55,11 @@ function AuthCallbackContent() {
           throw new Error("トークンまたはユーザー情報が取得できませんでした");
         }
 
-        // Login with tokens (this will automatically redirect)
+        // Login with tokens
         login(data.accessToken, data.refreshToken, data.user);
+        
+        // Redirect to home page
+        router.push('/');
       } catch (err) {
         console.error("認証エラー:", err);
         setError("認証処理中にエラーが発生しました");
