@@ -7,3 +7,4 @@ node_modules/.bin
 node_modules
 pnpm-lock.yaml
 apps/backend/vendor
+/docs/

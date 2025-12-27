@@ -18,24 +18,24 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 	User         User   `json:"user"`
 }
 
 type User struct {
 	ID          string `json:"id"`
-	DisplayName string `json:"display_name"`
-	PictureURL  string `json:"picture_url"`
+	DisplayName string `json:"displayName"`
+	PictureURL  string `json:"pictureUrl"`
 	Email       string `json:"email"`
 }
 
 type RefreshRequest struct {
-	RefreshToken string `json:"refresh_token" validate:"required"`
+	RefreshToken string `json:"refreshToken" validate:"required"`
 }
 
 type RefreshResponse struct {
-	AccessToken string `json:"access_token"`
+	AccessToken string `json:"accessToken"`
 }
 
 func NewAuthHandler(oauthClient *external.LineOAuthClient, jwtManager *auth.JWTManager) *AuthHandler {
@@ -57,6 +57,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	// 1. Exchange authorization code for tokens
 	tokenResp, err := h.oauthClient.ExchangeCode(c.Request().Context(), req.Code)
 	if err != nil {
+		c.Logger().Errorf("Failed to exchange code: %v", err)
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"error": "failed to exchange code",
 		})
@@ -65,6 +66,7 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	// 2. Get LINE profile
 	profile, err := h.oauthClient.GetProfile(c.Request().Context(), tokenResp.AccessToken)
 	if err != nil {
+		c.Logger().Errorf("Failed to get profile: %v", err)
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"error": "failed to get profile",
 		})
