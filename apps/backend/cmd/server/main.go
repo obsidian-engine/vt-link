@@ -1,24 +1,43 @@
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
+	"os"
+
+	"vt-link/backend/internal/infrastructure/auth"
+	"vt-link/backend/internal/infrastructure/di"
+	"vt-link/backend/internal/infrastructure/external"
+	"vt-link/backend/internal/presentation/http"
 )
 
 func main() {
 	log.Println("VT-Link Backend Server starting...")
 
-	// 基本的なヘルスチェックエンドポイント
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "OK")
-	})
+	// DI Container初期化
+	container := di.GetContainer()
 
-	port := "8080"
+	// 外部依存の初期化
+	oauthClient := external.NewLineOAuthClient(
+		os.Getenv("LINE_LOGIN_CHANNEL_ID"),
+		os.Getenv("LINE_LOGIN_CHANNEL_SECRET"),
+		os.Getenv("LINE_LOGIN_CALLBACK_URL"),
+	)
+	jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET"))
+
+	// Handler初期化
+	authHandler := http.NewAuthHandler(oauthClient, jwtManager)
+	autoReplyHandler := http.NewAutoReplyHandler(container.AutoReplyUsecase)
+	richMenuHandler := http.NewRichMenuHandler(container.RichMenuUsecase)
+	messageHandler := http.NewMessageHandler(container.MessageUsecase)
+	schedulerHandler := http.NewSchedulerHandler(container.MessageUsecase, os.Getenv("SCHEDULER_SECRET"))
+
+	// Router初期化とサーバー起動
+	router := http.NewRouter(authHandler, autoReplyHandler, richMenuHandler, messageHandler, schedulerHandler, jwtManager)
+
+	port := ":8080"
 	log.Printf("Server listening on port %s", port)
 
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
+	if err := router.Setup().Start(port); err != nil {
 		log.Fatal("Server failed to start:", err)
 	}
 }

@@ -48,7 +48,7 @@ go mod tidy
 
 ### 2. 環境変数設定
 ```bash
-# apps/backend/.env.local
+# apps/backend/.env
 DATABASE_URL=postgres://user:pass@localhost:5432/dbname
 JWT_SECRET=your_jwt_secret_32chars_minimum
 LINE_ACCESS_TOKEN=your_line_access_token
@@ -181,7 +181,7 @@ make test-coverage
 #### 環境変数
 
 ```bash
-# .env.local に追加
+# .env に追加
 TEST_DATABASE_URL=postgres://user:pass@localhost:5432/test_db
 E2E_BASE_URL=http://localhost:3000
 E2E_SKIP=false  # E2Eテストをスキップする場合は true

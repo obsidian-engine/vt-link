@@ -1,0 +1,73 @@
+package http
+
+import (
+	"crypto/subtle"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/labstack/echo/v4"
+	"vt-link/backend/internal/application/message"
+)
+
+type SchedulerHandler struct {
+	usecase         message.Usecase
+	schedulerSecret string
+}
+
+type RunSchedulerRequest struct {
+	Limit int `json:"limit"`
+}
+
+type RunSchedulerResponse struct {
+	ProcessedCount int `json:"processed_count"`
+}
+
+func NewSchedulerHandler(usecase message.Usecase, schedulerSecret string) *SchedulerHandler {
+	return &SchedulerHandler{
+		usecase:         usecase,
+		schedulerSecret: schedulerSecret,
+	}
+}
+
+// Run handles POST /api/scheduler/run
+func (h *SchedulerHandler) Run(c echo.Context) error {
+	// 認証: X-Scheduler-Secret ヘッダーの検証（タイミング攻撃対策）
+	secret := c.Request().Header.Get("X-Scheduler-Secret")
+	if secret == "" || subtle.ConstantTimeCompare([]byte(secret), []byte(h.schedulerSecret)) != 1 {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"error": "unauthorized",
+		})
+	}
+
+	var req RunSchedulerRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": "invalid request body",
+		})
+	}
+
+	// デフォルト値設定
+	if req.Limit <= 0 {
+		req.Limit = 100
+	}
+
+	input := &message.SchedulerInput{
+		Now:   time.Now(),
+		Limit: req.Limit,
+	}
+
+	processedCount, err := h.usecase.RunScheduler(c.Request().Context(), input)
+	if err != nil {
+		log.Printf("Failed to run scheduler: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": "failed to run scheduler",
+		})
+	}
+
+	response := RunSchedulerResponse{
+		ProcessedCount: processedCount,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
