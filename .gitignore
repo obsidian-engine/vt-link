@@ -9,3 +9,5 @@ pnpm-lock.yaml
 apps/backend/vendor
 /docs/
 apps/backend/backend.log
+apps/backend/.env
+apps/frontend/.env
