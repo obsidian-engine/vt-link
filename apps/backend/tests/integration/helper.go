@@ -63,6 +63,7 @@ func (tdb *TestDB) ClearAllTables(t *testing.T) {
 	// PostgreSQL用のクリーンアップ（CASCADE付きTRUNCATE）
 	tables := []string{
 		"auto_reply_rules", // 依存関係の順序に注意
+		"rich_menus",
 		"messages",
 	}
 
@@ -248,4 +249,66 @@ func (tdb *TestDB) ClearAutoReplyRules(t *testing.T) {
 	}
 
 	t.Log("Cleared auto_reply_rules table for test isolation")
+}
+
+// CreateTestRichMenu テスト用のリッチメニューを作成
+func (tdb *TestDB) CreateTestRichMenu(t *testing.T, userID uuid.UUID) string {
+	ctx := context.Background()
+
+	// JSONB用のサイズとエリアを準備
+	sizeJSON := `{"width": 2500, "height": 1686}`
+	areasJSON := `[{
+		"bounds": {"x": 0, "y": 0, "width": 1250, "height": 843},
+		"action": {"type": "uri", "label": "ホーム", "uri": "https://example.com"}
+	}, {
+		"bounds": {"x": 1250, "y": 0, "width": 1250, "height": 843},
+		"action": {"type": "message", "label": "お問い合わせ", "text": "お問い合わせ"}
+	}]`
+
+	query := `
+		INSERT INTO rich_menus (id, user_id, name, chat_bar_text, image_url, size, areas, is_active, is_published_line, created_at, updated_at)
+		VALUES (gen_random_uuid(), $1, $2, $3, $4, $5::jsonb, $6::jsonb, false, false, NOW(), NOW())
+		RETURNING id
+	`
+
+	var menuID string
+	err := tdb.DB.GetContext(ctx, &menuID, query, userID, "テストメニュー", "タップしてください", "https://example.com/test.png", sizeJSON, areasJSON)
+	if err != nil {
+		t.Fatalf("Failed to create test rich menu: %v", err)
+	}
+
+	return menuID
+}
+
+// ClearRichMenus rich_menusテーブルをクリア
+func (tdb *TestDB) ClearRichMenus(t *testing.T) {
+	ctx := context.Background()
+
+	tx, err := tdb.DB.BeginTxx(ctx, nil)
+	if err != nil {
+		t.Fatalf("Failed to begin transaction: %v", err)
+	}
+	defer func() {
+		if p := recover(); p != nil {
+			tx.Rollback()
+			panic(p)
+		} else if err != nil {
+			tx.Rollback()
+		}
+	}()
+
+	query := "TRUNCATE TABLE rich_menus RESTART IDENTITY CASCADE"
+	if _, err := tx.ExecContext(ctx, query); err != nil {
+		// TRUNCATEが失敗した場合はDELETEを試行
+		deleteQuery := "DELETE FROM rich_menus"
+		if _, err := tx.ExecContext(ctx, deleteQuery); err != nil {
+			t.Fatalf("Failed to clear rich_menus table: %v", err)
+		}
+	}
+
+	if err = tx.Commit(); err != nil {
+		t.Fatalf("Failed to commit transaction: %v", err)
+	}
+
+	t.Log("Cleared rich_menus table for test isolation")
 }

@@ -754,6 +754,862 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/richmenus": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * リッチメニュー一覧取得
+         * @description リッチメニュー一覧を取得
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description リッチメニュー一覧 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok: boolean;
+                            data: {
+                                /**
+                                 * Format: uuid
+                                 * @description リッチメニューID
+                                 * @example 550e8400-e29b-41d4-a716-446655440000
+                                 */
+                                id: string;
+                                /**
+                                 * @description リッチメニュー名
+                                 * @example メインメニュー
+                                 */
+                                name: string;
+                                /**
+                                 * @description リッチメニューテンプレート
+                                 * @example 2x3
+                                 * @enum {string}
+                                 */
+                                template: "2x3" | "1x3" | "2x2";
+                                /**
+                                 * Format: uri
+                                 * @description 画像URL（Vercel Blob）
+                                 * @example https://blob.vercel-storage.com/richmenu-abc123.png
+                                 */
+                                imageUrl: string;
+                                /**
+                                 * @description エリア配列（最大6個）
+                                 * @example [
+                                 *       {
+                                 *         "bounds": {
+                                 *           "x": 0,
+                                 *           "y": 0,
+                                 *           "width": 833,
+                                 *           "height": 843
+                                 *         },
+                                 *         "action": {
+                                 *           "type": "uri",
+                                 *           "uri": "https://example.com",
+                                 *           "label": "商品一覧"
+                                 *         }
+                                 *       }
+                                 *     ]
+                                 */
+                                areas: {
+                                    /**
+                                     * @description リッチメニューエリアの境界
+                                     * @example {
+                                     *       "x": 0,
+                                     *       "y": 0,
+                                     *       "width": 833,
+                                     *       "height": 843
+                                     *     }
+                                     */
+                                    bounds: {
+                                        /**
+                                         * @description X座標
+                                         * @example 0
+                                         */
+                                        x: number;
+                                        /**
+                                         * @description Y座標
+                                         * @example 0
+                                         */
+                                        y: number;
+                                        /**
+                                         * @description 幅
+                                         * @example 833
+                                         */
+                                        width: number;
+                                        /**
+                                         * @description 高さ
+                                         * @example 843
+                                         */
+                                        height: number;
+                                    };
+                                    /**
+                                     * @description リッチメニューアクション
+                                     * @example {
+                                     *       "type": "uri",
+                                     *       "uri": "https://example.com",
+                                     *       "label": "商品一覧"
+                                     *     }
+                                     */
+                                    action: {
+                                        /**
+                                         * @description リッチメニューアクション種別
+                                         * @example uri
+                                         * @enum {string}
+                                         */
+                                        type: "uri" | "message";
+                                        /**
+                                         * Format: uri
+                                         * @description URLリンク（type=uriの場合）
+                                         * @example https://example.com
+                                         */
+                                        uri?: string;
+                                        /**
+                                         * @description ボタンラベル
+                                         * @example 商品一覧
+                                         */
+                                        label?: string;
+                                        /**
+                                         * @description テキスト送信内容（type=messageの場合）
+                                         * @example 商品を見る
+                                         */
+                                        text?: string;
+                                    };
+                                }[];
+                                /**
+                                 * @description LINE Rich Menu ID
+                                 * @example richmenu-abc123def456
+                                 */
+                                lineRichMenuId: string | null;
+                                /**
+                                 * @description 有効フラグ
+                                 * @example true
+                                 */
+                                isActive: boolean;
+                                /**
+                                 * Format: date-time
+                                 * @description 作成日時 (ISO 8601)
+                                 * @example 2025-01-10T09:00:00Z
+                                 */
+                                createdAt: string;
+                                /**
+                                 * Format: date-time
+                                 * @description 更新日時 (ISO 8601)
+                                 * @example 2025-01-10T09:00:00Z
+                                 */
+                                updatedAt: string;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * リッチメニュー作成
+         * @description リッチメニューを作成
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            responses: {
+                /** @description 作成されたリッチメニュー */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok: boolean;
+                            /**
+                             * @description リッチメニュー
+                             * @example {
+                             *       "id": "550e8400-e29b-41d4-a716-446655440000",
+                             *       "name": "メインメニュー",
+                             *       "template": "2x3",
+                             *       "imageUrl": "https://blob.vercel-storage.com/richmenu-abc123.png",
+                             *       "areas": [
+                             *         {
+                             *           "bounds": {
+                             *             "x": 0,
+                             *             "y": 0,
+                             *             "width": 833,
+                             *             "height": 843
+                             *           },
+                             *           "action": {
+                             *             "type": "uri",
+                             *             "uri": "https://example.com",
+                             *             "label": "商品一覧"
+                             *           }
+                             *         }
+                             *       ],
+                             *       "lineRichMenuId": "richmenu-abc123def456",
+                             *       "isActive": true,
+                             *       "createdAt": "2025-01-10T09:00:00Z",
+                             *       "updatedAt": "2025-01-10T09:00:00Z"
+                             *     }
+                             */
+                            data: {
+                                /**
+                                 * Format: uuid
+                                 * @description リッチメニューID
+                                 * @example 550e8400-e29b-41d4-a716-446655440000
+                                 */
+                                id: string;
+                                /**
+                                 * @description リッチメニュー名
+                                 * @example メインメニュー
+                                 */
+                                name: string;
+                                /**
+                                 * @description リッチメニューテンプレート
+                                 * @example 2x3
+                                 * @enum {string}
+                                 */
+                                template: "2x3" | "1x3" | "2x2";
+                                /**
+                                 * Format: uri
+                                 * @description 画像URL（Vercel Blob）
+                                 * @example https://blob.vercel-storage.com/richmenu-abc123.png
+                                 */
+                                imageUrl: string;
+                                /**
+                                 * @description エリア配列（最大6個）
+                                 * @example [
+                                 *       {
+                                 *         "bounds": {
+                                 *           "x": 0,
+                                 *           "y": 0,
+                                 *           "width": 833,
+                                 *           "height": 843
+                                 *         },
+                                 *         "action": {
+                                 *           "type": "uri",
+                                 *           "uri": "https://example.com",
+                                 *           "label": "商品一覧"
+                                 *         }
+                                 *       }
+                                 *     ]
+                                 */
+                                areas: {
+                                    /**
+                                     * @description リッチメニューエリアの境界
+                                     * @example {
+                                     *       "x": 0,
+                                     *       "y": 0,
+                                     *       "width": 833,
+                                     *       "height": 843
+                                     *     }
+                                     */
+                                    bounds: {
+                                        /**
+                                         * @description X座標
+                                         * @example 0
+                                         */
+                                        x: number;
+                                        /**
+                                         * @description Y座標
+                                         * @example 0
+                                         */
+                                        y: number;
+                                        /**
+                                         * @description 幅
+                                         * @example 833
+                                         */
+                                        width: number;
+                                        /**
+                                         * @description 高さ
+                                         * @example 843
+                                         */
+                                        height: number;
+                                    };
+                                    /**
+                                     * @description リッチメニューアクション
+                                     * @example {
+                                     *       "type": "uri",
+                                     *       "uri": "https://example.com",
+                                     *       "label": "商品一覧"
+                                     *     }
+                                     */
+                                    action: {
+                                        /**
+                                         * @description リッチメニューアクション種別
+                                         * @example uri
+                                         * @enum {string}
+                                         */
+                                        type: "uri" | "message";
+                                        /**
+                                         * Format: uri
+                                         * @description URLリンク（type=uriの場合）
+                                         * @example https://example.com
+                                         */
+                                        uri?: string;
+                                        /**
+                                         * @description ボタンラベル
+                                         * @example 商品一覧
+                                         */
+                                        label?: string;
+                                        /**
+                                         * @description テキスト送信内容（type=messageの場合）
+                                         * @example 商品を見る
+                                         */
+                                        text?: string;
+                                    };
+                                }[];
+                                /**
+                                 * @description LINE Rich Menu ID
+                                 * @example richmenu-abc123def456
+                                 */
+                                lineRichMenuId: string | null;
+                                /**
+                                 * @description 有効フラグ
+                                 * @example true
+                                 */
+                                isActive: boolean;
+                                /**
+                                 * Format: date-time
+                                 * @description 作成日時 (ISO 8601)
+                                 * @example 2025-01-10T09:00:00Z
+                                 */
+                                createdAt: string;
+                                /**
+                                 * Format: date-time
+                                 * @description 更新日時 (ISO 8601)
+                                 * @example 2025-01-10T09:00:00Z
+                                 */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description バリデーションエラー */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            ok: false;
+                            error: {
+                                code: string;
+                                message: string;
+                                details?: {
+                                    [key: string]: unknown;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/richmenus/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * リッチメニュー詳細取得
+         * @description リッチメニュー詳細を取得
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description リッチメニューID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description リッチメニュー詳細 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok: boolean;
+                            /**
+                             * @description リッチメニュー
+                             * @example {
+                             *       "id": "550e8400-e29b-41d4-a716-446655440000",
+                             *       "name": "メインメニュー",
+                             *       "template": "2x3",
+                             *       "imageUrl": "https://blob.vercel-storage.com/richmenu-abc123.png",
+                             *       "areas": [
+                             *         {
+                             *           "bounds": {
+                             *             "x": 0,
+                             *             "y": 0,
+                             *             "width": 833,
+                             *             "height": 843
+                             *           },
+                             *           "action": {
+                             *             "type": "uri",
+                             *             "uri": "https://example.com",
+                             *             "label": "商品一覧"
+                             *           }
+                             *         }
+                             *       ],
+                             *       "lineRichMenuId": "richmenu-abc123def456",
+                             *       "isActive": true,
+                             *       "createdAt": "2025-01-10T09:00:00Z",
+                             *       "updatedAt": "2025-01-10T09:00:00Z"
+                             *     }
+                             */
+                            data: {
+                                /**
+                                 * Format: uuid
+                                 * @description リッチメニューID
+                                 * @example 550e8400-e29b-41d4-a716-446655440000
+                                 */
+                                id: string;
+                                /**
+                                 * @description リッチメニュー名
+                                 * @example メインメニュー
+                                 */
+                                name: string;
+                                /**
+                                 * @description リッチメニューテンプレート
+                                 * @example 2x3
+                                 * @enum {string}
+                                 */
+                                template: "2x3" | "1x3" | "2x2";
+                                /**
+                                 * Format: uri
+                                 * @description 画像URL（Vercel Blob）
+                                 * @example https://blob.vercel-storage.com/richmenu-abc123.png
+                                 */
+                                imageUrl: string;
+                                /**
+                                 * @description エリア配列（最大6個）
+                                 * @example [
+                                 *       {
+                                 *         "bounds": {
+                                 *           "x": 0,
+                                 *           "y": 0,
+                                 *           "width": 833,
+                                 *           "height": 843
+                                 *         },
+                                 *         "action": {
+                                 *           "type": "uri",
+                                 *           "uri": "https://example.com",
+                                 *           "label": "商品一覧"
+                                 *         }
+                                 *       }
+                                 *     ]
+                                 */
+                                areas: {
+                                    /**
+                                     * @description リッチメニューエリアの境界
+                                     * @example {
+                                     *       "x": 0,
+                                     *       "y": 0,
+                                     *       "width": 833,
+                                     *       "height": 843
+                                     *     }
+                                     */
+                                    bounds: {
+                                        /**
+                                         * @description X座標
+                                         * @example 0
+                                         */
+                                        x: number;
+                                        /**
+                                         * @description Y座標
+                                         * @example 0
+                                         */
+                                        y: number;
+                                        /**
+                                         * @description 幅
+                                         * @example 833
+                                         */
+                                        width: number;
+                                        /**
+                                         * @description 高さ
+                                         * @example 843
+                                         */
+                                        height: number;
+                                    };
+                                    /**
+                                     * @description リッチメニューアクション
+                                     * @example {
+                                     *       "type": "uri",
+                                     *       "uri": "https://example.com",
+                                     *       "label": "商品一覧"
+                                     *     }
+                                     */
+                                    action: {
+                                        /**
+                                         * @description リッチメニューアクション種別
+                                         * @example uri
+                                         * @enum {string}
+                                         */
+                                        type: "uri" | "message";
+                                        /**
+                                         * Format: uri
+                                         * @description URLリンク（type=uriの場合）
+                                         * @example https://example.com
+                                         */
+                                        uri?: string;
+                                        /**
+                                         * @description ボタンラベル
+                                         * @example 商品一覧
+                                         */
+                                        label?: string;
+                                        /**
+                                         * @description テキスト送信内容（type=messageの場合）
+                                         * @example 商品を見る
+                                         */
+                                        text?: string;
+                                    };
+                                }[];
+                                /**
+                                 * @description LINE Rich Menu ID
+                                 * @example richmenu-abc123def456
+                                 */
+                                lineRichMenuId: string | null;
+                                /**
+                                 * @description 有効フラグ
+                                 * @example true
+                                 */
+                                isActive: boolean;
+                                /**
+                                 * Format: date-time
+                                 * @description 作成日時 (ISO 8601)
+                                 * @example 2025-01-10T09:00:00Z
+                                 */
+                                createdAt: string;
+                                /**
+                                 * Format: date-time
+                                 * @description 更新日時 (ISO 8601)
+                                 * @example 2025-01-10T09:00:00Z
+                                 */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description リッチメニューが見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            ok: false;
+                            error: {
+                                code: string;
+                                message: string;
+                                details?: {
+                                    [key: string]: unknown;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        /**
+         * リッチメニュー更新
+         * @description リッチメニューを更新
+         */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description リッチメニューID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            responses: {
+                /** @description 更新されたリッチメニュー */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok: boolean;
+                            /**
+                             * @description リッチメニュー
+                             * @example {
+                             *       "id": "550e8400-e29b-41d4-a716-446655440000",
+                             *       "name": "メインメニュー",
+                             *       "template": "2x3",
+                             *       "imageUrl": "https://blob.vercel-storage.com/richmenu-abc123.png",
+                             *       "areas": [
+                             *         {
+                             *           "bounds": {
+                             *             "x": 0,
+                             *             "y": 0,
+                             *             "width": 833,
+                             *             "height": 843
+                             *           },
+                             *           "action": {
+                             *             "type": "uri",
+                             *             "uri": "https://example.com",
+                             *             "label": "商品一覧"
+                             *           }
+                             *         }
+                             *       ],
+                             *       "lineRichMenuId": "richmenu-abc123def456",
+                             *       "isActive": true,
+                             *       "createdAt": "2025-01-10T09:00:00Z",
+                             *       "updatedAt": "2025-01-10T09:00:00Z"
+                             *     }
+                             */
+                            data: {
+                                /**
+                                 * Format: uuid
+                                 * @description リッチメニューID
+                                 * @example 550e8400-e29b-41d4-a716-446655440000
+                                 */
+                                id: string;
+                                /**
+                                 * @description リッチメニュー名
+                                 * @example メインメニュー
+                                 */
+                                name: string;
+                                /**
+                                 * @description リッチメニューテンプレート
+                                 * @example 2x3
+                                 * @enum {string}
+                                 */
+                                template: "2x3" | "1x3" | "2x2";
+                                /**
+                                 * Format: uri
+                                 * @description 画像URL（Vercel Blob）
+                                 * @example https://blob.vercel-storage.com/richmenu-abc123.png
+                                 */
+                                imageUrl: string;
+                                /**
+                                 * @description エリア配列（最大6個）
+                                 * @example [
+                                 *       {
+                                 *         "bounds": {
+                                 *           "x": 0,
+                                 *           "y": 0,
+                                 *           "width": 833,
+                                 *           "height": 843
+                                 *         },
+                                 *         "action": {
+                                 *           "type": "uri",
+                                 *           "uri": "https://example.com",
+                                 *           "label": "商品一覧"
+                                 *         }
+                                 *       }
+                                 *     ]
+                                 */
+                                areas: {
+                                    /**
+                                     * @description リッチメニューエリアの境界
+                                     * @example {
+                                     *       "x": 0,
+                                     *       "y": 0,
+                                     *       "width": 833,
+                                     *       "height": 843
+                                     *     }
+                                     */
+                                    bounds: {
+                                        /**
+                                         * @description X座標
+                                         * @example 0
+                                         */
+                                        x: number;
+                                        /**
+                                         * @description Y座標
+                                         * @example 0
+                                         */
+                                        y: number;
+                                        /**
+                                         * @description 幅
+                                         * @example 833
+                                         */
+                                        width: number;
+                                        /**
+                                         * @description 高さ
+                                         * @example 843
+                                         */
+                                        height: number;
+                                    };
+                                    /**
+                                     * @description リッチメニューアクション
+                                     * @example {
+                                     *       "type": "uri",
+                                     *       "uri": "https://example.com",
+                                     *       "label": "商品一覧"
+                                     *     }
+                                     */
+                                    action: {
+                                        /**
+                                         * @description リッチメニューアクション種別
+                                         * @example uri
+                                         * @enum {string}
+                                         */
+                                        type: "uri" | "message";
+                                        /**
+                                         * Format: uri
+                                         * @description URLリンク（type=uriの場合）
+                                         * @example https://example.com
+                                         */
+                                        uri?: string;
+                                        /**
+                                         * @description ボタンラベル
+                                         * @example 商品一覧
+                                         */
+                                        label?: string;
+                                        /**
+                                         * @description テキスト送信内容（type=messageの場合）
+                                         * @example 商品を見る
+                                         */
+                                        text?: string;
+                                    };
+                                }[];
+                                /**
+                                 * @description LINE Rich Menu ID
+                                 * @example richmenu-abc123def456
+                                 */
+                                lineRichMenuId: string | null;
+                                /**
+                                 * @description 有効フラグ
+                                 * @example true
+                                 */
+                                isActive: boolean;
+                                /**
+                                 * Format: date-time
+                                 * @description 作成日時 (ISO 8601)
+                                 * @example 2025-01-10T09:00:00Z
+                                 */
+                                createdAt: string;
+                                /**
+                                 * Format: date-time
+                                 * @description 更新日時 (ISO 8601)
+                                 * @example 2025-01-10T09:00:00Z
+                                 */
+                                updatedAt: string;
+                            };
+                        };
+                    };
+                };
+                /** @description リッチメニューが見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            ok: false;
+                            error: {
+                                code: string;
+                                message: string;
+                                details?: {
+                                    [key: string]: unknown;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        post?: never;
+        /**
+         * リッチメニュー削除
+         * @description リッチメニューを削除
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    /** @description リッチメニューID */
+                    id: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 削除成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            ok: true;
+                            message?: string;
+                        };
+                    };
+                };
+                /** @description リッチメニューが見つかりません */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            ok: false;
+                            error: {
+                                code: string;
+                                message: string;
+                                details?: {
+                                    [key: string]: unknown;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1394,6 +2250,618 @@ export interface components {
                  * @example 1
                  */
                 priority: number;
+                /**
+                 * Format: date-time
+                 * @description 作成日時 (ISO 8601)
+                 * @example 2025-01-10T09:00:00Z
+                 */
+                createdAt: string;
+                /**
+                 * Format: date-time
+                 * @description 更新日時 (ISO 8601)
+                 * @example 2025-01-10T09:00:00Z
+                 */
+                updatedAt: string;
+            };
+        };
+        /**
+         * @description リッチメニュー
+         * @example {
+         *       "id": "550e8400-e29b-41d4-a716-446655440000",
+         *       "name": "メインメニュー",
+         *       "template": "2x3",
+         *       "imageUrl": "https://blob.vercel-storage.com/richmenu-abc123.png",
+         *       "areas": [
+         *         {
+         *           "bounds": {
+         *             "x": 0,
+         *             "y": 0,
+         *             "width": 833,
+         *             "height": 843
+         *           },
+         *           "action": {
+         *             "type": "uri",
+         *             "uri": "https://example.com",
+         *             "label": "商品一覧"
+         *           }
+         *         }
+         *       ],
+         *       "lineRichMenuId": "richmenu-abc123def456",
+         *       "isActive": true,
+         *       "createdAt": "2025-01-10T09:00:00Z",
+         *       "updatedAt": "2025-01-10T09:00:00Z"
+         *     }
+         */
+        RichMenu: {
+            /**
+             * Format: uuid
+             * @description リッチメニューID
+             * @example 550e8400-e29b-41d4-a716-446655440000
+             */
+            id: string;
+            /**
+             * @description リッチメニュー名
+             * @example メインメニュー
+             */
+            name: string;
+            /**
+             * @description リッチメニューテンプレート
+             * @example 2x3
+             * @enum {string}
+             */
+            template: "2x3" | "1x3" | "2x2";
+            /**
+             * Format: uri
+             * @description 画像URL（Vercel Blob）
+             * @example https://blob.vercel-storage.com/richmenu-abc123.png
+             */
+            imageUrl: string;
+            /**
+             * @description エリア配列（最大6個）
+             * @example [
+             *       {
+             *         "bounds": {
+             *           "x": 0,
+             *           "y": 0,
+             *           "width": 833,
+             *           "height": 843
+             *         },
+             *         "action": {
+             *           "type": "uri",
+             *           "uri": "https://example.com",
+             *           "label": "商品一覧"
+             *         }
+             *       }
+             *     ]
+             */
+            areas: {
+                /**
+                 * @description リッチメニューエリアの境界
+                 * @example {
+                 *       "x": 0,
+                 *       "y": 0,
+                 *       "width": 833,
+                 *       "height": 843
+                 *     }
+                 */
+                bounds: {
+                    /**
+                     * @description X座標
+                     * @example 0
+                     */
+                    x: number;
+                    /**
+                     * @description Y座標
+                     * @example 0
+                     */
+                    y: number;
+                    /**
+                     * @description 幅
+                     * @example 833
+                     */
+                    width: number;
+                    /**
+                     * @description 高さ
+                     * @example 843
+                     */
+                    height: number;
+                };
+                /**
+                 * @description リッチメニューアクション
+                 * @example {
+                 *       "type": "uri",
+                 *       "uri": "https://example.com",
+                 *       "label": "商品一覧"
+                 *     }
+                 */
+                action: {
+                    /**
+                     * @description リッチメニューアクション種別
+                     * @example uri
+                     * @enum {string}
+                     */
+                    type: "uri" | "message";
+                    /**
+                     * Format: uri
+                     * @description URLリンク（type=uriの場合）
+                     * @example https://example.com
+                     */
+                    uri?: string;
+                    /**
+                     * @description ボタンラベル
+                     * @example 商品一覧
+                     */
+                    label?: string;
+                    /**
+                     * @description テキスト送信内容（type=messageの場合）
+                     * @example 商品を見る
+                     */
+                    text?: string;
+                };
+            }[];
+            /**
+             * @description LINE Rich Menu ID
+             * @example richmenu-abc123def456
+             */
+            lineRichMenuId: string | null;
+            /**
+             * @description 有効フラグ
+             * @example true
+             */
+            isActive: boolean;
+            /**
+             * Format: date-time
+             * @description 作成日時 (ISO 8601)
+             * @example 2025-01-10T09:00:00Z
+             */
+            createdAt: string;
+            /**
+             * Format: date-time
+             * @description 更新日時 (ISO 8601)
+             * @example 2025-01-10T09:00:00Z
+             */
+            updatedAt: string;
+        };
+        /** @description リッチメニュー作成リクエスト */
+        CreateRichMenuRequest: {
+            name: string;
+            /**
+             * @description リッチメニューテンプレート
+             * @example 2x3
+             * @enum {string}
+             */
+            template: "2x3" | "1x3" | "2x2";
+            /** Format: uri */
+            imageUrl: string;
+            areas: {
+                /**
+                 * @description リッチメニューエリアの境界
+                 * @example {
+                 *       "x": 0,
+                 *       "y": 0,
+                 *       "width": 833,
+                 *       "height": 843
+                 *     }
+                 */
+                bounds: {
+                    /**
+                     * @description X座標
+                     * @example 0
+                     */
+                    x: number;
+                    /**
+                     * @description Y座標
+                     * @example 0
+                     */
+                    y: number;
+                    /**
+                     * @description 幅
+                     * @example 833
+                     */
+                    width: number;
+                    /**
+                     * @description 高さ
+                     * @example 843
+                     */
+                    height: number;
+                };
+                /**
+                 * @description リッチメニューアクション
+                 * @example {
+                 *       "type": "uri",
+                 *       "uri": "https://example.com",
+                 *       "label": "商品一覧"
+                 *     }
+                 */
+                action: {
+                    /**
+                     * @description リッチメニューアクション種別
+                     * @example uri
+                     * @enum {string}
+                     */
+                    type: "uri" | "message";
+                    /**
+                     * Format: uri
+                     * @description URLリンク（type=uriの場合）
+                     * @example https://example.com
+                     */
+                    uri?: string;
+                    /**
+                     * @description ボタンラベル
+                     * @example 商品一覧
+                     */
+                    label?: string;
+                    /**
+                     * @description テキスト送信内容（type=messageの場合）
+                     * @example 商品を見る
+                     */
+                    text?: string;
+                };
+            }[];
+            /** @default false */
+            isActive: boolean;
+        };
+        /** @description リッチメニュー更新リクエスト */
+        UpdateRichMenuRequest: {
+            name?: string;
+            /**
+             * @description リッチメニューテンプレート
+             * @example 2x3
+             * @enum {string}
+             */
+            template?: "2x3" | "1x3" | "2x2";
+            /** Format: uri */
+            imageUrl?: string;
+            areas?: {
+                /**
+                 * @description リッチメニューエリアの境界
+                 * @example {
+                 *       "x": 0,
+                 *       "y": 0,
+                 *       "width": 833,
+                 *       "height": 843
+                 *     }
+                 */
+                bounds: {
+                    /**
+                     * @description X座標
+                     * @example 0
+                     */
+                    x: number;
+                    /**
+                     * @description Y座標
+                     * @example 0
+                     */
+                    y: number;
+                    /**
+                     * @description 幅
+                     * @example 833
+                     */
+                    width: number;
+                    /**
+                     * @description 高さ
+                     * @example 843
+                     */
+                    height: number;
+                };
+                /**
+                 * @description リッチメニューアクション
+                 * @example {
+                 *       "type": "uri",
+                 *       "uri": "https://example.com",
+                 *       "label": "商品一覧"
+                 *     }
+                 */
+                action: {
+                    /**
+                     * @description リッチメニューアクション種別
+                     * @example uri
+                     * @enum {string}
+                     */
+                    type: "uri" | "message";
+                    /**
+                     * Format: uri
+                     * @description URLリンク（type=uriの場合）
+                     * @example https://example.com
+                     */
+                    uri?: string;
+                    /**
+                     * @description ボタンラベル
+                     * @example 商品一覧
+                     */
+                    label?: string;
+                    /**
+                     * @description テキスト送信内容（type=messageの場合）
+                     * @example 商品を見る
+                     */
+                    text?: string;
+                };
+            }[];
+            /** @default false */
+            isActive: boolean;
+        };
+        /** @description リッチメニュー一覧レスポンス */
+        RichMenuListResponse: {
+            ok: boolean;
+            data: {
+                /**
+                 * Format: uuid
+                 * @description リッチメニューID
+                 * @example 550e8400-e29b-41d4-a716-446655440000
+                 */
+                id: string;
+                /**
+                 * @description リッチメニュー名
+                 * @example メインメニュー
+                 */
+                name: string;
+                /**
+                 * @description リッチメニューテンプレート
+                 * @example 2x3
+                 * @enum {string}
+                 */
+                template: "2x3" | "1x3" | "2x2";
+                /**
+                 * Format: uri
+                 * @description 画像URL（Vercel Blob）
+                 * @example https://blob.vercel-storage.com/richmenu-abc123.png
+                 */
+                imageUrl: string;
+                /**
+                 * @description エリア配列（最大6個）
+                 * @example [
+                 *       {
+                 *         "bounds": {
+                 *           "x": 0,
+                 *           "y": 0,
+                 *           "width": 833,
+                 *           "height": 843
+                 *         },
+                 *         "action": {
+                 *           "type": "uri",
+                 *           "uri": "https://example.com",
+                 *           "label": "商品一覧"
+                 *         }
+                 *       }
+                 *     ]
+                 */
+                areas: {
+                    /**
+                     * @description リッチメニューエリアの境界
+                     * @example {
+                     *       "x": 0,
+                     *       "y": 0,
+                     *       "width": 833,
+                     *       "height": 843
+                     *     }
+                     */
+                    bounds: {
+                        /**
+                         * @description X座標
+                         * @example 0
+                         */
+                        x: number;
+                        /**
+                         * @description Y座標
+                         * @example 0
+                         */
+                        y: number;
+                        /**
+                         * @description 幅
+                         * @example 833
+                         */
+                        width: number;
+                        /**
+                         * @description 高さ
+                         * @example 843
+                         */
+                        height: number;
+                    };
+                    /**
+                     * @description リッチメニューアクション
+                     * @example {
+                     *       "type": "uri",
+                     *       "uri": "https://example.com",
+                     *       "label": "商品一覧"
+                     *     }
+                     */
+                    action: {
+                        /**
+                         * @description リッチメニューアクション種別
+                         * @example uri
+                         * @enum {string}
+                         */
+                        type: "uri" | "message";
+                        /**
+                         * Format: uri
+                         * @description URLリンク（type=uriの場合）
+                         * @example https://example.com
+                         */
+                        uri?: string;
+                        /**
+                         * @description ボタンラベル
+                         * @example 商品一覧
+                         */
+                        label?: string;
+                        /**
+                         * @description テキスト送信内容（type=messageの場合）
+                         * @example 商品を見る
+                         */
+                        text?: string;
+                    };
+                }[];
+                /**
+                 * @description LINE Rich Menu ID
+                 * @example richmenu-abc123def456
+                 */
+                lineRichMenuId: string | null;
+                /**
+                 * @description 有効フラグ
+                 * @example true
+                 */
+                isActive: boolean;
+                /**
+                 * Format: date-time
+                 * @description 作成日時 (ISO 8601)
+                 * @example 2025-01-10T09:00:00Z
+                 */
+                createdAt: string;
+                /**
+                 * Format: date-time
+                 * @description 更新日時 (ISO 8601)
+                 * @example 2025-01-10T09:00:00Z
+                 */
+                updatedAt: string;
+            }[];
+        };
+        /** @description リッチメニューレスポンス */
+        RichMenuResponse: {
+            ok: boolean;
+            /**
+             * @description リッチメニュー
+             * @example {
+             *       "id": "550e8400-e29b-41d4-a716-446655440000",
+             *       "name": "メインメニュー",
+             *       "template": "2x3",
+             *       "imageUrl": "https://blob.vercel-storage.com/richmenu-abc123.png",
+             *       "areas": [
+             *         {
+             *           "bounds": {
+             *             "x": 0,
+             *             "y": 0,
+             *             "width": 833,
+             *             "height": 843
+             *           },
+             *           "action": {
+             *             "type": "uri",
+             *             "uri": "https://example.com",
+             *             "label": "商品一覧"
+             *           }
+             *         }
+             *       ],
+             *       "lineRichMenuId": "richmenu-abc123def456",
+             *       "isActive": true,
+             *       "createdAt": "2025-01-10T09:00:00Z",
+             *       "updatedAt": "2025-01-10T09:00:00Z"
+             *     }
+             */
+            data: {
+                /**
+                 * Format: uuid
+                 * @description リッチメニューID
+                 * @example 550e8400-e29b-41d4-a716-446655440000
+                 */
+                id: string;
+                /**
+                 * @description リッチメニュー名
+                 * @example メインメニュー
+                 */
+                name: string;
+                /**
+                 * @description リッチメニューテンプレート
+                 * @example 2x3
+                 * @enum {string}
+                 */
+                template: "2x3" | "1x3" | "2x2";
+                /**
+                 * Format: uri
+                 * @description 画像URL（Vercel Blob）
+                 * @example https://blob.vercel-storage.com/richmenu-abc123.png
+                 */
+                imageUrl: string;
+                /**
+                 * @description エリア配列（最大6個）
+                 * @example [
+                 *       {
+                 *         "bounds": {
+                 *           "x": 0,
+                 *           "y": 0,
+                 *           "width": 833,
+                 *           "height": 843
+                 *         },
+                 *         "action": {
+                 *           "type": "uri",
+                 *           "uri": "https://example.com",
+                 *           "label": "商品一覧"
+                 *         }
+                 *       }
+                 *     ]
+                 */
+                areas: {
+                    /**
+                     * @description リッチメニューエリアの境界
+                     * @example {
+                     *       "x": 0,
+                     *       "y": 0,
+                     *       "width": 833,
+                     *       "height": 843
+                     *     }
+                     */
+                    bounds: {
+                        /**
+                         * @description X座標
+                         * @example 0
+                         */
+                        x: number;
+                        /**
+                         * @description Y座標
+                         * @example 0
+                         */
+                        y: number;
+                        /**
+                         * @description 幅
+                         * @example 833
+                         */
+                        width: number;
+                        /**
+                         * @description 高さ
+                         * @example 843
+                         */
+                        height: number;
+                    };
+                    /**
+                     * @description リッチメニューアクション
+                     * @example {
+                     *       "type": "uri",
+                     *       "uri": "https://example.com",
+                     *       "label": "商品一覧"
+                     *     }
+                     */
+                    action: {
+                        /**
+                         * @description リッチメニューアクション種別
+                         * @example uri
+                         * @enum {string}
+                         */
+                        type: "uri" | "message";
+                        /**
+                         * Format: uri
+                         * @description URLリンク（type=uriの場合）
+                         * @example https://example.com
+                         */
+                        uri?: string;
+                        /**
+                         * @description ボタンラベル
+                         * @example 商品一覧
+                         */
+                        label?: string;
+                        /**
+                         * @description テキスト送信内容（type=messageの場合）
+                         * @example 商品を見る
+                         */
+                        text?: string;
+                    };
+                }[];
+                /**
+                 * @description LINE Rich Menu ID
+                 * @example richmenu-abc123def456
+                 */
+                lineRichMenuId: string | null;
+                /**
+                 * @description 有効フラグ
+                 * @example true
+                 */
+                isActive: boolean;
                 /**
                  * Format: date-time
                  * @description 作成日時 (ISO 8601)

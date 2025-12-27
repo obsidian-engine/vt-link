@@ -10,10 +10,11 @@ type Router struct {
 	echo             *echo.Echo
 	authHandler      *AuthHandler
 	autoReplyHandler *AutoReplyHandler
+	richMenuHandler  *RichMenuHandler
 	jwtManager       *auth.JWTManager
 }
 
-func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, jwtManager *auth.JWTManager) *Router {
+func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, richMenuHandler *RichMenuHandler, jwtManager *auth.JWTManager) *Router {
 	e := echo.New()
 
 	// Middleware
@@ -25,6 +26,7 @@ func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, jwt
 		echo:             e,
 		authHandler:      authHandler,
 		autoReplyHandler: autoReplyHandler,
+		richMenuHandler:  richMenuHandler,
 		jwtManager:       jwtManager,
 	}
 }
@@ -56,6 +58,13 @@ func (r *Router) Setup() *echo.Echo {
 	api.GET("/autoreply/rules", r.autoReplyHandler.ListRules)
 	api.PUT("/autoreply/rules/:id", r.autoReplyHandler.UpdateRule)
 	api.DELETE("/autoreply/rules/:id", r.autoReplyHandler.DeleteRule)
+
+	// RichMenu routes
+	api.POST("/richmenu", r.richMenuHandler.CreateRichMenu)
+	api.GET("/richmenu", r.richMenuHandler.GetRichMenu)
+	api.PUT("/richmenu/:id", r.richMenuHandler.UpdateRichMenu)
+	api.DELETE("/richmenu/:id", r.richMenuHandler.DeleteRichMenu)
+	api.POST("/richmenu/:id/publish", r.richMenuHandler.PublishToLINE)
 
 	return r.echo
 }

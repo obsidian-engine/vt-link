@@ -7,6 +7,7 @@ import (
 
 	"vt-link/backend/internal/application/autoreply"
 	"vt-link/backend/internal/application/message"
+	"vt-link/backend/internal/application/richmenu"
 	"vt-link/backend/internal/infrastructure/db"
 	"vt-link/backend/internal/infrastructure/db/pg"
 	"vt-link/backend/internal/infrastructure/external"
@@ -16,6 +17,7 @@ import (
 type Container struct {
 	MessageUsecase   message.Usecase
 	AutoReplyUsecase autoreply.Usecase
+	RichMenuUsecase  richmenu.Usecase
 	DB               *db.DB
 }
 
@@ -46,6 +48,7 @@ func newContainer() (*Container, error) {
 	// Repository
 	messageRepo := pg.NewMessageRepository(database)
 	autoReplyRuleRepo := pg.NewAutoReplyRuleRepository(database)
+	richMenuRepo := pg.NewRichMenuRepository(database)
 
 	// Transaction Manager
 	txManager := db.NewTxManager(database)
@@ -56,6 +59,7 @@ func newContainer() (*Container, error) {
 	// pusher := external.NewDummyPusher()
 
 	lineReplier := external.NewLineReplier(os.Getenv("LINE_ACCESS_TOKEN"))
+	lineRichMenuService := external.NewLineRichMenuService(os.Getenv("LINE_ACCESS_TOKEN"))
 
 	// Clock
 	clock := clock.NewRealClock()
@@ -73,9 +77,15 @@ func newContainer() (*Container, error) {
 		lineReplier,
 	)
 
+	richMenuUsecase := richmenu.NewInteractor(
+		richMenuRepo,
+		lineRichMenuService,
+	)
+
 	return &Container{
 		MessageUsecase:   messageUsecase,
 		AutoReplyUsecase: autoReplyUsecase,
+		RichMenuUsecase:  richMenuUsecase,
 		DB:               database,
 	}, nil
 }

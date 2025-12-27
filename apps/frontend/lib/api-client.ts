@@ -45,6 +45,41 @@ export interface UpdateAutoReplyRuleRequest {
   isEnabled?: boolean
 }
 
+export interface RichMenu {
+  id: string
+  name: string
+  template: '2x3' | '1x3' | '2x2'
+  imageUrl: string
+  areas: RichMenuArea[]
+  lineRichMenuId?: string
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export interface RichMenuArea {
+  bounds: { x: number; y: number; width: number; height: number }
+  action: {
+    type: 'uri' | 'message'
+    uri?: string
+    label?: string
+    text?: string
+  }
+}
+
+export interface CreateRichMenuRequest {
+  name: string
+  template: '2x3' | '1x3' | '2x2'
+  imageUrl: string
+  areas: RichMenuArea[]
+}
+
+export interface UpdateRichMenuRequest {
+  name?: string
+  imageUrl?: string
+  areas?: RichMenuArea[]
+}
+
 export interface ApiResponse<T> {
   data?: T
   error?: {

@@ -15,6 +15,11 @@ import {
   UpdateAutoReplyRuleRequest,
   AutoReplyRuleListResponse,
   AutoReplyRuleResponse,
+  RichMenu,
+  CreateRichMenuRequest,
+  UpdateRichMenuRequest,
+  RichMenuListResponse,
+  RichMenuResponse,
   ApiError,
   ApiSuccess
 } from './schemas/index.js'
@@ -35,6 +40,11 @@ registry.register('CreateAutoReplyRuleRequest', CreateAutoReplyRuleRequest)
 registry.register('UpdateAutoReplyRuleRequest', UpdateAutoReplyRuleRequest)
 registry.register('AutoReplyRuleListResponse', AutoReplyRuleListResponse)
 registry.register('AutoReplyRuleResponse', AutoReplyRuleResponse)
+registry.register('RichMenu', RichMenu)
+registry.register('CreateRichMenuRequest', CreateRichMenuRequest)
+registry.register('UpdateRichMenuRequest', UpdateRichMenuRequest)
+registry.register('RichMenuListResponse', RichMenuListResponse)
+registry.register('RichMenuResponse', RichMenuResponse)
 registry.register('ApiError', ApiError)
 registry.register('ApiSuccess', ApiSuccess)
 
@@ -295,6 +305,170 @@ registry.registerPath({
   }
 })
 
+// RichMenu エンドポイント
+registry.registerPath({
+  method: 'get',
+  path: '/api/v1/richmenus',
+  description: 'リッチメニュー一覧を取得',
+  summary: 'リッチメニュー一覧取得',
+  tags: ['rich-menus'],
+  responses: {
+    200: {
+      description: 'リッチメニュー一覧',
+      content: {
+        'application/json': {
+          schema: RichMenuListResponse
+        }
+      }
+    }
+  }
+})
+
+registry.registerPath({
+  method: 'post',
+  path: '/api/v1/richmenus',
+  description: 'リッチメニューを作成',
+  summary: 'リッチメニュー作成',
+  tags: ['rich-menus'],
+  requestBody: {
+    content: {
+      'application/json': {
+        schema: CreateRichMenuRequest
+      }
+    }
+  },
+  responses: {
+    201: {
+      description: '作成されたリッチメニュー',
+      content: {
+        'application/json': {
+          schema: RichMenuResponse
+        }
+      }
+    },
+    400: {
+      description: 'バリデーションエラー',
+      content: {
+        'application/json': {
+          schema: ApiError
+        }
+      }
+    }
+  }
+})
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/v1/richmenus/{id}',
+  description: 'リッチメニュー詳細を取得',
+  summary: 'リッチメニュー詳細取得',
+  tags: ['rich-menus'],
+  parameters: [
+    {
+      name: 'id',
+      in: 'path',
+      description: 'リッチメニューID',
+      required: true,
+      schema: { type: 'string', format: 'uuid' }
+    }
+  ],
+  responses: {
+    200: {
+      description: 'リッチメニュー詳細',
+      content: {
+        'application/json': {
+          schema: RichMenuResponse
+        }
+      }
+    },
+    404: {
+      description: 'リッチメニューが見つかりません',
+      content: {
+        'application/json': {
+          schema: ApiError
+        }
+      }
+    }
+  }
+})
+
+registry.registerPath({
+  method: 'put',
+  path: '/api/v1/richmenus/{id}',
+  description: 'リッチメニューを更新',
+  summary: 'リッチメニュー更新',
+  tags: ['rich-menus'],
+  parameters: [
+    {
+      name: 'id',
+      in: 'path',
+      description: 'リッチメニューID',
+      required: true,
+      schema: { type: 'string', format: 'uuid' }
+    }
+  ],
+  requestBody: {
+    content: {
+      'application/json': {
+        schema: UpdateRichMenuRequest
+      }
+    }
+  },
+  responses: {
+    200: {
+      description: '更新されたリッチメニュー',
+      content: {
+        'application/json': {
+          schema: RichMenuResponse
+        }
+      }
+    },
+    404: {
+      description: 'リッチメニューが見つかりません',
+      content: {
+        'application/json': {
+          schema: ApiError
+        }
+      }
+    }
+  }
+})
+
+registry.registerPath({
+  method: 'delete',
+  path: '/api/v1/richmenus/{id}',
+  description: 'リッチメニューを削除',
+  summary: 'リッチメニュー削除',
+  tags: ['rich-menus'],
+  parameters: [
+    {
+      name: 'id',
+      in: 'path',
+      description: 'リッチメニューID',
+      required: true,
+      schema: { type: 'string', format: 'uuid' }
+    }
+  ],
+  responses: {
+    200: {
+      description: '削除成功',
+      content: {
+        'application/json': {
+          schema: ApiSuccess
+        }
+      }
+    },
+    404: {
+      description: 'リッチメニューが見つかりません',
+      content: {
+        'application/json': {
+          schema: ApiError
+        }
+      }
+    }
+  }
+})
+
 const generator = new OpenApiGeneratorV3(registry.definitions)
 
 const document = generator.generateDocument({
@@ -330,6 +504,10 @@ const document = generator.generateDocument({
     {
       name: 'auto-reply-rules',
       description: '自動返信ルール管理API'
+    },
+    {
+      name: 'rich-menus',
+      description: 'リッチメニュー管理API'
     }
   ]
 })
