@@ -94,7 +94,7 @@ const REDIRECT_URI = process.env.NEXT_PUBLIC_LINE_REDIRECT_URI ?? ''
  * LINE OAuth認証URLを生成
  */
 export function getLineLoginUrl(): string {
-  const state = Math.random().toString(36).substring(7)
+  const state = crypto.randomUUID()
   return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${state}&scope=profile%20openid%20email`
 }
 

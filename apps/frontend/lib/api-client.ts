@@ -100,7 +100,7 @@ export function makeClient(): ApiClient {
    */
   function getCsrfTokenFromCookie(): string {
     if (typeof document === 'undefined') return ''
-    const match = document.cookie.match(/csrf_token=([^;]+)/)
+    const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]*)/)
     return match ? match[1] : ''
   }
 

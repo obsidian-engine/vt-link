@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAuth } from "@/lib/auth";
 
 function AuthCallbackContent() {
   const router = useRouter();
@@ -52,7 +51,9 @@ function AuthCallbackContent() {
         // Tokens stored in HttpOnly cookies, redirect to home page
         router.push('/');
       } catch (err) {
-        console.error("認証エラー:", err);
+        if (process.env.NODE_ENV === 'development') {
+          console.error("認証エラー:", err);
+        }
         setError("認証処理中にエラーが発生しました");
         setTimeout(() => router.push("/login?error=auth_error"), 2000);
       }
