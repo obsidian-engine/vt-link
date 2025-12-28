@@ -4,10 +4,10 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import AutoReplyPage from '../page'
 import type { AutoReplyRule } from '@/lib/api-client'
-import { useAutoReplyRules } from '@/lib/hooks/use-auto-reply-rules'
+import { useAutoReplyRules } from '../_hooks/use-auto-reply-rules'
 
 // SWRフックのモック
-vi.mock('@/lib/hooks/use-auto-reply-rules', () => ({
+vi.mock('../_hooks/use-auto-reply-rules', () => ({
   useAutoReplyRules: vi.fn(() => ({
     rules: [],
     isLoading: false,
@@ -195,7 +195,7 @@ describe('AutoReplyPage', () => {
   it('should call deleteRule when delete button is clicked', async () => {
     const user = userEvent.default?.setup() ?? userEvent.setup()
     const mockDeleteRule = vi.fn()
-    const { deleteRule } = await import('@/lib/hooks/use-auto-reply-rules')
+    const { deleteRule } = await import('../_hooks/use-auto-reply-rules')
     ;(deleteRule as ReturnType<typeof vi.fn>).mockImplementation(mockDeleteRule)
     ;(useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: mockRules,
@@ -217,7 +217,7 @@ describe('AutoReplyPage', () => {
   it('should call updateRule when toggle button is clicked', async () => {
     const user = userEvent.default?.setup() ?? userEvent.setup()
     const mockUpdateRule = vi.fn()
-    const { updateRule } = await import('@/lib/hooks/use-auto-reply-rules')
+    const { updateRule } = await import('../_hooks/use-auto-reply-rules')
     ;(updateRule as ReturnType<typeof vi.fn>).mockImplementation(mockUpdateRule)
     ;(useAutoReplyRules as ReturnType<typeof vi.fn>).mockReturnValue({
       rules: mockRules,

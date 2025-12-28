@@ -1,12 +1,12 @@
 'use client'
 import useSWR from 'swr'
-import { makeClient } from '../api-client'
+import { makeClient } from '@/lib/api-client'
 import type {
   RichMenu,
   CreateRichMenuRequest,
   UpdateRichMenuRequest,
   ApiResponse
-} from '../api-client'
+} from '@/lib/api-client'
 
 const client = makeClient()
 

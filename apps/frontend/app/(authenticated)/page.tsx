@@ -1,7 +1,7 @@
 
 'use client'
 import Link from 'next/link'
-import { useDashboardStats, useCampaigns, Campaign } from '@/lib/hooks/use-dashboard'
+import { useDashboardStats, useCampaigns, Campaign } from './_shared/hooks/use-dashboard'
 
 /**
  * エラーからメッセージを安全に取得する型ガード関数

@@ -1,15 +1,15 @@
 'use client'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { RuleCard } from '@/components/auto-reply/rule-card'
-import { RuleForm } from '@/components/auto-reply/rule-form'
+import { RuleCard } from './_components/rule-card'
+import { RuleForm } from './_components/rule-form'
 import {
   useAutoReplyRules,
   createRule,
   updateRule,
   deleteRule,
   bulkUpdateRules
-} from '@/lib/hooks/use-auto-reply-rules'
+} from './_hooks/use-auto-reply-rules'
 import type { AutoReplyRule, CreateAutoReplyRuleRequest } from '@/lib/api-client'
 
 export default function AutoReplyPage() {

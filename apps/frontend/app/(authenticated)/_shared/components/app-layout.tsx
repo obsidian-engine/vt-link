@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Sidebar } from "./sidebar";
-import { UserMenu } from "./user-menu";
+import { UserMenu } from "@/app/_shared/components/user-menu";
 import { useAuth } from "@/lib/auth";
 
 interface AppLayoutProps {

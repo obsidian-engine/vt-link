@@ -1,6 +1,7 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import type { AutoReplyRule, CreateAutoReplyRuleRequest } from '@/lib/api-client'
+import { useAutoReplyForm, type AutoReplyFormValues } from '../_hooks/use-auto-reply-form'
 
 interface RuleFormProps {
   rule?: AutoReplyRule
@@ -10,84 +11,66 @@ interface RuleFormProps {
 }
 
 export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleFormProps) {
-  const [type, setType] = useState<'follow' | 'keyword'>(rule?.type ?? 'keyword')
-  const [name, setName] = useState(rule?.name ?? '')
+  // keywordsはUI上カンマ区切り文字列で管理
   const [keywordsInput, setKeywordsInput] = useState(rule?.keywords?.join(', ') ?? '')
-  const [matchType, setMatchType] = useState<'exact' | 'partial'>(rule?.matchType ?? 'partial')
-  const [replyMessage, setReplyMessage] = useState(rule?.replyMessage ?? '')
-  const [priority, setPriority] = useState(rule?.priority ?? 1)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  
+  // React Hook Form初期化
+  const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useAutoReplyForm({
+    type: rule?.type ?? 'keyword',
+    name: rule?.name ?? '',
+    keywords: rule?.keywords ?? [],
+    matchType: rule?.matchType ?? 'partial',
+    replyMessage: rule?.replyMessage ?? '',
+    priority: rule?.priority ?? 1,
+    isEnabled: rule?.isEnabled ?? true
+  })
 
-  // バリデーション
-  const validate = (): boolean => {
-    const newErrors: Record<string, string> = {}
+  // リアルタイム監視
+  const type = watch('type')
+  const replyMessage = watch('replyMessage')
+  const name = watch('name')
 
-    if (!name.trim()) {
-      newErrors.name = 'ルール名を入力してください'
-    } else if (name.length > 50) {
-      newErrors.name = 'ルール名は50文字以内で入力してください'
-    }
-
-    if (type === 'keyword') {
-      const keywords = keywordsInput.split(',').map(k => k.trim()).filter(Boolean)
-      if (keywords.length === 0) {
-        newErrors.keywords = '反応する言葉を入力してください'
-      } else if (keywords.length > 10) {
-        newErrors.keywords = '反応する言葉は最大10個までです'
-      }
-    }
-
-    if (!replyMessage.trim()) {
-      newErrors.replyMessage = '返信メッセージを入力してください'
-    } else if (replyMessage.length > 1000) {
-      newErrors.replyMessage = '返信メッセージは1000文字以内で入力してください'
-    }
-
+  // フォーム送信処理
+  const onSubmitForm = async (data: AutoReplyFormValues) => {
+    // 最大5件チェック（zodスキーマ外のビジネスロジック）
     if (!rule && existingRulesCount >= 5) {
-      newErrors.general = 'ルールは最大5件までです'
+      return
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    // keywordsInputを配列に変換
+    const keywords = data.type === 'keyword' 
+      ? keywordsInput.split(',').map(k => k.trim()).filter(Boolean)
+      : undefined
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validate()) return
-
-    setIsSubmitting(true)
-    try {
-      const keywords = type === 'keyword' 
-        ? keywordsInput.split(',').map(k => k.trim()).filter(Boolean)
-        : undefined
-
-      const data: CreateAutoReplyRuleRequest = {
-        type,
-        name: name.trim(),
-        keywords,
-        matchType: type === 'keyword' ? matchType : undefined,
-        replyMessage: replyMessage.trim(),
-        priority,
-        isEnabled: true
+    // keyword型の場合のkeywords検証
+    if (data.type === 'keyword') {
+      if (!keywords || keywords.length === 0) {
+        return
       }
+      if (keywords.length > 10) {
+        return
+      }
+    }
 
-      await onSubmit(data)
+    const requestData: CreateAutoReplyRuleRequest = {
+      type: data.type,
+      name: data.name.trim(),
+      keywords,
+      matchType: data.type === 'keyword' ? data.matchType : undefined,
+      replyMessage: data.replyMessage.trim(),
+      priority: data.priority,
+      isEnabled: data.isEnabled
+    }
+
+    try {
+      await onSubmit(requestData)
     } catch (error) {
-      setErrors({ general: error instanceof Error ? error.message : '保存に失敗しました' })
-    } finally {
-      setIsSubmitting(false)
+      console.error('Failed to submit:', error)
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {errors.general && (
-        <div className="p-3 rounded-lg bg-red-500/10 text-red-600 dark:text-red-400 text-sm">
-          {errors.general}
-        </div>
-      )}
+    <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6">
 
       {/* タイプ選択 */}
       <div>
@@ -95,7 +78,7 @@ export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleF
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"
-            onClick={() => setType('follow')}
+            onClick={() => setValue('type', 'follow')}
             className={`p-3 rounded-lg border transition-colors ${
               type === 'follow'
                 ? 'border-primary bg-primary/10 text-primary'
@@ -107,7 +90,7 @@ export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleF
           </button>
           <button
             type="button"
-            onClick={() => setType('keyword')}
+            onClick={() => setValue('type', 'keyword')}
             className={`p-3 rounded-lg border transition-colors ${
               type === 'keyword'
                 ? 'border-primary bg-primary/10 text-primary'
@@ -128,13 +111,12 @@ export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleF
         <input
           id="name"
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
           placeholder="例: 営業時間外の自動返信"
           maxLength={50}
           className="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-primary"
+          {...register('name')}
         />
-        {errors.name && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.name}</p>}
+        {errors.name?.message && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.name.message}</p>}
         <p className="mt-1 text-xs text-muted-foreground">{name.length}/50文字</p>
       </div>
 
@@ -153,7 +135,6 @@ export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleF
               placeholder="例: 料金, 値段, いくら"
               className="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-primary"
             />
-            {errors.keywords && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.keywords}</p>}
             <p className="mt-1 text-xs text-muted-foreground">
               カンマ区切りで最大10個まで入力できます（例: 料金, 値段, いくら）
             </p>
@@ -167,8 +148,7 @@ export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleF
                 <input
                   type="radio"
                   value="partial"
-                  checked={matchType === 'partial'}
-                  onChange={() => setMatchType('partial')}
+                  {...register('matchType')}
                   className="text-primary focus:ring-primary"
                 />
                 <span className="text-sm">部分一致（おすすめ）</span>
@@ -177,8 +157,7 @@ export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleF
                 <input
                   type="radio"
                   value="exact"
-                  checked={matchType === 'exact'}
-                  onChange={() => setMatchType('exact')}
+                  {...register('matchType')}
                   className="text-primary focus:ring-primary"
                 />
                 <span className="text-sm">完全一致</span>
@@ -198,14 +177,13 @@ export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleF
         </label>
         <textarea
           id="replyMessage"
-          value={replyMessage}
-          onChange={(e) => setReplyMessage(e.target.value)}
           placeholder="お客様に送信するメッセージを入力してください"
           maxLength={1000}
           rows={5}
           className="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+          {...register('replyMessage')}
         />
-        {errors.replyMessage && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.replyMessage}</p>}
+        {errors.replyMessage?.message && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{errors.replyMessage.message}</p>}
         <p className="mt-1 text-xs text-muted-foreground">{replyMessage.length}/1000文字</p>
       </div>
 
@@ -235,9 +213,8 @@ export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleF
         </label>
         <select
           id="priority"
-          value={priority}
-          onChange={(e) => setPriority(Number(e.target.value))}
           className="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-primary"
+          {...register('priority', { valueAsNumber: true })}
         >
           {[1, 2, 3, 4, 5].map(p => (
             <option key={p} value={p}>

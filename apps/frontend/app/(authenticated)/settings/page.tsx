@@ -1,7 +1,7 @@
 "use client"
 import { Save, Upload, Loader2, AlertCircle } from "lucide-react"
 import { useState, useEffect } from "react"
-import { useSettings, updateSettings } from "@/lib/hooks/use-settings"
+import { useSettings, updateSettings } from "./_hooks/use-settings"
 
 export default function SettingsPage() {
   // API接続（バックエンドAPIに存在するフィールド）

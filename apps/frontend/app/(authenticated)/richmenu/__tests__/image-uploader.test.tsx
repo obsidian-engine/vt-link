@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ImageUploader } from '../image-uploader'
+import { ImageUploader } from '../_components/image-uploader'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // グローバルfetchのモック

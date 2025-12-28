@@ -1,7 +1,7 @@
 'use client'
 import useSWR from 'swr'
-import { getMessages, createMessage, type CreateMessageInput } from '../repo'
-import { type Message, type ApiResponse } from '../api-client'
+import { getMessages, createMessage, type CreateMessageInput } from '@/lib/repo'
+import { type Message, type ApiResponse } from '@/lib/api-client'
 
 export function useMessages() {
   const { data, error, isLoading, mutate } = useSWR(
