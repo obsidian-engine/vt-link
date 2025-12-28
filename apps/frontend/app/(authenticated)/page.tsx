@@ -3,6 +3,15 @@
 import Link from 'next/link'
 import { useDashboardStats, useCampaigns, Campaign } from '@/lib/hooks/use-dashboard'
 
+/**
+ * エラーからメッセージを安全に取得する型ガード関数
+ */
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'string') return error
+  return '不明なエラー'
+}
+
 export default function HomePage() {
   const { stats, isLoading: statsLoading, isError: statsError } = useDashboardStats()
   const { campaigns, isLoading: campaignsLoading, isError: campaignsError } = useCampaigns()
@@ -33,17 +42,69 @@ export default function HomePage() {
 
   // エラー状態
   if (statsError || campaignsError) {
+    const errorMessage = getErrorMessage(statsError) || getErrorMessage(campaignsError) || '不明なエラー'
+    const isNetworkError = errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('fetch')
+
     return (
       <div className="space-y-8">
         <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
           <div className="text-center py-8">
-            <p className="text-red-600 dark:text-red-400 mb-4">データの取得に失敗しました</p>
-            <button 
-              onClick={() => window.location.reload()} 
-              className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition"
-            >
-              再読み込み
-            </button>
+            <div className="mb-4">
+              <svg
+                className="mx-auto h-12 w-12 text-red-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+              データの取得に失敗しました
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {isNetworkError
+                ? 'ネットワーク接続を確認してください。インターネット接続が不安定な可能性があります。'
+                : 'サーバーとの通信に問題が発生しました。しばらく経ってから再度お試しください。'}
+            </p>
+            <details className="text-left mb-6 max-w-md mx-auto">
+              <summary className="text-xs text-gray-500 dark:text-gray-500 cursor-pointer hover:text-gray-700 dark:hover:text-gray-300">
+                エラー詳細を表示
+              </summary>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-2 p-3 bg-gray-100 dark:bg-gray-800 rounded font-mono break-all">
+                {errorMessage}
+              </p>
+            </details>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => window.location.reload()}
+                className="min-h-[44px] px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
+              >
+                再読み込み
+              </button>
+              <a
+                href="/settings"
+                className="min-h-[44px] inline-flex items-center px-4 py-2 rounded-lg bg-muted text-foreground hover:bg-muted/80 active:bg-muted/70 focus:outline-none focus:ring-2 focus:ring-border focus:ring-offset-2 transition"
+              >
+                設定を確認
+              </a>
+            </div>
+            <p className="mt-6 text-xs text-gray-500 dark:text-gray-500">
+              問題が解決しない場合は、
+              <a
+                href="mailto:support@example.com"
+                className="text-primary hover:underline"
+              >
+                サポートにお問い合わせ
+              </a>
+              ください。
+            </p>
           </div>
         </div>
       </div>
@@ -130,6 +191,7 @@ export default function HomePage() {
                   </td>
                 </tr>
               ))}
+
             </tbody>
           </table>
         </div>
