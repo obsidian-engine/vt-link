@@ -30,6 +30,7 @@ type Container struct {
 	HistoryUsecase   history.Usecase
 	SettingsUsecase  settings.Usecase
 	DashboardUsecase dashboard.Usecase
+	JWTManager       *auth.JWTManager
 	DB               *db.DB
 }
 
@@ -134,6 +135,7 @@ func newContainer() (*Container, error) {
 		HistoryUsecase:   historyUsecase,
 		SettingsUsecase:  settingsUsecase,
 		DashboardUsecase: dashboardUsecase,
+		JWTManager:       jwtManager,
 		DB:               database,
 	}, nil
 }
