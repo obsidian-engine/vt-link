@@ -1,5 +1,6 @@
 
 'use client'
+import Link from 'next/link'
 import { useDashboardStats, useCampaigns, Campaign } from '@/lib/hooks/use-dashboard'
 
 export default function HomePage() {
@@ -50,38 +51,59 @@ export default function HomePage() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
+      {/* Page Header */}
+      <div>
+        <h1 className="text-3xl font-bold">ダッシュボード</h1>
+        <p className="text-muted-foreground mt-2">
+          LINE公式アカウントの配信状況とパフォーマンスを確認できます
+        </p>
+      </div>
+
       {/* Stats Grid */}
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">友だち数</p>
-          <p className="text-2xl font-bold">{stats?.friendCount.toLocaleString()}</p>
-        </div>
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">今月の送信</p>
-          <p className="text-2xl font-bold">{stats?.sendCount.toLocaleString()} / {stats?.sendLimit.toLocaleString()}</p>
-        </div>
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">平均CTR</p>
-          <p className="text-2xl font-bold">{stats?.averageCtr}%</p>
-        </div>
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
-          <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">今月の売上</p>
-          <p className="text-2xl font-bold">¥{stats?.monthlyRevenue.toLocaleString()}</p>
+      <div>
+        <h2 className="text-lg font-semibold mb-4">主要指標</h2>
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="bg-white rounded-lg p-6 border border-border hover:border-primary/50 transition">
+            <p className="text-sm text-muted-foreground mb-1">友だち数</p>
+            <p className="text-3xl font-bold">{stats?.friendCount.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground mt-2">現在の友だち総数</p>
+          </div>
+          <div className="bg-white rounded-lg p-6 border border-border hover:border-primary/50 transition">
+            <p className="text-sm text-muted-foreground mb-1">今月の送信</p>
+            <p className="text-3xl font-bold">{stats?.sendCount.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground mt-2">上限: {stats?.sendLimit.toLocaleString()}通</p>
+          </div>
+          <div className="bg-white rounded-lg p-6 border border-border hover:border-primary/50 transition">
+            <p className="text-sm text-muted-foreground mb-1">平均CTR</p>
+            <p className="text-3xl font-bold">{stats?.averageCtr}%</p>
+            <p className="text-xs text-muted-foreground mt-2">クリック率（高いほど良好）</p>
+          </div>
+          <div className="bg-white rounded-lg p-6 border border-border hover:border-primary/50 transition">
+            <p className="text-sm text-muted-foreground mb-1">今月の売上</p>
+            <p className="text-3xl font-bold">¥{stats?.monthlyRevenue.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground mt-2">メッセージ経由の売上</p>
+          </div>
         </div>
       </div>
 
       {/* Recent Campaigns */}
-      <div className="glass dark:glass-dark rounded-lg shadow-soft overflow-hidden">
-        <div className="p-6 border-b border-white/30 dark:border-slate-700/60 font-medium flex items-center justify-between">
-          <span>最近のキャンペーン</span>
-          <div className="flex items-center gap-2">
-            <button className="text-xs px-3 py-1.5 rounded-md hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary">更新</button>
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-lg font-semibold">最近のキャンペーン</h2>
+            <p className="text-sm text-muted-foreground">過去の配信結果を確認できます</p>
           </div>
+          <Link
+            href="/messages"
+            className="text-sm text-primary hover:text-primary/80 font-medium"
+          >
+            すべて見る →
+          </Link>
         </div>
-        <div className="overflow-x-auto">
+        <div className="bg-white rounded-lg border border-border overflow-hidden">
           <table className="min-w-full text-sm">
-            <thead className="text-slate-600 dark:text-slate-400 bg-white/40 dark:bg-slate-800/30">
+            <thead className="bg-muted text-muted-foreground">
               <tr>
                 <th className="px-6 py-3 text-left font-medium">キャンペーン名</th>
                 <th className="px-6 py-3 text-right font-medium">送信</th>
@@ -90,9 +112,9 @@ export default function HomePage() {
                 <th className="px-6 py-3 text-left font-medium">状態</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/20 dark:divide-slate-700/60">
+            <tbody className="divide-y divide-border">
               {campaigns.map((campaign: Campaign) => (
-                <tr key={campaign.id} className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition">
+                <tr key={campaign.id} className="hover:bg-muted/50 transition">
                   <td className="px-6 py-4">{campaign.name}</td>
                   <td className="px-6 py-4 text-right">{campaign.sentCount.toLocaleString()}</td>
                   <td className="px-6 py-4 text-right">{campaign.ctr}%</td>

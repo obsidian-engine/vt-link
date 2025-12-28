@@ -3,8 +3,8 @@
 import * as React from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
-// shadcn削除: Buttonをプレーン要素へ置換
 import { Sidebar } from "./sidebar";
+import { UserMenu } from "./user-menu";
 import { useAuth } from "@/lib/auth";
 
 interface AppLayoutProps {
@@ -44,19 +44,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground shadow-md hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              新規メッセージ
-            </button>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600 text-white shadow-md hover:bg-red-700 hover:shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
-            >
-              ログアウト
-            </button>
+            <UserMenu onLogout={handleLogout} />
           </div>
         </header>
 

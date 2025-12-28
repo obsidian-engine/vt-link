@@ -19,13 +19,13 @@ import { cn } from "@/lib/utils"
 import { ThemeToggle } from "./theme-toggle"
 
 const navigation = [
-  { name: "ダッシュボード", href: "/", icon: LayoutDashboard },
-  { name: "メッセージ", href: "/messages", icon: MessageSquare },
-  { name: "オーディエンス", href: "/audience", icon: Users },
-  { name: "履歴", href: "/history", icon: History },
-  { name: "リッチメニュー", href: "/richmenu", icon: Grid3X3 },
-  { name: "自動返信", href: "/autoreply", icon: MessageCircle },
-  { name: "設定", href: "/settings", icon: Settings },
+  { name: "ダッシュボード", href: "/", icon: LayoutDashboard, description: "統計と概要" },
+  { name: "メッセージ", href: "/messages", icon: MessageSquare, description: "一斉配信" },
+  { name: "オーディエンス", href: "/audience", icon: Users, description: "友だち管理" },
+  { name: "履歴", href: "/history", icon: History, description: "配信履歴" },
+  { name: "リッチメニュー", href: "/richmenu", icon: Grid3X3, description: "メニュー設定" },
+  { name: "自動返信", href: "/autoreply", icon: MessageCircle, description: "自動応答" },
+  { name: "設定", href: "/settings", icon: Settings, description: "アカウント設定" },
 ]
 
 interface SidebarProps {
@@ -73,7 +73,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="flex flex-col gap-1 text-sm font-medium">
+        <nav className="flex flex-col gap-1 text-sm">
           {navigation.map((item) => {
             const isActive = pathname === item.href
             return (
@@ -81,19 +81,28 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-2 rounded-lg px-3 py-2 transition-colors",
+                  "flex items-center gap-3 rounded-lg px-3 py-3 transition-colors group",
                   "hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                   isActive
                     ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    : "text-foreground hover:text-primary"
                 )}
                 onClick={() => setIsOpen(false)}
+                title={item.description}
               >
                 <item.icon className={cn(
-                  "h-4 w-4",
+                  "h-5 w-5 flex-shrink-0",
                   isActive ? "opacity-100" : "opacity-70 group-hover:opacity-100"
                 )} />
-                {item.name}
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium">{item.name}</div>
+                  <div className={cn(
+                    "text-xs mt-0.5",
+                    isActive ? "text-primary/70" : "text-muted-foreground"
+                  )}>
+                    {item.description}
+                  </div>
+                </div>
               </Link>
             )
           })}

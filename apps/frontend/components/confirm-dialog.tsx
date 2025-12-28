@@ -26,12 +26,12 @@ export function ConfirmDialog({
   const getConfirmButtonStyle = () => {
     switch (variant) {
       case 'danger':
-        return 'bg-red-600 hover:bg-red-700 focus:ring-red-500'
+        return 'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive'
       case 'warning':
-        return 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500'
+        return 'bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-500'
       case 'info':
       default:
-        return 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+        return 'bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary'
     }
   }
 
@@ -64,7 +64,7 @@ export function ConfirmDialog({
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                className="px-4 py-2 text-sm font-medium text-muted-foreground bg-muted rounded-md hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-border"
               >
                 {cancelLabel}
               </button>

@@ -1,11 +1,13 @@
 'use client'
 import * as React from 'react'
+import { toast } from 'sonner'
 import { useCreateMessageForm, type FormValues } from './useCreateMessageForm'
 import { makeClient } from '@/lib/api-client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { MessagePreview } from '@/components/message-preview'
 import { ConfirmDialog } from '@/components/confirm-dialog'
+import type { SubmitHandler } from 'react-hook-form'
 
 const client = makeClient()
 
@@ -18,7 +20,7 @@ export default function NewMessagePage() {
   // フォーム値をリアルタイム監視
   const watchedValues = watch()
 
-  const onSubmit = async (values: FormValues) => {
+  const onSubmit: SubmitHandler<FormValues> = async (values) => {
     // 確認ダイアログを表示
     setPendingValues(values)
     setConfirmOpen(true)
@@ -32,22 +34,25 @@ export default function NewMessagePage() {
       if (res.error) {
         throw new Error('メッセージの配信に失敗しました')
       }
+      toast.success('メッセージを配信しました')
       router.push('/messages')
     } catch (error) {
       console.error('Error creating message:', error)
-      alert('エラーが発生しました')
+      toast.error('メッセージの配信に失敗しました。もう一度お試しください。')
     } finally {
       setPendingValues(null)
+      setConfirmOpen(false)
     }
   }
 
   return (
     <main className="px-4 py-6">
       <div className="max-w-7xl mx-auto">
-        <div className="flex items-center space-x-4 mb-6">
+        <div className="flex items-center space-x-4 mb-8">
           <Link
             href="/messages"
-            className="text-blue-600 hover:text-blue-800"
+            className="text-primary hover:text-primary/90"
+            aria-label="メッセージ一覧に戻る"
           >
             ← 一覧に戻る
           </Link>
@@ -67,11 +72,11 @@ export default function NewMessagePage() {
               <input
                 id="title"
                 type="text"
-                className="mt-1 w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 w-full rounded border border-border bg-background text-foreground px-3 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 {...register('title')}
               />
               {errors.title && (
-                <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>
+                <p className="text-sm text-destructive mt-1">{errors.title.message}</p>
               )}
             </div>
 
@@ -82,11 +87,11 @@ export default function NewMessagePage() {
               <textarea
                 id="body"
                 rows={6}
-                className="mt-1 w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 w-full rounded border border-border bg-background text-foreground px-3 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 {...register('body')}
               />
               {errors.body && (
-                <p className="text-sm text-red-600 mt-1">{errors.body.message}</p>
+                <p className="text-sm text-destructive mt-1">{errors.body.message}</p>
               )}
             </div>
 
@@ -97,11 +102,11 @@ export default function NewMessagePage() {
               <input
                 id="imageUrl"
                 type="url"
-                className="mt-1 w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 w-full rounded border border-border bg-background text-foreground px-3 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 {...register('imageUrl')}
               />
               {errors.imageUrl && (
-                <p className="text-sm text-red-600 mt-1">{errors.imageUrl.message}</p>
+                <p className="text-sm text-destructive mt-1">{errors.imageUrl.message}</p>
               )}
             </div>
 
@@ -112,11 +117,11 @@ export default function NewMessagePage() {
               <input
                 id="scheduledAt"
                 type="datetime-local"
-                className="mt-1 w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 w-full rounded border border-border bg-background text-foreground px-3 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 {...register('scheduledAt')}
               />
               {errors.scheduledAt && (
-                <p className="text-sm text-red-600 mt-1">{errors.scheduledAt.message}</p>
+                <p className="text-sm text-destructive mt-1">{errors.scheduledAt.message}</p>
               )}
             </div>
 
@@ -126,36 +131,37 @@ export default function NewMessagePage() {
               </label>
               <select
                 id="status"
-                className="mt-1 w-full rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 w-full rounded border border-border bg-background text-foreground px-3 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                 {...register('status')}
               >
                 <option value="draft">下書き</option>
                 <option value="scheduled">配信予定</option>
               </select>
               {errors.status && (
-                <p className="text-sm text-red-600 mt-1">{errors.status.message}</p>
+                <p className="text-sm text-destructive mt-1">{errors.status.message}</p>
               )}
             </div>
 
-            <div className="flex space-x-3 pt-4">
+            <div className="flex space-x-4 pt-4">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm hover:bg-blue-700 disabled:bg-gray-400"
+                className="bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? '配信中…' : '配信する'}
               </button>
-              <Link
-                href="/messages"
-                className="bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md text-sm hover:bg-gray-400 dark:hover:bg-gray-500"
+              <button
+                type="button"
+                onClick={() => router.push('/messages')}
+                className="bg-muted text-muted-foreground px-4 py-2 rounded-md text-sm hover:bg-muted/80"
               >
                 キャンセル
-              </Link>
+              </button>
             </div>
           </form>
 
           {/* 右側: プレビュー */}
-          <div className="sticky top-6 h-fit">
+          <div className="lg:sticky lg:top-6 h-fit">
             <MessagePreview
               title={watchedValues.title || ''}
               body={watchedValues.body || ''}

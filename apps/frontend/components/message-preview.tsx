@@ -1,5 +1,7 @@
 "use client"
 
+import Image from 'next/image'
+
 interface MessagePreviewProps {
   title: string
   body: string
@@ -39,7 +41,7 @@ export function MessagePreview({ title, body, imageUrl, scheduledAt }: MessagePr
         <div className="flex items-start space-x-3">
           {/* アイコン（仮のプレースホルダー） */}
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-10 h-10 rounded-full bg-brand-primary flex items-center justify-center text-white font-bold text-sm">
               VT
             </div>
           </div>
@@ -47,7 +49,7 @@ export function MessagePreview({ title, body, imageUrl, scheduledAt }: MessagePr
           {/* メッセージ本体 */}
           <div className="flex-1 min-w-0">
             {/* 吹き出し */}
-            <div className="bg-green-500 text-white rounded-lg rounded-tl-none px-4 py-3 shadow-sm">
+            <div className="bg-brand-primary text-white rounded-lg rounded-tl-none px-4 py-3 shadow-sm">
               {/* タイトル */}
               {title && (
                 <div className="font-bold mb-2 text-sm">
@@ -64,15 +66,13 @@ export function MessagePreview({ title, body, imageUrl, scheduledAt }: MessagePr
 
               {/* 画像 */}
               {imageUrl && (
-                <div className="mt-3">
-                  <img
+                <div className="mt-3 relative w-full h-48">
+                  <Image
                     src={imageUrl}
                     alt="プレビュー画像"
-                    className="rounded-md max-w-full h-auto"
-                    onError={(e) => {
-                      // 画像読み込みエラー時の処理
-                      e.currentTarget.style.display = 'none'
-                    }}
+                    fill
+                    className="rounded-md object-cover"
+                    unoptimized
                   />
                 </div>
               )}
