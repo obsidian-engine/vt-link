@@ -1,6 +1,11 @@
 import Link from 'next/link'
 import { serverApi, CACHE_STRATEGY } from '@/lib/server-api'
 
+// Force dynamic rendering for cookie access
+export const dynamic = 'force-dynamic'
+// Disable caching to always read fresh cookies
+export const revalidate = 0
+
 interface DashboardStats {
   friendCount: number
   sendCount: number
@@ -33,6 +38,9 @@ interface CampaignsResponse {
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message
   if (typeof error === 'string') return error
+  if (error && typeof error === 'object' && 'message' in error) {
+    return String(error.message)
+  }
   return '不明なエラー'
 }
 

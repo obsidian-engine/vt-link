@@ -48,8 +48,11 @@ function AuthCallbackContent() {
           throw new Error("認証リクエストに失敗しました");
         }
 
-        // Tokens stored in HttpOnly cookies, redirect to home page
-        router.push('/');
+        // Tokens stored in HttpOnly cookies
+        // Use full page reload to ensure cookies are sent with next request
+        if (typeof window !== 'undefined') {
+          window.location.href = '/?t=' + Date.now();
+        }
       } catch (err) {
         if (process.env.NODE_ENV === 'development') {
           console.error("認証エラー:", err);

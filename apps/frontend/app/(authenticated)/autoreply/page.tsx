@@ -2,6 +2,9 @@ import { serverApi, CACHE_STRATEGY } from '@/lib/server-api'
 import type { AutoReplyRule } from '@/lib/api-client'
 import { AutoReplyClient } from './_components/autoreply-client'
 
+// Force dynamic rendering for cookie access
+export const dynamic = 'force-dynamic'
+
 interface AutoReplyRulesResponse {
   data: AutoReplyRule[]
 }

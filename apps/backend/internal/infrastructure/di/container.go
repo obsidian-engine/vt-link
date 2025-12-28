@@ -65,6 +65,7 @@ func newContainer() (*Container, error) {
 	fanRepo := pg.NewFanRepository(database)
 	messageHistoryRepo := pg.NewMessageHistoryRepository(database)
 	userSettingsRepo := pg.NewUserSettingsRepository(database)
+	userRepo := pg.NewUserRepository(database)
 
 	// 新規追加
 	dashboardRepo := pg.NewDashboardRepository(database)
@@ -84,9 +85,9 @@ func newContainer() (*Container, error) {
 
 	// Auth Services
 	lineOAuthClient := external.NewLineOAuthClient(
-		os.Getenv("LINE_CLIENT_ID"),
-		os.Getenv("LINE_CLIENT_SECRET"),
-		os.Getenv("LINE_REDIRECT_URI"),
+		os.Getenv("LINE_LOGIN_CHANNEL_ID"),
+		os.Getenv("LINE_LOGIN_CHANNEL_SECRET"),
+		os.Getenv("LINE_LOGIN_CALLBACK_URL"),
 	)
 	jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET"))
 	stateStore := auth.NewInMemoryStateStore(5 * time.Minute)
@@ -96,7 +97,7 @@ func newContainer() (*Container, error) {
 
 	// Usecase
 	// Auth Usecase
-	authUsecase := authApp.NewInteractor(lineOAuthClient, jwtManager, stateStore)
+	authUsecase := authApp.NewInteractor(lineOAuthClient, jwtManager, stateStore, userRepo)
 	messageUsecase := message.NewInteractor(
 		messageRepo,
 		txManager,

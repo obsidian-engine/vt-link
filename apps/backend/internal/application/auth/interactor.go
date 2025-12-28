@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 
+	"vt-link/backend/internal/domain/model"
+	"vt-link/backend/internal/domain/repository"
 	"vt-link/backend/internal/infrastructure/auth"
 	"vt-link/backend/internal/infrastructure/external"
 	"vt-link/backend/internal/shared/errx"
@@ -13,18 +15,33 @@ type Interactor struct {
 	oauthClient *external.LineOAuthClient
 	jwtManager  *auth.JWTManager
 	stateStore  auth.StateStore
+	userRepo    repository.UserRepository
 }
 
 func NewInteractor(
 	oauthClient *external.LineOAuthClient,
 	jwtManager *auth.JWTManager,
 	stateStore auth.StateStore,
+	userRepo repository.UserRepository,
 ) Usecase {
 	return &Interactor{
 		oauthClient: oauthClient,
 		jwtManager:  jwtManager,
 		stateStore:  stateStore,
+		userRepo:    userRepo,
 	}
+}
+
+func (i *Interactor) GenerateState(ctx context.Context) (*GenerateStateOutput, error) {
+	state, err := i.stateStore.Generate()
+	if err != nil {
+		log.Printf("Failed to generate state: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	return &GenerateStateOutput{
+		State: state,
+	}, nil
 }
 
 func (i *Interactor) Login(ctx context.Context, input *LoginInput) (*LoginOutput, error) {
@@ -52,7 +69,21 @@ func (i *Interactor) Login(ctx context.Context, input *LoginInput) (*LoginOutput
 		return nil, errx.NewAppError("PROFILE_FAILED", "Failed to get user profile", 401)
 	}
 
-	// 3. Generate JWT tokens
+	// 3. Create or update user in database
+	user := &model.User{
+		LineUserID:  profile.UserID,
+		DisplayName: profile.DisplayName,
+		PictureURL:  profile.PictureURL,
+		Email:       profile.Email,
+	}
+
+	savedUser, err := i.userRepo.Upsert(ctx, user)
+	if err != nil {
+		log.Printf("Failed to upsert user: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	// 4. Generate JWT tokens
 	accessToken, err := i.jwtManager.GenerateToken(profile.UserID)
 	if err != nil {
 		log.Printf("Failed to generate access token: %v", err)
@@ -65,7 +96,7 @@ func (i *Interactor) Login(ctx context.Context, input *LoginInput) (*LoginOutput
 		return nil, errx.ErrInternalServer
 	}
 
-	// 4. Generate CSRF token
+	// 5. Generate CSRF token
 	csrfToken, err := auth.GenerateCSRFToken()
 	if err != nil {
 		log.Printf("Failed to generate CSRF token: %v", err)
@@ -74,10 +105,10 @@ func (i *Interactor) Login(ctx context.Context, input *LoginInput) (*LoginOutput
 
 	// Return tokens and profile data for presentation layer to handle
 	return &LoginOutput{
-		UserID:       profile.UserID,
-		DisplayName:  profile.DisplayName,
-		PictureURL:   profile.PictureURL,
-		Email:        profile.Email,
+		UserID:       savedUser.LineUserID,
+		DisplayName:  savedUser.DisplayName,
+		PictureURL:   savedUser.PictureURL,
+		Email:        savedUser.Email,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		CSRFToken:    csrfToken,

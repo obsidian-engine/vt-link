@@ -91,16 +91,20 @@ export function createAuthService(
     async checkAuth(): Promise<boolean> {
       // HttpOnly Cookieは直接読めないため、/auth/me APIで認証状態を確認
       try {
-        const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE || ''
         const response = await fetch(`${apiBase}/api/v1/auth/me`, {
           method: 'GET',
           credentials: 'include', // Cookieを送信
         })
         return response.ok
       } catch (error) {
-        console.error('認証状態の確認に失敗:', error)
-        return false
+      if (error instanceof TypeError) {
+        console.error('Network error during auth check:', error)
+      } else {
+        console.error('Auth check failed:', error)
       }
+      return false
+    }
     },
   }
 }
@@ -115,17 +119,39 @@ const REDIRECT_URI = process.env.NEXT_PUBLIC_LINE_REDIRECT_URI ?? ''
 /**
  * LINE OAuth認証URLを生成
  */
-export function getLineLoginUrl(): string {
-  const state = crypto.randomUUID()
-  return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${state}&scope=profile%20openid%20email`
+export async function getLineLoginUrl(): Promise<string> {
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || ''
+
+  try {
+    // バックエンドからstateを取得
+    const response = await fetch(`${apiBase}/auth/state`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to generate state')
+    }
+
+    const data = await response.json()
+    const state = data.state
+
+    return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${state}&scope=profile%20openid%20email`
+  } catch (error) {
+    console.error('Failed to get LINE login URL:', error)
+    // フォールバック: クライアント側で生成（セキュリティは低い）
+    const state = crypto.randomUUID()
+    return `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${state}&scope=profile%20openid%20email`
+  }
 }
 
 /**
  * LINE認証ページにリダイレクト
  */
-export function redirectToLineLogin(): void {
+export async function redirectToLineLogin(): Promise<void> {
   if (typeof window === 'undefined') return
-  window.location.href = getLineLoginUrl()
+  const url = await getLineLoginUrl()
+  window.location.href = url
 }
 
 /**

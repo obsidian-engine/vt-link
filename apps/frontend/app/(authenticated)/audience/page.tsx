@@ -2,6 +2,9 @@ import { Users } from "lucide-react"
 import { serverApi, CACHE_STRATEGY } from "@/lib/server-api"
 import type { Fan, Pagination } from "@/lib/api-client"
 
+// Force dynamic rendering for cookie access
+export const dynamic = 'force-dynamic'
+
 export default async function AudiencePage() {
   // Server Componentでデータフェッチ（ページ1、20件取得）
   const response = await serverApi.GET<{ data: Fan[]; pagination: Pagination }>(
