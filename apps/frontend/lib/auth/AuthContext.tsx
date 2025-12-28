@@ -61,7 +61,7 @@ export function AuthProvider({
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  // 初期化: トークンの存在をチェック
+  // 初期化: Cookieトークンの存在をチェック
   useEffect(() => {
     const checkAuth = () => {
       const authenticated = authService.isAuthenticated()
@@ -70,18 +70,6 @@ export function AuthProvider({
     }
 
     checkAuth()
-
-    // 他タブでのログイン/ログアウトを検知
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === 'accessToken') {
-        checkAuth()
-      }
-    }
-
-    window.addEventListener('storage', handleStorageChange)
-    return () => {
-      window.removeEventListener('storage', handleStorageChange)
-    }
   }, [authService])
 
   // ログイン処理（LINE OAuth）

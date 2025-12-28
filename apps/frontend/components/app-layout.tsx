@@ -57,9 +57,6 @@ export function AppLayout({ children }: AppLayoutProps) {
             >
               ログアウト
             </button>
-            <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold shadow-md">
-              SA
-            </div>
           </div>
         </header>
 
