@@ -1,5 +1,10 @@
 export * from './message.js';
 export * from './fan.js';
+export * from './auth.js';
+export * from './autoreply.js';
+export * from './richmenu.js';
+export * from './history.js';
+export * from './settings.js';
 import { z } from 'zod';
 export declare const ApiError: z.ZodObject<{
     ok: z.ZodLiteral<false>;

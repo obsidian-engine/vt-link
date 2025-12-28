@@ -36,9 +36,12 @@ func main() {
 	richMenuHandler := http.NewRichMenuHandler(container.RichMenuUsecase)
 	messageHandler := http.NewMessageHandler(container.MessageUsecase)
 	schedulerHandler := http.NewSchedulerHandler(container.MessageUsecase, os.Getenv("SCHEDULER_SECRET"))
+	audienceHandler := http.NewAudienceHandler(container.AudienceUsecase)
+	historyHandler := http.NewHistoryHandler(container.HistoryUsecase)
+	settingsHandler := http.NewSettingsHandler(container.SettingsUsecase)
 
 	// Router初期化とサーバー起動
-	router := http.NewRouter(authHandler, autoReplyHandler, richMenuHandler, messageHandler, schedulerHandler, jwtManager)
+	router := http.NewRouter(authHandler, autoReplyHandler, richMenuHandler, messageHandler, schedulerHandler, audienceHandler, historyHandler, settingsHandler, jwtManager)
 
 	port := ":8080"
 	log.Printf("Server listening on port %s", port)

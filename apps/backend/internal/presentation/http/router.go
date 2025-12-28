@@ -16,10 +16,13 @@ type Router struct {
 	richMenuHandler  *RichMenuHandler
 	messageHandler   *MessageHandler
 	schedulerHandler *SchedulerHandler
+	audienceHandler  *AudienceHandler
+	historyHandler   *HistoryHandler
+	settingsHandler  *SettingsHandler
 	jwtManager       *auth.JWTManager
 }
 
-func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, richMenuHandler *RichMenuHandler, messageHandler *MessageHandler, schedulerHandler *SchedulerHandler, jwtManager *auth.JWTManager) *Router {
+func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, richMenuHandler *RichMenuHandler, messageHandler *MessageHandler, schedulerHandler *SchedulerHandler, audienceHandler *AudienceHandler, historyHandler *HistoryHandler, settingsHandler *SettingsHandler, jwtManager *auth.JWTManager) *Router {
 	e := echo.New()
 
 	// Middleware
@@ -39,6 +42,9 @@ func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, ric
 		richMenuHandler:  richMenuHandler,
 		messageHandler:   messageHandler,
 		schedulerHandler: schedulerHandler,
+		audienceHandler:  audienceHandler,
+		historyHandler:   historyHandler,
+		settingsHandler:  settingsHandler,
 		jwtManager:       jwtManager,
 	}
 }
@@ -87,6 +93,22 @@ func (r *Router) Setup() *echo.Echo {
 	api.PUT("/messages/:id", r.messageHandler.UpdateMessage)
 	api.DELETE("/messages/:id", r.messageHandler.DeleteMessage)
 	api.POST("/messages/:id/send", r.messageHandler.SendMessage)
+
+	// Audience routes
+	api.GET("/audience", r.audienceHandler.ListFans)
+	api.GET("/audience/:id", r.audienceHandler.GetFan)
+	api.PUT("/audience/:id/tags", r.audienceHandler.UpdateFanTags)
+	api.POST("/audience/:id/block", r.audienceHandler.BlockFan)
+	api.POST("/audience/:id/unblock", r.audienceHandler.UnblockFan)
+	api.DELETE("/audience/:id", r.audienceHandler.DeleteFan)
+
+	// History routes
+	api.GET("/history", r.historyHandler.ListHistory)
+	api.GET("/history/:id", r.historyHandler.GetHistory)
+
+	// Settings routes
+	api.GET("/settings", r.settingsHandler.GetSettings)
+	api.PUT("/settings", r.settingsHandler.UpdateSettings)
 
 	// Scheduler route (public, no JWT authentication)
 	r.echo.POST("/api/scheduler/run", r.schedulerHandler.Run)
