@@ -1,6 +1,7 @@
 package http
 
 import (
+	"crypto/subtle"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -35,7 +36,7 @@ func CSRFMiddleware() echo.MiddlewareFunc {
 			}
 
 			// Compare tokens
-			if csrfCookie.Value != csrfHeader {
+			if subtle.ConstantTimeCompare([]byte(csrfCookie.Value), []byte(csrfHeader)) != 1 {
 				return c.JSON(http.StatusForbidden, map[string]interface{}{
 					"error": "CSRF token mismatch",
 				})

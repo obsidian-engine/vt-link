@@ -4,14 +4,17 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 
 	"vt-link/backend/internal/application/audience"
+	authApp "vt-link/backend/internal/application/auth"
 	"vt-link/backend/internal/application/autoreply"
 	"vt-link/backend/internal/application/dashboard"
 	"vt-link/backend/internal/application/history"
 	"vt-link/backend/internal/application/message"
 	"vt-link/backend/internal/application/richmenu"
 	"vt-link/backend/internal/application/settings"
+	"vt-link/backend/internal/infrastructure/auth"
 	"vt-link/backend/internal/infrastructure/db"
 	"vt-link/backend/internal/infrastructure/db/pg"
 	"vt-link/backend/internal/infrastructure/external"
@@ -19,6 +22,7 @@ import (
 )
 
 type Container struct {
+	AuthUsecase      authApp.Usecase
 	MessageUsecase   message.Usecase
 	AutoReplyUsecase autoreply.Usecase
 	RichMenuUsecase  richmenu.Usecase
@@ -77,10 +81,21 @@ func newContainer() (*Container, error) {
 	lineReplier := external.NewLineReplier(os.Getenv("LINE_ACCESS_TOKEN"))
 	lineRichMenuService := external.NewLineRichMenuService(os.Getenv("LINE_ACCESS_TOKEN"))
 
+	// Auth Services
+	lineOAuthClient := external.NewLineOAuthClient(
+		os.Getenv("LINE_CLIENT_ID"),
+		os.Getenv("LINE_CLIENT_SECRET"),
+		os.Getenv("LINE_REDIRECT_URI"),
+	)
+	jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET"))
+	stateStore := auth.NewInMemoryStateStore(5 * time.Minute)
+
 	// Clock
 	clock := clock.NewRealClock()
 
 	// Usecase
+	// Auth Usecase
+	authUsecase := authApp.NewInteractor(lineOAuthClient, jwtManager, stateStore)
 	messageUsecase := message.NewInteractor(
 		messageRepo,
 		txManager,
@@ -111,6 +126,7 @@ func newContainer() (*Container, error) {
 	dashboardUsecase := dashboard.NewDashboardInteractor(dashboardRepo, campaignRepo)
 
 	return &Container{
+		AuthUsecase:      authUsecase,
 		MessageUsecase:   messageUsecase,
 		AutoReplyUsecase: autoReplyUsecase,
 		RichMenuUsecase:  richMenuUsecase,

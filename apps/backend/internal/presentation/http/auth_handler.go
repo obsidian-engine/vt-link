@@ -4,13 +4,12 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	authApp "vt-link/backend/internal/application/auth"
 	"vt-link/backend/internal/infrastructure/auth"
-	"vt-link/backend/internal/infrastructure/external"
 )
 
 type AuthHandler struct {
-	oauthClient *external.LineOAuthClient
-	jwtManager  *auth.JWTManager
+	authUsecase authApp.Usecase
 }
 
 type LoginRequest struct {
@@ -34,10 +33,9 @@ type RefreshResponse struct {
 	CSRFToken string `json:"csrfToken"`
 }
 
-func NewAuthHandler(oauthClient *external.LineOAuthClient, jwtManager *auth.JWTManager) *AuthHandler {
+func NewAuthHandler(authUsecase authApp.Usecase) *AuthHandler {
 	return &AuthHandler{
-		oauthClient: oauthClient,
-		jwtManager:  jwtManager,
+		authUsecase: authUsecase,
 	}
 }
 
@@ -53,61 +51,32 @@ func (h *AuthHandler) Login(c echo.Context) error {
 	// Note: state validation is performed on the frontend side using sessionStorage.
 	// Backend only receives the state for API consistency and potential future use.
 
-	// 1. Exchange authorization code for tokens
-	tokenResp, err := h.oauthClient.ExchangeCode(c.Request().Context(), req.Code)
+	// Call usecase
+	output, err := h.authUsecase.Login(c.Request().Context(), &authApp.LoginInput{
+		Code:  req.Code,
+		State: req.State,
+	})
 	if err != nil {
-		c.Logger().Errorf("Failed to exchange code: %v", err)
+		c.Logger().Errorf("Login failed: %v", err)
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-			"error": "failed to exchange code",
+			"error": "authentication failed",
 		})
 	}
 
-	// 2. Get LINE profile
-	profile, err := h.oauthClient.GetProfile(c.Request().Context(), tokenResp.AccessToken)
-	if err != nil {
-		c.Logger().Errorf("Failed to get profile: %v", err)
-		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
-			"error": "failed to get profile",
-		})
-	}
+	// Set tokens in HttpOnly cookies (Presentation layer responsibility)
+	auth.SetAccessTokenCookie(c, output.AccessToken)
+	auth.SetRefreshTokenCookie(c, output.RefreshToken)
+	auth.SetCSRFTokenCookie(c, output.CSRFToken)
 
-	// 3. Generate JWT tokens
-	accessToken, err := h.jwtManager.GenerateToken(profile.UserID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": "failed to generate access token",
-		})
-	}
-
-	refreshToken, err := h.jwtManager.GenerateRefreshToken(profile.UserID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": "failed to generate refresh token",
-		})
-	}
-
-	// 4. Set tokens in HttpOnly cookies
-	auth.SetAccessTokenCookie(c, accessToken)
-	auth.SetRefreshTokenCookie(c, refreshToken)
-
-	// 5. Generate CSRF token
-	csrfToken, err := auth.GenerateCSRFToken()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": "failed to generate CSRF token",
-		})
-	}
-	auth.SetCSRFTokenCookie(c, csrfToken)
-
-	// 6. Return response
+	// Return response
 	return c.JSON(http.StatusOK, LoginResponse{
 		User: User{
-			ID:          profile.UserID,
-			DisplayName: profile.DisplayName,
-			PictureURL:  profile.PictureURL,
-			Email:       profile.Email,
+			ID:          output.UserID,
+			DisplayName: output.DisplayName,
+			PictureURL:  output.PictureURL,
+			Email:       output.Email,
 		},
-		CSRFToken: csrfToken,
+		CSRFToken: output.CSRFToken,
 	})
 }
 
@@ -122,7 +91,7 @@ func (h *AuthHandler) Logout(c echo.Context) error {
 
 // Refresh handles POST /auth/refresh
 func (h *AuthHandler) Refresh(c echo.Context) error {
-	// 1. Get refresh token from cookie
+	// Get refresh token from cookie
 	refreshToken, err := auth.GetRefreshTokenFromCookie(c)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
@@ -130,35 +99,21 @@ func (h *AuthHandler) Refresh(c echo.Context) error {
 		})
 	}
 
-	// 2. Validate refresh token
-	claims, err := h.jwtManager.ValidateToken(refreshToken)
+	// Call usecase
+	output, err := h.authUsecase.Refresh(c.Request().Context(), refreshToken)
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
 			"error": "invalid refresh token",
 		})
 	}
 
-	// 3. Generate new access token
-	accessToken, err := h.jwtManager.GenerateToken(claims.UserID)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": "failed to generate access token",
-		})
-	}
-	auth.SetAccessTokenCookie(c, accessToken)
+	// Set new tokens in HttpOnly cookies (Presentation layer responsibility)
+	auth.SetAccessTokenCookie(c, output.AccessToken)
+	auth.SetCSRFTokenCookie(c, output.CSRFToken)
 
-	// 4. Generate new CSRF token
-	csrfToken, err := auth.GenerateCSRFToken()
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": "failed to generate CSRF token",
-		})
-	}
-	auth.SetCSRFTokenCookie(c, csrfToken)
-
-	// 5. Return response
+	// Return response
 	return c.JSON(http.StatusOK, RefreshResponse{
-		CSRFToken: csrfToken,
+		CSRFToken: output.CSRFToken,
 	})
 }
 
