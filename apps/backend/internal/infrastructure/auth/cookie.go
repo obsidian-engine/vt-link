@@ -36,7 +36,7 @@ func SetRefreshTokenCookie(c echo.Context, token string) {
 		Name:     refreshTokenCookieName,
 		Value:    token,
 		MaxAge:   30 * 24 * 3600, // 30 days
-		Path:     "/auth",
+		Path:     "/",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 		Secure:   os.Getenv("APP_ENV") == "production",
@@ -65,7 +65,7 @@ func ClearAuthCookies(c echo.Context) {
 		path string
 	}{
 		{accessTokenCookieName, "/"},
-		{refreshTokenCookieName, "/auth"},
+		{refreshTokenCookieName, "/"},
 		{csrfTokenCookieName, "/"},
 	}
 

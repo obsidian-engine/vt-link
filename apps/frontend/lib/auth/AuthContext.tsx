@@ -2,9 +2,7 @@
 
 import {
   createContext,
-  useCallback,
   useEffect,
-  useMemo,
   useState,
   type ReactNode,
 } from 'react'
@@ -61,10 +59,10 @@ export function AuthProvider({
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
-  // 初期化: Cookieトークンの存在をチェック
+  // 初期化: API経由で認証状態をチェック
   useEffect(() => {
-    const checkAuth = () => {
-      const authenticated = authService.isAuthenticated()
+    const checkAuth = async () => {
+      const authenticated = await authService.checkAuth()
       setIsAuthenticated(authenticated)
       setIsLoading(false)
     }
@@ -73,36 +71,33 @@ export function AuthProvider({
   }, [authService])
 
   // ログイン処理（LINE OAuth）
-  const login = useCallback(() => {
+  // React 19 Compiler が自動最適化するため useCallback 不要
+  const login = () => {
     redirectToLineLogin()
-  }, [redirectToLineLogin])
+  }
 
   // ログアウト処理
-  const logout = useCallback(() => {
+  const logout = () => {
     authService.clearTokens()
     setIsAuthenticated(false)
-  }, [authService])
+  }
 
-  // トークン保存（OAuth callbackから呼ばれる）
-  const setTokens = useCallback(
-    (tokens: AuthTokens) => {
-      authService.setTokens(tokens)
-      setIsAuthenticated(true)
-    },
-    [authService]
-  )
+  // トークン保存後の状態更新（実際のCookie設定はバックエンドが行う）
+  const setTokens = (tokens: AuthTokens) => {
+    // HttpOnly Cookieはバックエンドでのみ設定可能
+    // ここでは認証状態を更新するのみ
+    setIsAuthenticated(true)
+  }
 
-  // Context値をメモ化
-  const value = useMemo<AuthContextValue>(
-    () => ({
-      isAuthenticated,
-      isLoading,
-      login,
-      logout,
-      setTokens,
-    }),
-    [isAuthenticated, isLoading, login, logout, setTokens]
-  )
+  // Context値
+  // React 19 Compiler が自動メモ化するため useMemo 不要
+  const value: AuthContextValue = {
+    isAuthenticated,
+    isLoading,
+    login,
+    logout,
+    setTokens,
+  }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

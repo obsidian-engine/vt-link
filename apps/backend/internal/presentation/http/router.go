@@ -73,6 +73,9 @@ func (r *Router) Setup() *echo.Echo {
 	api.Use(JWTMiddleware(r.jwtManager))
 	api.Use(CSRFMiddleware())
 
+	// Auth routes (under /api/v1 for consistency)
+	api.GET("/auth/me", r.authHandler.Me)
+
 	// AutoReply routes
 	api.POST("/autoreply/rules", r.autoReplyHandler.CreateRule)
 	api.GET("/autoreply/rules", r.autoReplyHandler.ListRules)

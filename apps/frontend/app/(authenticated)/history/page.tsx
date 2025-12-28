@@ -1,7 +1,53 @@
 "use client"
-import { Calendar, Download, Filter, BarChart3 } from "lucide-react"
+import { Calendar, Download, Filter } from "lucide-react"
+import { useHistory } from "@/lib/hooks/use-history"
 
 export default function HistoryPage() {
+  const { histories, isLoading, isError } = useHistory()
+
+  // 日時フォーマット関数
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return '-'
+    const date = new Date(dateString)
+    return date.toLocaleString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).replace(/\//g, '/')
+  }
+
+  // ステータス表示関数
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'sent':
+        return (
+          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-700 dark:text-green-400">
+            配信完了
+          </span>
+        )
+      case 'failed':
+        return (
+          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-700 dark:text-red-400">
+            配信失敗
+          </span>
+        )
+      case 'pending':
+        return (
+          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-500/15 text-yellow-700 dark:text-yellow-400">
+            配信待機中
+          </span>
+        )
+      default:
+        return (
+          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-gray-500/15 text-gray-700 dark:text-gray-400">
+            不明
+          </span>
+        )
+    }
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -24,142 +70,70 @@ export default function HistoryPage() {
         </div>
       </div>
 
-      {/* Summary Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
-          <div className="flex flex-row items-center justify-between pb-2">
-            <div className="text-sm font-medium">総配信数</div>
-            <Calendar className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-          </div>
-          <div className="text-2xl font-bold">127</div>
-          <p className="text-xs text-slate-600 dark:text-slate-400">全期間</p>
-        </div>
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
-          <div className="flex flex-row items-center justify-between pb-2">
-            <div className="text-sm font-medium">総リーチ</div>
-            <BarChart3 className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-          </div>
-          <div className="text-2xl font-bold">1.2M</div>
-          <p className="text-xs text-slate-600 dark:text-slate-400">累計</p>
-        </div>
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
-          <div className="flex flex-row items-center justify-between pb-2">
-            <div className="text-sm font-medium">平均CTR</div>
-            <BarChart3 className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-          </div>
-          <div className="text-2xl font-bold">4.8%</div>
-          <p className="text-xs text-slate-600 dark:text-slate-400">全期間平均</p>
-        </div>
-        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
-          <div className="flex flex-row items-center justify-between pb-2">
-            <div className="text-sm font-medium">今月配信</div>
-            <Calendar className="h-4 w-4 text-slate-600 dark:text-slate-400" />
-          </div>
-          <div className="text-2xl font-bold">24</div>
-          <p className="text-xs text-slate-600 dark:text-slate-400">+8 先月比</p>
-        </div>
-      </div>
+      {/* Summary Stats - 将来のAPI拡張で実装予定 */}
+      {/* TODO: サマリーAPIエンドポイント実装後に有効化 */}
 
       {/* History Table */}
       <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
         <h2 className="text-base font-semibold mb-1">配信履歴詳細</h2>
         <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">配信されたメッセージとその結果</p>
-        <div className="rounded-lg border border-white/30 overflow-hidden">
+        
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
+            <span className="ml-3 text-slate-600 dark:text-slate-400">読み込み中...</span>
+          </div>
+        )}
+
+        {/* Error State */}
+        {isError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 p-4">
+            <p className="text-sm text-red-800 dark:text-red-400">
+              配信履歴の取得に失敗しました。時間をおいて再度お試しください。
+            </p>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !isError && histories.length === 0 && (
+          <div className="text-center py-12">
+            <Calendar className="h-12 w-12 mx-auto text-slate-400 mb-3" />
+            <p className="text-slate-600 dark:text-slate-400">配信履歴がありません</p>
+          </div>
+        )}
+
+        {/* Data Table */}
+        {!isLoading && !isError && histories.length > 0 && (
+          <div className="rounded-lg border border-white/30 overflow-hidden">
             <table className="min-w-full text-sm">
               <thead className="text-slate-600 dark:text-slate-400 bg-white/40 dark:bg-slate-800/30">
                 <tr>
                   <th className="px-6 py-3 text-left font-medium">配信日時</th>
-                  <th className="px-6 py-3 text-left font-medium">メッセージタイトル</th>
+                  <th className="px-6 py-3 text-left font-medium">メッセージID</th>
                   <th className="px-6 py-3 text-right font-medium">配信数</th>
-                  <th className="px-6 py-3 text-right font-medium">開封率</th>
-                  <th className="px-6 py-3 text-right font-medium">CTR</th>
                   <th className="px-6 py-3 text-left font-medium">ステータス</th>
-                  <th className="px-6 py-3 text-left font-medium">アクション</th>
+                  <th className="px-6 py-3 text-left font-medium">エラー</th>
+                  <th className="px-6 py-3 text-left font-medium">作成日時</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/20 dark:divide-slate-700/60">
-                <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
-                  <td className="px-6 py-4">2024/07/15 10:00</td>
-                  <td className="px-6 py-4">夏のセール開始のお知らせ</td>
-                  <td className="px-6 py-4 text-right">12,340</td>
-                  <td className="px-6 py-4 text-right">89.2%</td>
-                  <td className="px-6 py-4 text-right">6.8%</td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-700 dark:text-green-400">
-                      配信完了
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">詳細</button>
-                  </td>
-                </tr>
-
-                <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
-                  <td className="px-6 py-4">2024/07/12 14:30</td>
-                  <td className="px-6 py-4">新スタンプリリース告知</td>
-                  <td className="px-6 py-4 text-right">11,890</td>
-                  <td className="px-6 py-4 text-right">85.4%</td>
-                  <td className="px-6 py-4 text-right">5.2%</td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-700 dark:text-green-400">
-                      配信完了
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">詳細</button>
-                  </td>
-                </tr>
-
-                <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
-                  <td className="px-6 py-4">2024/07/10 16:00</td>
-                  <td className="px-6 py-4">ライブ配信のお知らせ</td>
-                  <td className="px-6 py-4 text-right">12,100</td>
-                  <td className="px-6 py-4 text-right">92.1%</td>
-                  <td className="px-6 py-4 text-right">8.3%</td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-700 dark:text-green-400">
-                      配信完了
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">詳細</button>
-                  </td>
-                </tr>
-
-                <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
-                  <td className="px-6 py-4">2024/07/08 11:15</td>
-                  <td className="px-6 py-4">限定グッズ販売開始</td>
-                  <td className="px-6 py-4 text-right">9,876</td>
-                  <td className="px-6 py-4 text-right">87.6%</td>
-                  <td className="px-6 py-4 text-right">4.9%</td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-700 dark:text-green-400">
-                      配信完了
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">詳細</button>
-                  </td>
-                </tr>
-
-                <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
-                  <td className="px-6 py-4">2024/07/05 09:30</td>
-                  <td className="px-6 py-4">月初のご挨拶</td>
-                  <td className="px-6 py-4 text-right">12,234</td>
-                  <td className="px-6 py-4 text-right">91.3%</td>
-                  <td className="px-6 py-4 text-right">3.2%</td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-700 dark:text-green-400">
-                      配信完了
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <button className="px-3 py-1.5 text-sm rounded-md hover:bg-white/40">詳細</button>
-                  </td>
-                </tr>
+                {histories.map((history) => (
+                  <tr key={history.id} className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition-colors">
+                    <td className="px-6 py-4">{formatDate(history.sentAt)}</td>
+                    <td className="px-6 py-4 font-mono text-xs">{history.messageId}</td>
+                    <td className="px-6 py-4 text-right">{history.recipientCount.toLocaleString()}</td>
+                    <td className="px-6 py-4">{getStatusBadge(history.status)}</td>
+                    <td className="px-6 py-4 max-w-xs truncate" title={history.errorMessage || undefined}>
+                      {history.errorMessage || '-'}
+                    </td>
+                    <td className="px-6 py-4 text-xs text-slate-500">{formatDate(history.createdAt)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
+        )}
       </div>
     </div>
   )

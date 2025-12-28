@@ -26,7 +26,7 @@ export interface AuthService {
   getRefreshToken(): string | null
   setTokens(tokens: AuthTokens): void
   clearTokens(): void
-  isAuthenticated(): boolean
+  checkAuth(): Promise<boolean>
 }
 
 // Cookieキー定数（バックエンドと一致させる）
@@ -46,7 +46,9 @@ const createCookieAdapter = (): StorageAdapter => ({
     if (typeof document === 'undefined') return
     // HttpOnly Cookieはサーバー側で設定されるため、クライアントでは設定しない
     // この関数は互換性のために残すが、実際の設定はバックエンドが行う
-    console.warn('Cookie設定はバックエンドで行われます')
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('Cookie設定はバックエンドで行われます')
+    }
   },
   removeItem: (key: string) => {
     if (typeof document === 'undefined') return
@@ -71,17 +73,34 @@ export function createAuthService(
     },
 
     setTokens(tokens: AuthTokens): void {
-      storage.setItem(STORAGE_KEYS.ACCESS_TOKEN, tokens.accessToken)
-      storage.setItem(STORAGE_KEYS.REFRESH_TOKEN, tokens.refreshToken)
+      // HttpOnly Cookieはバックエンドでのみ設定可能
+      // このメソッドは互換性のために残すが、実際の処理は行わない
+      if (process.env.NODE_ENV === 'development') {
+        console.info('トークンはバックエンドでHttpOnly Cookieとして設定されます')
+      }
     },
 
     clearTokens(): void {
-      storage.removeItem(STORAGE_KEYS.ACCESS_TOKEN)
-      storage.removeItem(STORAGE_KEYS.REFRESH_TOKEN)
+      // HttpOnly Cookieはバックエンドの/auth/logoutエンドポイントで削除される
+      // クライアント側では削除できないため、ここでは何もしない
+      if (process.env.NODE_ENV === 'development') {
+        console.info('Cookieクリアはバックエンドの/auth/logoutで行われます')
+      }
     },
 
-    isAuthenticated(): boolean {
-      return this.getAccessToken() !== null
+    async checkAuth(): Promise<boolean> {
+      // HttpOnly Cookieは直接読めないため、/auth/me APIで認証状態を確認
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'
+        const response = await fetch(`${apiBase}/api/v1/auth/me`, {
+          method: 'GET',
+          credentials: 'include', // Cookieを送信
+        })
+        return response.ok
+      } catch (error) {
+        console.error('認証状態の確認に失敗:', error)
+        return false
+      }
     },
   }
 }
