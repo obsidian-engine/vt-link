@@ -2,7 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { RuleForm } from '../rule-form'
+import { RuleForm } from '../_components/rule-form'
 import type { AutoReplyRule } from '@/lib/api-client'
 
 describe('RuleForm', () => {

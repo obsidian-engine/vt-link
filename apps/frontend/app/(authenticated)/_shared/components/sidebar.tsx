@@ -16,7 +16,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 // shadcn削除: Buttonをプレーン要素へ置換
-import { ThemeToggle } from "./theme-toggle"
+import { ThemeToggle } from "@/app/_shared/components/theme-toggle"
 
 const navigation = [
   { name: "ダッシュボード", href: "/", icon: LayoutDashboard, description: "統計と概要" },

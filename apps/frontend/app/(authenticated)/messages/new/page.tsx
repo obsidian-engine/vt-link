@@ -5,8 +5,8 @@ import { useCreateMessageForm, type FormValues } from './useCreateMessageForm'
 import { makeClient } from '@/lib/api-client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { MessagePreview } from '@/components/message-preview'
-import { ConfirmDialog } from '@/components/confirm-dialog'
+import { MessagePreview } from '@/app/_shared/components/message-preview'
+import { ConfirmDialog } from '@/app/_shared/components/confirm-dialog'
 import type { SubmitHandler } from 'react-hook-form'
 
 const client = makeClient()

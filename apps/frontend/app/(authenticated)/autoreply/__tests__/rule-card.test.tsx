@@ -2,7 +2,7 @@ import React from 'react'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { RuleCard } from '../rule-card'
+import { RuleCard } from '../_components/rule-card'
 import type { AutoReplyRule } from '@/lib/api-client'
 
 describe('RuleCard', () => {

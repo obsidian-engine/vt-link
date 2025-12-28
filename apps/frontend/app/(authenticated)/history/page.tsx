@@ -1,6 +1,6 @@
 "use client"
 import { Calendar, Download, Filter } from "lucide-react"
-import { useHistory } from "@/lib/hooks/use-history"
+import { useHistory } from "./_hooks/use-history"
 
 export default function HistoryPage() {
   const { histories, isLoading, isError } = useHistory()

@@ -1,6 +1,6 @@
 "use client"
 import { Users } from "lucide-react"
-import { useFans } from "@/lib/hooks/use-fans"
+import { useFans } from "./_hooks/use-fans"
 
 export default function AudiencePage() {
   const { fans, pagination, isLoading, isError } = useFans(1, 20)

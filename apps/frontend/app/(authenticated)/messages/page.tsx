@@ -1,5 +1,5 @@
 'use client'
-import { useMessages } from '@/lib/hooks/useMessages'
+import { useMessages } from './_hooks/useMessages'
 import { type Message } from '@/lib/api-client'
 import Link from 'next/link'
 
