@@ -5,9 +5,12 @@ import (
 	"os"
 	"sync"
 
+	"vt-link/backend/internal/application/audience"
 	"vt-link/backend/internal/application/autoreply"
+	"vt-link/backend/internal/application/history"
 	"vt-link/backend/internal/application/message"
 	"vt-link/backend/internal/application/richmenu"
+	"vt-link/backend/internal/application/settings"
 	"vt-link/backend/internal/infrastructure/db"
 	"vt-link/backend/internal/infrastructure/db/pg"
 	"vt-link/backend/internal/infrastructure/external"
@@ -18,6 +21,9 @@ type Container struct {
 	MessageUsecase   message.Usecase
 	AutoReplyUsecase autoreply.Usecase
 	RichMenuUsecase  richmenu.Usecase
+	AudienceUsecase  audience.Usecase
+	HistoryUsecase   history.Usecase
+	SettingsUsecase  settings.Usecase
 	DB               *db.DB
 }
 
@@ -49,6 +55,9 @@ func newContainer() (*Container, error) {
 	messageRepo := pg.NewMessageRepository(database)
 	autoReplyRuleRepo := pg.NewAutoReplyRuleRepository(database)
 	richMenuRepo := pg.NewRichMenuRepository(database)
+	fanRepo := pg.NewFanRepository(database)
+	messageHistoryRepo := pg.NewMessageHistoryRepository(database)
+	userSettingsRepo := pg.NewUserSettingsRepository(database)
 
 	// Transaction Manager
 	txManager := db.NewTxManager(database)
@@ -82,10 +91,22 @@ func newContainer() (*Container, error) {
 		lineRichMenuService,
 	)
 
+	// Audience Usecase
+	audienceUsecase := audience.NewInteractor(fanRepo)
+
+	// History Usecase
+	historyUsecase := history.NewInteractor(messageHistoryRepo)
+
+	// Settings Usecase
+	settingsUsecase := settings.NewInteractor(userSettingsRepo)
+
 	return &Container{
 		MessageUsecase:   messageUsecase,
 		AutoReplyUsecase: autoReplyUsecase,
 		RichMenuUsecase:  richMenuUsecase,
+		AudienceUsecase:  audienceUsecase,
+		HistoryUsecase:   historyUsecase,
+		SettingsUsecase:  settingsUsecase,
 		DB:               database,
 	}, nil
 }

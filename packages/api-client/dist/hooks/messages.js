@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { makeClient } from '../client.js';
+import { makeClient } from '../client';
 const client = makeClient();
 export function useMessages(page = 1, limit = 20) {
     return useSWR(['/api/v1/messages', 'listMessages', page, limit], async () => {

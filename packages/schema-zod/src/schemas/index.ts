@@ -3,6 +3,8 @@ export * from './fan.js'
 export * from './auth.js'
 export * from './autoreply.js'
 export * from './richmenu.js'
+export * from './history.js'
+export * from './settings.js'
 
 // 共通レスポンス型
 import { z } from 'zod'
