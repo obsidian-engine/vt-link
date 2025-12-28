@@ -20,12 +20,28 @@ build: deps ## ビルド
 
 .PHONY: lint
 lint: ## golangci-lintでコードチェック
-	@which golangci-lint > /dev/null || (echo "golangci-lint not found. Install it with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest" && exit 1)
+	@which golangci-lint > /dev/null || (echo "golangci-lint not found. Install it with: brew install golangci-lint" && exit 1)
 	golangci-lint run ./...
 
-.PHONY: test
-test: ## テスト実行
+.PHONY: lint-fix
+lint-fix: ## golangci-lintで自動修正
+	@which golangci-lint > /dev/null || (echo "golangci-lint not found. Install it with: brew install golangci-lint" && exit 1)
+	golangci-lint run --fix ./...
+
+.PHONY: test-unit
+test-unit: ## ユニットテストのみ実行
 	$(GOCMD) test -v -race ./tests/unit/...
+
+.PHONY: test-integration
+test-integration: ## 統合テストのみ実行
+	@if [ -z "$(TEST_DATABASE_URL)" ]; then \
+		echo "ERROR: TEST_DATABASE_URL environment variable is required"; \
+		exit 1; \
+	fi
+	$(GOCMD) test -v -race ./tests/integration/...
+
+.PHONY: test
+test: test-unit test-integration ## 全テスト実行（ユニット+統合）
 
 .PHONY: clean
 clean: ## クリーンアップ
