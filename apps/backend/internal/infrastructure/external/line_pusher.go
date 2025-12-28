@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"vt-link/backend/internal/domain/service"
+	"vt-link/backend/internal/shared/retry"
 )
 
 type LinePusher struct {
@@ -35,7 +36,7 @@ func NewLinePusher() service.Pusher {
 		channelAccessToken: os.Getenv("LINE_MESSAGING_ACCESS_TOKEN"),
 		channelID:          os.Getenv("LINE_MESSAGING_CHANNEL_ID"),
 		httpClient: &http.Client{
-			Timeout: 10 * time.Second,
+			Timeout: 3 * time.Second, // LINE API推奨タイムアウト
 		},
 	}
 }
@@ -73,33 +74,39 @@ func (p *LinePusher) PushMessage(ctx context.Context, title, body string) error 
 }
 
 func (p *LinePusher) sendMessage(ctx context.Context, message LineMessage) error {
+	return p.sendMessageWithRetry(ctx, message, retry.DefaultConfig)
+}
+
+func (p *LinePusher) sendMessageWithRetry(ctx context.Context, message LineMessage, cfg retry.Config) error {
 	jsonData, err := json.Marshal(message)
 	if err != nil {
 		return fmt.Errorf("failed to marshal message: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", "https://api.line.me/v2/bot/message/push", bytes.NewBuffer(jsonData))
-	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
-	}
+	return retry.WithRetry(ctx, cfg, func() error {
+		req, err := http.NewRequestWithContext(ctx, "POST", "https://api.line.me/v2/bot/message/push", bytes.NewBuffer(jsonData))
+		if err != nil {
+			return fmt.Errorf("failed to create request: %w", err)
+		}
 
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+p.channelAccessToken)
+		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("Authorization", "Bearer "+p.channelAccessToken)
 
-	resp, err := p.httpClient.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to send request: %w", err)
-	}
-	defer resp.Body.Close()
+		resp, err := p.httpClient.Do(req)
+		if err != nil {
+			return fmt.Errorf("failed to send request: %w", err)
+		}
+		defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		log.Printf("LINE API error: status=%d, body=%s", resp.StatusCode, string(body))
-		return fmt.Errorf("LINE API error: status %d", resp.StatusCode)
-	}
+		if resp.StatusCode != http.StatusOK {
+			body, _ := io.ReadAll(resp.Body)
+			log.Printf("[LINE API] Push error: status=%d, body=%s", resp.StatusCode, string(body))
+			return fmt.Errorf("LINE API error: status %d", resp.StatusCode)
+		}
 
-	log.Printf("Successfully sent LINE message")
-	return nil
+		log.Printf("[LINE API] Successfully sent push message")
+		return nil
+	})
 }
 
 // PushWithRetry 指数バックオフでリトライしながらメッセージを送信
