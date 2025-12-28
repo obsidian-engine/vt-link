@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/mock/gomock"
 
 	"vt-link/backend/internal/application/richmenu"
 	richMenuMocks "vt-link/backend/internal/application/richmenu/mocks"
@@ -22,14 +22,20 @@ type RichMenuInteractorTestSuite struct {
 	mockRepo        *repoMocks.MockRichMenuRepository
 	mockLineService *richMenuMocks.MockLineRichMenuService
 	ctx             context.Context
+	ctrl            *gomock.Controller
 }
 
 func (s *RichMenuInteractorTestSuite) SetupTest() {
-	s.mockRepo = repoMocks.NewMockRichMenuRepository(s.T())
-	s.mockLineService = richMenuMocks.NewMockLineRichMenuService(s.T())
+	s.ctrl = gomock.NewController(s.T())
+	s.mockRepo = repoMocks.NewMockRichMenuRepository(s.ctrl)
+	s.mockLineService = richMenuMocks.NewMockLineRichMenuService(s.ctrl)
 	s.ctx = context.Background()
 
 	s.interactor = richmenu.NewInteractor(s.mockRepo, s.mockLineService)
+}
+
+func (s *RichMenuInteractorTestSuite) TearDownTest() {
+	s.ctrl.Finish()
 }
 
 func (s *RichMenuInteractorTestSuite) TestCreateRichMenu_Success() {
@@ -62,8 +68,8 @@ func (s *RichMenuInteractorTestSuite) TestCreateRichMenu_Success() {
 	}
 
 	// 既存メニューがない場合
-	s.mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(nil, errx.ErrNotFound).Once()
-	s.mockRepo.EXPECT().Create(s.ctx, mock.AnythingOfType("*model.RichMenu")).Return(nil).Once()
+	s.mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(nil, errx.ErrNotFound)
+	s.mockRepo.EXPECT().Create(s.ctx, gomock.Any()).Return(nil)
 
 	// テスト実行
 	output, err := s.interactor.CreateRichMenu(s.ctx, input)
@@ -106,9 +112,9 @@ func (s *RichMenuInteractorTestSuite) TestCreateRichMenu_ExistingMenuDeleted() {
 	}
 
 	// Mockの期待値を設定
-	s.mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(existingMenu, nil).Once()
-	s.mockRepo.EXPECT().Delete(s.ctx, existingMenuID).Return(nil).Once()
-	s.mockRepo.EXPECT().Create(s.ctx, mock.AnythingOfType("*model.RichMenu")).Return(nil).Once()
+	s.mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(existingMenu, nil)
+	s.mockRepo.EXPECT().Delete(s.ctx, existingMenuID).Return(nil)
+	s.mockRepo.EXPECT().Create(s.ctx, gomock.Any()).Return(nil)
 
 	// テスト実行
 	output, err := s.interactor.CreateRichMenu(s.ctx, input)
@@ -206,7 +212,7 @@ func (s *RichMenuInteractorTestSuite) TestGetRichMenu_Success() {
 	}
 
 	// Mockの期待値を設定
-	s.mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(expectedMenu, nil).Once()
+	s.mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(expectedMenu, nil)
 
 	// テスト実行
 	menu, err := s.interactor.GetRichMenu(s.ctx, userID)
@@ -223,7 +229,7 @@ func (s *RichMenuInteractorTestSuite) TestGetRichMenu_NotFound() {
 	userID := uuid.New()
 
 	// Mockの期待値を設定
-	s.mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(nil, errx.ErrNotFound).Once()
+	s.mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(nil, errx.ErrNotFound)
 
 	// テスト実行
 	menu, err := s.interactor.GetRichMenu(s.ctx, userID)
@@ -278,13 +284,15 @@ func (s *RichMenuInteractorTestSuite) TestUpdateRichMenu_Success() {
 	}
 
 	// Mockの期待値を設定
-	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(existingMenu, nil).Once()
-	s.mockRepo.EXPECT().Update(s.ctx, mock.MatchedBy(func(m *model.RichMenu) bool {
-		return m.ID == menuID &&
-			m.Name == newName &&
-			m.ChatBarText == newChatBarText &&
-			len(m.Areas) == 2
-	})).Return(nil).Once()
+	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(existingMenu, nil)
+	s.mockRepo.EXPECT().Update(s.ctx, gomock.Cond(func(m any) bool {
+		menu, ok := m.(*model.RichMenu)
+		return ok &&
+			menu.ID == menuID &&
+			menu.Name == newName &&
+			menu.ChatBarText == newChatBarText &&
+			len(menu.Areas) == 2
+	})).Return(nil)
 
 	// テスト実行
 	output, err := s.interactor.UpdateRichMenu(s.ctx, input)
@@ -304,7 +312,7 @@ func (s *RichMenuInteractorTestSuite) TestUpdateRichMenu_NotFound() {
 	}
 
 	// Mockの期待値を設定
-	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(nil, errx.ErrNotFound).Once()
+	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(nil, errx.ErrNotFound)
 
 	// テスト実行
 	output, err := s.interactor.UpdateRichMenu(s.ctx, input)
@@ -326,9 +334,9 @@ func (s *RichMenuInteractorTestSuite) TestDeleteRichMenu_Success() {
 	}
 
 	// Mockの期待値を設定
-	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(menu, nil).Once()
-	s.mockLineService.EXPECT().DeleteRichMenu(s.ctx, lineRichMenuID).Return(nil).Once()
-	s.mockRepo.EXPECT().Delete(s.ctx, menuID).Return(nil).Once()
+	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(menu, nil)
+	s.mockLineService.EXPECT().DeleteRichMenu(s.ctx, lineRichMenuID).Return(nil)
+	s.mockRepo.EXPECT().Delete(s.ctx, menuID).Return(nil)
 
 	// テスト実行
 	err := s.interactor.DeleteRichMenu(s.ctx, menuID)
@@ -347,9 +355,9 @@ func (s *RichMenuInteractorTestSuite) TestDeleteRichMenu_NotPublishedToLINE() {
 	}
 
 	// Mockの期待値を設定
-	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(menu, nil).Once()
+	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(menu, nil)
 	// DeleteRichMenuは呼ばれない
-	s.mockRepo.EXPECT().Delete(s.ctx, menuID).Return(nil).Once()
+	s.mockRepo.EXPECT().Delete(s.ctx, menuID).Return(nil)
 
 	// テスト実行
 	err := s.interactor.DeleteRichMenu(s.ctx, menuID)
@@ -374,16 +382,18 @@ func (s *RichMenuInteractorTestSuite) TestPublishToLINE_Success() {
 	}
 
 	// Mockの期待値を設定
-	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(menu, nil).Once()
-	s.mockLineService.EXPECT().CreateRichMenu(s.ctx, menu).Return(lineRichMenuID, nil).Once()
-	s.mockLineService.EXPECT().SetDefault(s.ctx, lineRichMenuID).Return(nil).Once()
-	s.mockRepo.EXPECT().Update(s.ctx, mock.MatchedBy(func(m *model.RichMenu) bool {
-		return m.ID == menuID &&
-			m.LineRichMenuID != nil &&
-			*m.LineRichMenuID == lineRichMenuID &&
-			m.IsPublishedLine &&
-			m.IsActive
-	})).Return(nil).Once()
+	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(menu, nil)
+	s.mockLineService.EXPECT().CreateRichMenu(s.ctx, menu).Return(lineRichMenuID, nil)
+	s.mockLineService.EXPECT().SetDefault(s.ctx, lineRichMenuID).Return(nil)
+	s.mockRepo.EXPECT().Update(s.ctx, gomock.Cond(func(m any) bool {
+		menu, ok := m.(*model.RichMenu)
+		return ok &&
+			menu.ID == menuID &&
+			menu.LineRichMenuID != nil &&
+			*menu.LineRichMenuID == lineRichMenuID &&
+			menu.IsPublishedLine &&
+			menu.IsActive
+	})).Return(nil)
 
 	// テスト実行
 	err := s.interactor.PublishToLINE(s.ctx, menuID)
@@ -397,7 +407,7 @@ func (s *RichMenuInteractorTestSuite) TestPublishToLINE_NotFound() {
 	menuID := uuid.New()
 
 	// Mockの期待値を設定
-	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(nil, errx.ErrNotFound).Once()
+	s.mockRepo.EXPECT().FindByID(s.ctx, menuID).Return(nil, errx.ErrNotFound)
 
 	// テスト実行
 	err := s.interactor.PublishToLINE(s.ctx, menuID)

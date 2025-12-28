@@ -14,19 +14,18 @@ import (
 	"github.com/google/uuid"
 	"vt-link/backend/internal/domain/model"
 	"vt-link/backend/internal/domain/repository"
-	"vt-link/backend/internal/infrastructure/external"
 	"vt-link/backend/internal/shared/errx"
 )
 
 type Interactor struct {
 	ruleRepo      repository.AutoReplyRuleRepository
-	replier       *external.LineReplier
+	replier       repository.LineReplier
 	channelSecret string
 }
 
 func NewInteractor(
 	ruleRepo repository.AutoReplyRuleRepository,
-	replier *external.LineReplier,
+	replier repository.LineReplier,
 ) Usecase {
 	return &Interactor{
 		ruleRepo:      ruleRepo,

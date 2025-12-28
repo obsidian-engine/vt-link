@@ -8,6 +8,8 @@ import (
 	"vt-link/backend/internal/domain/model"
 )
 
+//go:generate mockgen -source=$GOFILE -destination=mocks/mock_$GOFILE -package=mocks
+
 type MessageRepository interface {
 	// Create 新しいメッセージを作成
 	Create(ctx context.Context, message *model.Message) error
