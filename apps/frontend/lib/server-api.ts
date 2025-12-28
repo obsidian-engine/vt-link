@@ -79,6 +79,8 @@ async function serverRequest<T>(
         hasCsrf: !!csrfToken,
         // Show actual cookie names (not values for security)
         cookieNames: cookieHeader.split('; ').map(c => c.split('=')[0]).join(', '),
+        // Show access_token length for debugging
+        accessTokenLength: cookieHeader.match(/access_token=([^;]+)/)?.[1]?.length || 0,
       })
     }
 

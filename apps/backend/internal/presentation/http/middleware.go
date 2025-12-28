@@ -11,6 +11,11 @@ import (
 func JWTMiddleware(jwtManager *auth.JWTManager) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			// Debug: log all cookies
+			if c.Request().Header.Get("User-Agent") == "node" {
+				c.Logger().Infof("[JWT] Server Component request - Cookie header: %s", c.Request().Header.Get("Cookie"))
+			}
+
 			// 1. Get access token from cookie
 			tokenString, err := auth.GetAccessTokenFromCookie(c)
 			if err != nil {
