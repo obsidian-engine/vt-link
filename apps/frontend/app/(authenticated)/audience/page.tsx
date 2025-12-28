@@ -1,12 +1,18 @@
-"use client"
 import { Users } from "lucide-react"
-import { useFans } from "./_hooks/use-fans"
+import { serverApi, CACHE_STRATEGY } from "@/lib/server-api"
+import type { Fan, Pagination } from "@/lib/api-client"
 
-export default function AudiencePage() {
-  const { fans, pagination, isLoading, isError } = useFans(1, 20)
+export default async function AudiencePage() {
+  // Server Componentでデータフェッチ（ページ1、20件取得）
+  const response = await serverApi.GET<{ data: Fan[]; pagination: Pagination }>(
+    '/api/v1/audience/fans?page=1&limit=20',
+    {
+      revalidate: CACHE_STRATEGY.NO_CACHE, // 常に最新データを取得
+    }
+  )
 
-  // エラー状態
-  if (isError) {
+  // エラーハンドリング
+  if (response.error) {
     return (
       <div className="space-y-8">
         <div className="flex items-center justify-between">
@@ -17,40 +23,18 @@ export default function AudiencePage() {
         </div>
         <div className="bg-white rounded-lg p-6 border border-border">
           <div className="text-center py-8">
-            <p className="text-destructive mb-4">データの取得に失敗しました</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition"
-            >
-              再読み込み
-            </button>
+            <p className="text-destructive mb-4">
+              データの取得に失敗しました: {response.error.message || "時間をおいて再度お試しください。"}
+            </p>
           </div>
         </div>
       </div>
     )
   }
 
-  // ローディング状態
-  if (isLoading) {
-    return (
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">オーディエンス管理</h1>
-            <p className="text-muted-foreground">友だち一覧の確認とタグ管理</p>
-          </div>
-        </div>
-        <div className="bg-white rounded-lg p-6 border border-border animate-pulse">
-          <div className="h-6 bg-muted rounded w-32 mb-4"></div>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 bg-muted rounded"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
+  // データを取得
+  const fans = response.data?.data || []
+  const pagination = response.data?.pagination || { total: 0, page: 1, limit: 20, totalPages: 0 }
 
   return (
     <div className="space-y-8">
