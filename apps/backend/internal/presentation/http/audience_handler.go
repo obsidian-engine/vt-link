@@ -58,7 +58,7 @@ func (h *AudienceHandler) ListFans(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"ok": true,
+		"ok":   true,
 		"data": result.Fans,
 		"pagination": map[string]interface{}{
 			"total":      result.Total,

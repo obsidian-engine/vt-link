@@ -10,17 +10,17 @@ import (
 )
 
 type Router struct {
-	echo              *echo.Echo
-	authHandler       *AuthHandler
-	autoReplyHandler  *AutoReplyHandler
-	richMenuHandler   *RichMenuHandler
-	messageHandler    *MessageHandler
-	schedulerHandler  *SchedulerHandler
-	audienceHandler   *AudienceHandler
-	historyHandler    *HistoryHandler
-	settingsHandler   *SettingsHandler
-	dashboardHandler  *DashboardHandler
-	jwtManager        *auth.JWTManager
+	echo             *echo.Echo
+	authHandler      *AuthHandler
+	autoReplyHandler *AutoReplyHandler
+	richMenuHandler  *RichMenuHandler
+	messageHandler   *MessageHandler
+	schedulerHandler *SchedulerHandler
+	audienceHandler  *AudienceHandler
+	historyHandler   *HistoryHandler
+	settingsHandler  *SettingsHandler
+	dashboardHandler *DashboardHandler
+	jwtManager       *auth.JWTManager
 }
 
 func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, richMenuHandler *RichMenuHandler, messageHandler *MessageHandler, schedulerHandler *SchedulerHandler, audienceHandler *AudienceHandler, historyHandler *HistoryHandler, settingsHandler *SettingsHandler, dashboardHandler *DashboardHandler, jwtManager *auth.JWTManager) *Router {
@@ -37,17 +37,17 @@ func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, ric
 	}))
 
 	return &Router{
-		echo:              e,
-		authHandler:       authHandler,
-		autoReplyHandler:  autoReplyHandler,
-		richMenuHandler:   richMenuHandler,
-		messageHandler:    messageHandler,
-		schedulerHandler:  schedulerHandler,
-		audienceHandler:   audienceHandler,
-		historyHandler:    historyHandler,
-		settingsHandler:   settingsHandler,
-		dashboardHandler:  dashboardHandler,
-		jwtManager:        jwtManager,
+		echo:             e,
+		authHandler:      authHandler,
+		autoReplyHandler: autoReplyHandler,
+		richMenuHandler:  richMenuHandler,
+		messageHandler:   messageHandler,
+		schedulerHandler: schedulerHandler,
+		audienceHandler:  audienceHandler,
+		historyHandler:   historyHandler,
+		settingsHandler:  settingsHandler,
+		dashboardHandler: dashboardHandler,
+		jwtManager:       jwtManager,
 	}
 }
 

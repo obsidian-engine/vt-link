@@ -18,7 +18,7 @@ type MessageHistoryRepository interface {
 	ListByUserID(ctx context.Context, userID uuid.UUID, limit, offset int) ([]*model.MessageHistory, error)
 
 	// Update 配信履歴を更新
-	Update(ctx context.Context, history *model.MessageHistory) error	// Delete 配信履歴を削除
+	Update(ctx context.Context, history *model.MessageHistory) error // Delete 配信履歴を削除
 	Delete(ctx context.Context, id uuid.UUID) error
 
 	// 統計用メソッド

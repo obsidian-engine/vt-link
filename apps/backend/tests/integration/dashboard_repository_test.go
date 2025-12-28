@@ -37,7 +37,7 @@ func (s *DashboardRepositoryIntegrationTestSuite) TearDownSuite() {
 func (s *DashboardRepositoryIntegrationTestSuite) SetupTest() {
 	// テストごとにデータをクリア
 	s.testDB.ClearAllTables(s.T())
-	
+
 	// テスト用ユーザーを作成
 	s.createTestUser(s.userID)
 }
@@ -70,7 +70,7 @@ func (s *DashboardRepositoryIntegrationTestSuite) TestGetStats_NoData() {
 
 func (s *DashboardRepositoryIntegrationTestSuite) TestGetStats_WithFansAndMessages() {
 	// Arrange: テストデータを作成
-	
+
 	// ファンを作成（3人、うち1人はブロック済み）
 	s.createTestFan(s.userID, "fan1", false)
 	s.createTestFan(s.userID, "fan2", false)

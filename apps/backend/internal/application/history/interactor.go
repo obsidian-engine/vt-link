@@ -86,4 +86,3 @@ func (i *Interactor) GetStats(ctx context.Context, userID uuid.UUID) (*model.His
 		LastSentDate:     lastSentDate,
 	}, nil
 }
-

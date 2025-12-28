@@ -37,7 +37,7 @@ func (s *CampaignRepositoryIntegrationTestSuite) TearDownSuite() {
 func (s *CampaignRepositoryIntegrationTestSuite) SetupTest() {
 	// テストごとにデータをクリア
 	s.testDB.ClearAllTables(s.T())
-	
+
 	// テスト用ユーザーを作成
 	s.createTestUser(s.userID)
 }
@@ -67,15 +67,15 @@ func (s *CampaignRepositoryIntegrationTestSuite) TestList_NoData() {
 func (s *CampaignRepositoryIntegrationTestSuite) TestList_WithCampaigns() {
 	// Arrange: テストデータを作成
 	baseTime := time.Now().Add(-1 * time.Hour)
-	
+
 	// キャンペーン1: 配信履歴あり
 	messageID1 := s.createTestMessage(s.userID, "夏のセール告知", "draft", baseTime)
 	s.createTestMessageHistory(s.userID, messageID1, 100)
 	s.createTestMessageHistory(s.userID, messageID1, 200)
-	
+
 	// キャンペーン2: 配信履歴なし
 	s.createTestMessage(s.userID, "新商品案内", "scheduled", baseTime.Add(10*time.Minute))
-	
+
 	// キャンペーン3: 複数の配信履歴
 	messageID3 := s.createTestMessage(s.userID, "限定キャンペーン", "sent", baseTime.Add(20*time.Minute))
 	s.createTestMessageHistory(s.userID, messageID3, 50)
