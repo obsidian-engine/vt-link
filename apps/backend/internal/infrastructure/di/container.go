@@ -7,6 +7,7 @@ import (
 
 	"vt-link/backend/internal/application/audience"
 	"vt-link/backend/internal/application/autoreply"
+	"vt-link/backend/internal/application/dashboard"
 	"vt-link/backend/internal/application/history"
 	"vt-link/backend/internal/application/message"
 	"vt-link/backend/internal/application/richmenu"
@@ -18,13 +19,14 @@ import (
 )
 
 type Container struct {
-	MessageUsecase   message.Usecase
-	AutoReplyUsecase autoreply.Usecase
-	RichMenuUsecase  richmenu.Usecase
-	AudienceUsecase  audience.Usecase
-	HistoryUsecase   history.Usecase
-	SettingsUsecase  settings.Usecase
-	DB               *db.DB
+	MessageUsecase    message.Usecase
+	AutoReplyUsecase  autoreply.Usecase
+	RichMenuUsecase   richmenu.Usecase
+	AudienceUsecase   audience.Usecase
+	HistoryUsecase    history.Usecase
+	SettingsUsecase   settings.Usecase
+	DashboardUsecase  dashboard.Usecase
+	DB                *db.DB
 }
 
 var (
@@ -100,13 +102,17 @@ func newContainer() (*Container, error) {
 	// Settings Usecase
 	settingsUsecase := settings.NewInteractor(userSettingsRepo)
 
+	// Dashboard Usecase
+	dashboardUsecase := dashboard.NewDashboardInteractor()
+
 	return &Container{
-		MessageUsecase:   messageUsecase,
-		AutoReplyUsecase: autoReplyUsecase,
-		RichMenuUsecase:  richMenuUsecase,
-		AudienceUsecase:  audienceUsecase,
-		HistoryUsecase:   historyUsecase,
-		SettingsUsecase:  settingsUsecase,
-		DB:               database,
+		MessageUsecase:    messageUsecase,
+		AutoReplyUsecase:  autoReplyUsecase,
+		RichMenuUsecase:   richMenuUsecase,
+		AudienceUsecase:   audienceUsecase,
+		HistoryUsecase:    historyUsecase,
+		SettingsUsecase:   settingsUsecase,
+		DashboardUsecase:  dashboardUsecase,
+		DB:                database,
 	}, nil
 }

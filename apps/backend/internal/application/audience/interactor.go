@@ -131,3 +131,38 @@ func (i *Interactor) DeleteFan(ctx context.Context, id uuid.UUID) error {
 
 	return nil
 }
+
+func (i *Interactor) GetStats(ctx context.Context, userID uuid.UUID) (*model.AudienceStats, error) {
+	// TODO: 実際のDBから取得する実装に置き換え
+	return &model.AudienceStats{
+		TotalFans:       12340,
+		ActiveFans:      9500,
+		NewFansThisWeek: 234,
+		BlockedFans:     120,
+		EngagementRate:  68.5,
+	}, nil
+}
+
+func (i *Interactor) GetSegments(ctx context.Context, userID uuid.UUID) ([]*model.Segment, error) {
+	// TODO: 実際のDBから取得する実装に置き換え
+	return []*model.Segment{
+		{
+			ID:          "1",
+			Name:        "アクティブユーザー",
+			Description: "過去30日以内にアクションしたユーザー",
+			Count:       4500,
+		},
+		{
+			ID:          "2",
+			Name:        "新規ユーザー",
+			Description: "過去7日以内に友だち追加したユーザー",
+			Count:       234,
+		},
+		{
+			ID:          "3",
+			Name:        "購入済みユーザー",
+			Description: "過去に購入履歴があるユーザー",
+			Count:       1200,
+		},
+	}, nil
+}

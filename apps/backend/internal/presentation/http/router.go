@@ -10,19 +10,20 @@ import (
 )
 
 type Router struct {
-	echo             *echo.Echo
-	authHandler      *AuthHandler
-	autoReplyHandler *AutoReplyHandler
-	richMenuHandler  *RichMenuHandler
-	messageHandler   *MessageHandler
-	schedulerHandler *SchedulerHandler
-	audienceHandler  *AudienceHandler
-	historyHandler   *HistoryHandler
-	settingsHandler  *SettingsHandler
-	jwtManager       *auth.JWTManager
+	echo              *echo.Echo
+	authHandler       *AuthHandler
+	autoReplyHandler  *AutoReplyHandler
+	richMenuHandler   *RichMenuHandler
+	messageHandler    *MessageHandler
+	schedulerHandler  *SchedulerHandler
+	audienceHandler   *AudienceHandler
+	historyHandler    *HistoryHandler
+	settingsHandler   *SettingsHandler
+	dashboardHandler  *DashboardHandler
+	jwtManager        *auth.JWTManager
 }
 
-func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, richMenuHandler *RichMenuHandler, messageHandler *MessageHandler, schedulerHandler *SchedulerHandler, audienceHandler *AudienceHandler, historyHandler *HistoryHandler, settingsHandler *SettingsHandler, jwtManager *auth.JWTManager) *Router {
+func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, richMenuHandler *RichMenuHandler, messageHandler *MessageHandler, schedulerHandler *SchedulerHandler, audienceHandler *AudienceHandler, historyHandler *HistoryHandler, settingsHandler *SettingsHandler, dashboardHandler *DashboardHandler, jwtManager *auth.JWTManager) *Router {
 	e := echo.New()
 
 	// Middleware
@@ -36,16 +37,17 @@ func NewRouter(authHandler *AuthHandler, autoReplyHandler *AutoReplyHandler, ric
 	}))
 
 	return &Router{
-		echo:             e,
-		authHandler:      authHandler,
-		autoReplyHandler: autoReplyHandler,
-		richMenuHandler:  richMenuHandler,
-		messageHandler:   messageHandler,
-		schedulerHandler: schedulerHandler,
-		audienceHandler:  audienceHandler,
-		historyHandler:   historyHandler,
-		settingsHandler:  settingsHandler,
-		jwtManager:       jwtManager,
+		echo:              e,
+		authHandler:       authHandler,
+		autoReplyHandler:  autoReplyHandler,
+		richMenuHandler:   richMenuHandler,
+		messageHandler:    messageHandler,
+		schedulerHandler:  schedulerHandler,
+		audienceHandler:   audienceHandler,
+		historyHandler:    historyHandler,
+		settingsHandler:   settingsHandler,
+		dashboardHandler:  dashboardHandler,
+		jwtManager:        jwtManager,
 	}
 }
 
@@ -104,14 +106,21 @@ func (r *Router) Setup() *echo.Echo {
 	api.POST("/audience/:id/block", r.audienceHandler.BlockFan)
 	api.POST("/audience/:id/unblock", r.audienceHandler.UnblockFan)
 	api.DELETE("/audience/:id", r.audienceHandler.DeleteFan)
+	api.GET("/audience/stats", r.audienceHandler.GetStats)
+	api.GET("/audience/segments", r.audienceHandler.GetSegments)
 
 	// History routes
 	api.GET("/history", r.historyHandler.ListHistory)
 	api.GET("/history/:id", r.historyHandler.GetHistory)
+	api.GET("/history/stats", r.historyHandler.GetStats)
 
 	// Settings routes
 	api.GET("/settings", r.settingsHandler.GetSettings)
 	api.PUT("/settings", r.settingsHandler.UpdateSettings)
+
+	// Dashboard routes
+	api.GET("/dashboard/stats", r.dashboardHandler.GetStats)
+	api.GET("/campaigns", r.dashboardHandler.GetCampaigns)
 
 	// Scheduler route (public, no JWT authentication)
 	r.echo.POST("/api/scheduler/run", r.schedulerHandler.Run)

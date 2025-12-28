@@ -100,3 +100,27 @@ export async function deleteFan(id: string): Promise<ApiResponse<void>> {
   }
   return res
 }
+
+
+export interface AudienceStats {
+  totalFans: number
+  activeUsers: { count: number; percentage: number }
+  monthlyNewFans: number
+  todayNewRegistrations: number
+}
+
+export function useAudienceStats() {
+  const { data, error, mutate } = useSWR<ApiResponse<{ data: AudienceStats }>>(
+    ['/api/v1/audience/stats', 'getAudienceStats'],
+    async () => {
+      return client.GET<{ data: AudienceStats }>('/api/v1/audience/stats')
+    }
+  )
+
+  return {
+    stats: data?.data?.data ?? null,
+    isLoading: !error && !data,
+    isError: error,
+    mutate
+  }
+}

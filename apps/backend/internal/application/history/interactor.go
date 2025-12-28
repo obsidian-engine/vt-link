@@ -51,3 +51,14 @@ func (i *Interactor) GetHistory(ctx context.Context, id uuid.UUID) (*model.Messa
 
 	return history, nil
 }
+
+func (i *Interactor) GetStats(ctx context.Context, userID uuid.UUID) (*model.HistoryStats, error) {
+	// TODO: 実際のDBから取得する実装に置き換え
+	return &model.HistoryStats{
+		TotalMessages:    127,
+		TotalRecipients:  45890,
+		AverageOpenRate:  42.3,
+		AverageClickRate: 8.7,
+		LastSentDate:     "2024-03-15",
+	}, nil
+}

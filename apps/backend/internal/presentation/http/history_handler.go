@@ -103,3 +103,31 @@ func (h *HistoryHandler) GetHistory(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, hist)
 }
+
+// GetStats handles GET /api/v1/history/stats
+func (h *HistoryHandler) GetStats(c echo.Context) error {
+	// Get user ID from context
+	userIDStr := c.Get("userID")
+	if userIDStr == nil {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"error": "unauthorized",
+		})
+	}
+
+	userID, err := uuid.Parse(userIDStr.(string))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": "invalid user ID",
+		})
+	}
+
+	stats, err := h.usecase.GetStats(c.Request().Context(), userID)
+	if err != nil {
+		log.Printf("Failed to get history stats: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": "failed to retrieve history stats",
+		})
+	}
+
+	return c.JSON(http.StatusOK, stats)
+}

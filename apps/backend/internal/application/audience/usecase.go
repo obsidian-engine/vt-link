@@ -48,4 +48,10 @@ type Usecase interface {
 
 	// DeleteFan ファンを削除
 	DeleteFan(ctx context.Context, id uuid.UUID) error
+
+	// GetStats オーディエンス統計情報を取得
+	GetStats(ctx context.Context, userID uuid.UUID) (*model.AudienceStats, error)
+
+	// GetSegments セグメント一覧を取得
+	GetSegments(ctx context.Context, userID uuid.UUID) ([]*model.Segment, error)
 }

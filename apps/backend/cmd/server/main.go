@@ -39,9 +39,10 @@ func main() {
 	audienceHandler := http.NewAudienceHandler(container.AudienceUsecase)
 	historyHandler := http.NewHistoryHandler(container.HistoryUsecase)
 	settingsHandler := http.NewSettingsHandler(container.SettingsUsecase)
+	dashboardHandler := http.NewDashboardHandler(container.DashboardUsecase)
 
 	// Router初期化とサーバー起動
-	router := http.NewRouter(authHandler, autoReplyHandler, richMenuHandler, messageHandler, schedulerHandler, audienceHandler, historyHandler, settingsHandler, jwtManager)
+	router := http.NewRouter(authHandler, autoReplyHandler, richMenuHandler, messageHandler, schedulerHandler, audienceHandler, historyHandler, settingsHandler, dashboardHandler, jwtManager)
 
 	port := ":8080"
 	log.Printf("Server listening on port %s", port)

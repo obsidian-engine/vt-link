@@ -19,4 +19,7 @@ type Usecase interface {
 
 	// GetHistory 配信履歴を取得
 	GetHistory(ctx context.Context, id uuid.UUID) (*model.MessageHistory, error)
+
+	// GetStats 配信履歴統計情報を取得
+	GetStats(ctx context.Context, userID uuid.UUID) (*model.HistoryStats, error)
 }

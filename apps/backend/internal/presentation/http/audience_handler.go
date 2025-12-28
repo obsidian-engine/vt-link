@@ -200,3 +200,63 @@ func (h *AudienceHandler) DeleteFan(c echo.Context) error {
 
 	return c.NoContent(http.StatusNoContent)
 }
+
+// GetStats handles GET /api/v1/audience/stats
+func (h *AudienceHandler) GetStats(c echo.Context) error {
+	// Get user ID from context
+	userIDStr, ok := c.Get("userID").(string)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"error": "unauthorized",
+		})
+	}
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"error": "invalid user ID",
+		})
+	}
+
+	stats, err := h.usecase.GetStats(c.Request().Context(), userID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"ok":   true,
+		"data": stats,
+	})
+}
+
+// GetSegments handles GET /api/v1/audience/segments
+func (h *AudienceHandler) GetSegments(c echo.Context) error {
+	// Get user ID from context
+	userIDStr, ok := c.Get("userID").(string)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"error": "unauthorized",
+		})
+	}
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"error": "invalid user ID",
+		})
+	}
+
+	segments, err := h.usecase.GetSegments(c.Request().Context(), userID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"ok":   true,
+		"data": segments,
+	})
+}

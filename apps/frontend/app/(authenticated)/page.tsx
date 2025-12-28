@@ -1,24 +1,73 @@
 
+'use client'
+import { useDashboardStats, useCampaigns, Campaign } from '@/lib/hooks/use-dashboard'
+
 export default function HomePage() {
+  const { stats, isLoading: statsLoading, isError: statsError } = useDashboardStats()
+  const { campaigns, isLoading: campaignsLoading, isError: campaignsError } = useCampaigns()
+
+  // ローディング状態
+  if (statsLoading || campaignsLoading) {
+    return (
+      <div className="space-y-12">
+        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="glass dark:glass-dark rounded-lg p-6 shadow-soft animate-pulse">
+              <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-16 mb-2"></div>
+              <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-24"></div>
+            </div>
+          ))}
+        </div>
+        <div className="glass dark:glass-dark rounded-lg shadow-soft p-6">
+          <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-32 mb-4"></div>
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // エラー状態
+  if (statsError || campaignsError) {
+    return (
+      <div className="space-y-8">
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <div className="text-center py-8">
+            <p className="text-red-600 dark:text-red-400 mb-4">データの取得に失敗しました</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition"
+            >
+              再読み込み
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-12">
       {/* Stats Grid */}
       <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
           <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">友だち数</p>
-          <p className="text-2xl font-bold">12,340</p>
+          <p className="text-2xl font-bold">{stats?.friendCount.toLocaleString()}</p>
         </div>
         <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
           <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">今月の送信</p>
-          <p className="text-2xl font-bold">8,900 / 15,000</p>
+          <p className="text-2xl font-bold">{stats?.sendCount.toLocaleString()} / {stats?.sendLimit.toLocaleString()}</p>
         </div>
         <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
           <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">平均CTR</p>
-          <p className="text-2xl font-bold">4.8%</p>
+          <p className="text-2xl font-bold">{stats?.averageCtr}%</p>
         </div>
         <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft hover:shadow-lg transition">
           <p className="text-xs text-slate-600 dark:text-slate-400 mb-1">今月の売上</p>
-          <p className="text-2xl font-bold">¥540,000</p>
+          <p className="text-2xl font-bold">¥{stats?.monthlyRevenue.toLocaleString()}</p>
         </div>
       </div>
 
@@ -42,33 +91,23 @@ export default function HomePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/20 dark:divide-slate-700/60">
-              <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition">
-                <td className="px-6 py-4">夏のセール告知</td>
-                <td className="px-6 py-4 text-right">5,000</td>
-                <td className="px-6 py-4 text-right">6.2%</td>
-                <td className="px-6 py-4 text-right">1.1%</td>
-                <td className="px-6 py-4">
-                  <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/15 text-green-700 dark:text-green-400">配信中</span>
-                </td>
-              </tr>
-              <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition">
-                <td className="px-6 py-4">新スタンプ発売</td>
-                <td className="px-6 py-4 text-right">7,800</td>
-                <td className="px-6 py-4 text-right">5.0%</td>
-                <td className="px-6 py-4 text-right">0.9%</td>
-                <td className="px-6 py-4">
-                  <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-red-500/15 text-red-700 dark:text-red-400">終了</span>
-                </td>
-              </tr>
-              <tr className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition">
-                <td className="px-6 py-4">限定ライブ招待</td>
-                <td className="px-6 py-4 text-right">3,200</td>
-                <td className="px-6 py-4 text-right">7.4%</td>
-                <td className="px-6 py-4 text-right">2.4%</td>
-                <td className="px-6 py-4">
-                  <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-400/15 text-yellow-700 dark:text-yellow-300">一時停止</span>
-                </td>
-              </tr>
+              {campaigns.map((campaign: Campaign) => (
+                <tr key={campaign.id} className="hover:bg-white/30 dark:hover:bg-slate-700/40 transition">
+                  <td className="px-6 py-4">{campaign.name}</td>
+                  <td className="px-6 py-4 text-right">{campaign.sentCount.toLocaleString()}</td>
+                  <td className="px-6 py-4 text-right">{campaign.ctr}%</td>
+                  <td className="px-6 py-4 text-right">{campaign.cvr}%</td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                      campaign.status === 'active' ? 'bg-green-500/15 text-green-700 dark:text-green-400' :
+                      campaign.status === 'ended' ? 'bg-red-500/15 text-red-700 dark:text-red-400' :
+                      'bg-yellow-400/15 text-yellow-700 dark:text-yellow-300'
+                    }`}>
+                      {campaign.status === 'active' ? '配信中' : campaign.status === 'ended' ? '終了' : '一時停止'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

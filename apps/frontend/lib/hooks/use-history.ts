@@ -56,3 +56,27 @@ export function useHistoryDetail(id?: string) {
     mutate
   }
 }
+
+
+export interface HistoryStats {
+  totalDeliveries: number
+  totalReach: number
+  averageCTR: number
+  monthlyDeliveries: { current: number; previousMonth: number }
+}
+
+export function useHistoryStats() {
+  const { data, error, mutate } = useSWR<ApiResponse<{ data: HistoryStats }>>(
+    ['/api/v1/history/stats', 'getHistoryStats'],
+    async () => {
+      return client.GET<{ data: HistoryStats }>('/api/v1/history/stats')
+    }
+  )
+
+  return {
+    stats: data?.data?.data ?? null,
+    isLoading: !error && !data,
+    isError: error,
+    mutate
+  }
+}
