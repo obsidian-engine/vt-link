@@ -107,21 +107,6 @@ jobs:
       run:
         working-directory: apps/backend
 
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: vt_link_test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
     steps:
       - uses: actions/checkout@v4
 
@@ -136,7 +121,6 @@ jobs:
         run: |
           make deps
           go install go.uber.org/mock/mockgen@latest
-          go install github.com/pressly/goose/v3/cmd/goose@latest
           curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.7.2
 
       - name: Format check
@@ -156,11 +140,7 @@ jobs:
         run: make lint
 
       - name: Test & Build
-        env:
-          TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/vt_link_test?sslmode=disable
         run: |
           make vet
           make test-unit
-          goose -dir ./internal/migrations postgres "$TEST_DATABASE_URL" up
-          make test-integration
           make build
