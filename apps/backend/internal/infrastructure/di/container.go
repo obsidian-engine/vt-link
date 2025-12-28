@@ -84,9 +84,9 @@ func newContainer() (*Container, error) {
 
 	// Auth Services
 	lineOAuthClient := external.NewLineOAuthClient(
-		os.Getenv("LINE_CLIENT_ID"),
-		os.Getenv("LINE_CLIENT_SECRET"),
-		os.Getenv("LINE_REDIRECT_URI"),
+		os.Getenv("LINE_LOGIN_CHANNEL_ID"),
+		os.Getenv("LINE_LOGIN_CHANNEL_SECRET"),
+		os.Getenv("LINE_LOGIN_CALLBACK_URL"),
 	)
 	jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET"))
 	stateStore := auth.NewInMemoryStateStore(5 * time.Minute)
