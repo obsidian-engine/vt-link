@@ -91,16 +91,20 @@ export function createAuthService(
     async checkAuth(): Promise<boolean> {
       // HttpOnly Cookieは直接読めないため、/auth/me APIで認証状態を確認
       try {
-        const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE || ''
         const response = await fetch(`${apiBase}/api/v1/auth/me`, {
           method: 'GET',
           credentials: 'include', // Cookieを送信
         })
         return response.ok
       } catch (error) {
-        console.error('認証状態の確認に失敗:', error)
-        return false
+      if (error instanceof TypeError) {
+        console.error('Network error during auth check:', error)
+      } else {
+        console.error('Auth check failed:', error)
       }
+      return false
+    }
     },
   }
 }

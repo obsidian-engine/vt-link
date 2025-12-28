@@ -38,7 +38,7 @@ func SetRefreshTokenCookie(c echo.Context, token string) {
 		MaxAge:   30 * 24 * 3600, // 30 days
 		Path:     "/",
 		HttpOnly: true,
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 		Secure:   os.Getenv("APP_ENV") == "production",
 	}
 	c.SetCookie(cookie)
@@ -52,7 +52,7 @@ func SetCSRFTokenCookie(c echo.Context, token string) {
 		MaxAge:   0, // Session cookie
 		Path:     "/",
 		HttpOnly: false, // JS needs to read this
-		SameSite: http.SameSiteStrictMode,
+		SameSite: http.SameSiteLaxMode,
 		Secure:   os.Getenv("APP_ENV") == "production",
 	}
 	c.SetCookie(cookie)

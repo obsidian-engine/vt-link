@@ -133,7 +133,9 @@ export interface ApiClient {
 }
 
 export function makeClient(): ApiClient {
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8080'
+  const apiBase = process.env.NEXT_PUBLIC_API_BASE || ''
+  let isRefreshing = false
+  let refreshPromise: Promise<boolean> | null = null
 
   /**
    * CookieからCSRFトークンを取得
@@ -145,21 +147,34 @@ export function makeClient(): ApiClient {
   }
 
   /**
-   * トークンリフレッシュ
+   * トークンリフレッシュ（並列リクエストの競合制御付き）
    */
   async function refreshToken(): Promise<boolean> {
-    try {
-      const res = await fetch(`${apiBase}/auth/refresh`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'X-CSRF-Token': getCsrfTokenFromCookie(),
-        },
-      })
-      return res.ok
-    } catch {
-      return false
+    if (isRefreshing && refreshPromise) {
+      return refreshPromise
     }
+
+    isRefreshing = true
+    refreshPromise = (async () => {
+      try {
+        const res = await fetch(`${apiBase}/auth/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'X-CSRF-Token': getCsrfTokenFromCookie(),
+          },
+        })
+        return res.ok
+      } catch (error) {
+        console.error('Token refresh failed:', error)
+        return false
+      } finally {
+        isRefreshing = false
+        refreshPromise = null
+      }
+    })()
+
+    return refreshPromise
   }
 
   /**
@@ -184,13 +199,30 @@ export function makeClient(): ApiClient {
 
     let response = await makeRequest()
 
-    // 401エラー時はリフレッシュを試みる
+    // 401エラー時はリフレッシュを試みる（1回のみ）
     if (response.status === 401) {
       const refreshed = await refreshToken()
       if (refreshed) {
         // リトライ
         response = await makeRequest()
+        
+        // リトライ後も401なら、ログインページへ
+        if (response.status === 401) {
+          if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+          window.location.href = '/login'
+        }
+          return {
+            error: {
+              message: 'Session expired',
+              status: 401,
+            },
+          }
+        }
       } else {
+        // リフレッシュ失敗 → ログインページへ
+        if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+          window.location.href = '/login'
+        }
         return {
           error: {
             message: 'Session expired',
@@ -212,7 +244,8 @@ export function makeClient(): ApiClient {
     try {
       const data = await response.json()
       return { data }
-    } catch {
+    } catch (error) {
+      console.error('Failed to parse JSON response:', error)
       return {
         error: {
           message: 'Invalid JSON response',
@@ -283,3 +316,8 @@ export function makeClient(): ApiClient {
     },
   }
 }
+
+/**
+ * APIクライアントのシングルトンインスタンス
+ */
+export const api = makeClient()
