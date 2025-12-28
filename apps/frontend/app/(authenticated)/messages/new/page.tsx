@@ -131,7 +131,6 @@ export default function NewMessagePage() {
               >
                 <option value="draft">下書き</option>
                 <option value="scheduled">配信予定</option>
-                <option value="sent">配信済み</option>
               </select>
               {errors.status && (
                 <p className="text-sm text-red-600 mt-1">{errors.status.message}</p>
