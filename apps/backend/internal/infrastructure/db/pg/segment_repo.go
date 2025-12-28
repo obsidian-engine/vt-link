@@ -21,7 +21,7 @@ func NewSegmentRepository(database *db.DB) repository.SegmentRepository {
 
 func (r *SegmentRepository) List(ctx context.Context, userID uuid.UUID) ([]*model.Segment, error) {
 	executor := db.GetExecutor(ctx, r.db)
-	
+
 	segments := make([]*model.Segment, 0)
 
 	// 1. アクティブユーザー（30日以内にインタラクション）

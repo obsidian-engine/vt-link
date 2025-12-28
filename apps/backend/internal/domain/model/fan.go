@@ -8,17 +8,17 @@ import (
 )
 
 type Fan struct {
-	ID                 uuid.UUID      `json:"id" db:"id"`
-	UserID             uuid.UUID      `json:"userId" db:"user_id"`
-	LineUserID         string         `json:"lineUserId" db:"line_user_id"`
-	DisplayName        *string        `json:"displayName" db:"display_name"`
-	PictureURL         *string        `json:"pictureUrl" db:"picture_url"`
-	FollowedAt         time.Time      `json:"followedAt" db:"followed_at"`
-	LastInteractionAt  *time.Time     `json:"lastInteractionAt" db:"last_interaction_at"`
-	IsBlocked          bool           `json:"isBlocked" db:"is_blocked"`
-	Tags               pq.StringArray `json:"tags" db:"tags"`
-	CreatedAt          time.Time      `json:"createdAt" db:"created_at"`
-	UpdatedAt          time.Time      `json:"updatedAt" db:"updated_at"`
+	ID                uuid.UUID      `json:"id" db:"id"`
+	UserID            uuid.UUID      `json:"userId" db:"user_id"`
+	LineUserID        string         `json:"lineUserId" db:"line_user_id"`
+	DisplayName       *string        `json:"displayName" db:"display_name"`
+	PictureURL        *string        `json:"pictureUrl" db:"picture_url"`
+	FollowedAt        time.Time      `json:"followedAt" db:"followed_at"`
+	LastInteractionAt *time.Time     `json:"lastInteractionAt" db:"last_interaction_at"`
+	IsBlocked         bool           `json:"isBlocked" db:"is_blocked"`
+	Tags              pq.StringArray `json:"tags" db:"tags"`
+	CreatedAt         time.Time      `json:"createdAt" db:"created_at"`
+	UpdatedAt         time.Time      `json:"updatedAt" db:"updated_at"`
 }
 
 // NewFan 新しいFanを作成

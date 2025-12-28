@@ -8,7 +8,6 @@ import (
 	"github.com/google/uuid"
 	"vt-link/backend/internal/domain/model"
 	"vt-link/backend/internal/domain/repository"
-	"vt-link/backend/internal/domain/service"
 	"vt-link/backend/internal/shared/clock"
 	"vt-link/backend/internal/shared/errx"
 )
@@ -16,14 +15,14 @@ import (
 type Interactor struct {
 	messageRepo repository.MessageRepository
 	txManager   repository.TxManager
-	pusher      service.Pusher
+	pusher      repository.Pusher
 	clock       clock.Clock
 }
 
 func NewInteractor(
 	messageRepo repository.MessageRepository,
 	txManager repository.TxManager,
-	pusher service.Pusher,
+	pusher repository.Pusher,
 	clock clock.Clock,
 ) Usecase {
 	return &Interactor{
@@ -98,7 +97,9 @@ func (i *Interactor) SendMessage(ctx context.Context, input *SendMessageInput) e
 		if err != nil {
 			log.Printf("Failed to push message: %v", err)
 			message.MarkAsFailed()
-			i.messageRepo.Update(ctx, message)
+			if err := i.messageRepo.Update(ctx, message); err != nil {
+				log.Printf("Failed to update message status after push failure: %v", err)
+			}
 			return errx.NewAppError("PUSH_FAILED", "Failed to send message", 500)
 		}
 

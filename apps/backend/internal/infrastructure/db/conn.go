@@ -12,6 +12,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
+type contextKey string
+
+const txKey contextKey = "tx"
+
 type DB struct {
 	*sqlx.DB
 }
@@ -43,7 +47,7 @@ func NewDB() (*DB, error) {
 
 		if err != nil {
 			log.Printf("Failed to ping database (attempt %d/%d): %v", i+1, maxRetries, err)
-			db.Close()
+			_ = db.Close()
 			time.Sleep(time.Duration(i+1) * time.Second)
 			continue
 		}
@@ -88,10 +92,10 @@ func (tm *TxManager) WithinTx(ctx context.Context, fn func(ctx context.Context) 
 	if err != nil {
 		return fmt.Errorf("failed to begin transaction: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }()
 
 	// トランザクション内でコンテキストに*sqlx.Txを設定
-	txCtx := context.WithValue(ctx, "tx", tx)
+	txCtx := context.WithValue(ctx, txKey, tx)
 
 	err = fn(txCtx)
 	if err != nil {

@@ -19,14 +19,14 @@ import (
 )
 
 type Container struct {
-	MessageUsecase    message.Usecase
-	AutoReplyUsecase  autoreply.Usecase
-	RichMenuUsecase   richmenu.Usecase
-	AudienceUsecase   audience.Usecase
-	HistoryUsecase    history.Usecase
-	SettingsUsecase   settings.Usecase
-	DashboardUsecase  dashboard.Usecase
-	DB                *db.DB
+	MessageUsecase   message.Usecase
+	AutoReplyUsecase autoreply.Usecase
+	RichMenuUsecase  richmenu.Usecase
+	AudienceUsecase  audience.Usecase
+	HistoryUsecase   history.Usecase
+	SettingsUsecase  settings.Usecase
+	DashboardUsecase dashboard.Usecase
+	DB               *db.DB
 }
 
 var (
@@ -60,7 +60,7 @@ func newContainer() (*Container, error) {
 	fanRepo := pg.NewFanRepository(database)
 	messageHistoryRepo := pg.NewMessageHistoryRepository(database)
 	userSettingsRepo := pg.NewUserSettingsRepository(database)
-	
+
 	// 新規追加
 	dashboardRepo := pg.NewDashboardRepository(database)
 	campaignRepo := pg.NewCampaignRepository(database)
@@ -111,13 +111,13 @@ func newContainer() (*Container, error) {
 	dashboardUsecase := dashboard.NewDashboardInteractor(dashboardRepo, campaignRepo)
 
 	return &Container{
-		MessageUsecase:    messageUsecase,
-		AutoReplyUsecase:  autoReplyUsecase,
-		RichMenuUsecase:   richMenuUsecase,
-		AudienceUsecase:   audienceUsecase,
-		HistoryUsecase:    historyUsecase,
-		SettingsUsecase:   settingsUsecase,
-		DashboardUsecase:  dashboardUsecase,
-		DB:                database,
+		MessageUsecase:   messageUsecase,
+		AutoReplyUsecase: autoReplyUsecase,
+		RichMenuUsecase:  richMenuUsecase,
+		AudienceUsecase:  audienceUsecase,
+		HistoryUsecase:   historyUsecase,
+		SettingsUsecase:  settingsUsecase,
+		DashboardUsecase: dashboardUsecase,
+		DB:               database,
 	}, nil
 }

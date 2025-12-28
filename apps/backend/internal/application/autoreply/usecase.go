@@ -1,5 +1,7 @@
 package autoreply
 
+//go:generate mockgen -source=$GOFILE -destination=mocks/mock_$GOFILE -package=mocks
+
 import (
 	"context"
 
@@ -8,13 +10,13 @@ import (
 )
 
 type CreateRuleInput struct {
-	UserID       uuid.UUID              `json:"userId"`
+	UserID       uuid.UUID               `json:"userId"`
 	Type         model.AutoReplyRuleType `json:"type"`
-	Name         string                 `json:"name"`
-	Keywords     []string               `json:"keywords"`
-	MatchType    *model.MatchType       `json:"matchType"`
-	ReplyMessage string                 `json:"replyMessage"`
-	Priority     int                    `json:"priority"`
+	Name         string                  `json:"name"`
+	Keywords     []string                `json:"keywords"`
+	MatchType    *model.MatchType        `json:"matchType"`
+	ReplyMessage string                  `json:"replyMessage"`
+	Priority     int                     `json:"priority"`
 }
 
 type UpdateRuleInput struct {

@@ -199,4 +199,3 @@ func (r *MessageHistoryRepository) GetLastSentDateByUserID(ctx context.Context, 
 
 	return lastSentDate, nil
 }
-

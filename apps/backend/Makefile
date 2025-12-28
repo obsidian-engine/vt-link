@@ -28,9 +28,30 @@ lint-fix: ## golangci-lintで自動修正
 	@which golangci-lint > /dev/null || (echo "golangci-lint not found. Install it with: brew install golangci-lint" && exit 1)
 	golangci-lint run --fix ./...
 
+.PHONY: generate
+generate: ## go:generateでモック生成
+	$(GOCMD) generate ./...
+	$(GOCMD) fmt ./...
+
+.PHONY: fmt
+fmt: ## コードフォーマット
+	$(GOCMD) fmt ./...
+
+.PHONY: vet
+vet: ## go vetでコードチェック
+	$(GOCMD) vet ./...
+
 .PHONY: test
-test: ## テスト実行
+test: ## テスト実行（全体）
+	$(GOCMD) test -v -race ./tests/...
+
+.PHONY: test-unit
+test-unit: ## ユニットテスト実行
 	$(GOCMD) test -v -race ./tests/unit/...
+
+.PHONY: test-integration
+test-integration: ## インテグレーションテスト実行
+	$(GOCMD) test -v -race ./tests/integration/...
 
 .PHONY: clean
 clean: ## クリーンアップ

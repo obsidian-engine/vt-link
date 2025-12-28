@@ -41,7 +41,7 @@ type RichMenuBounds struct {
 
 // RichMenuAction エリアのアクション
 type RichMenuAction struct {
-	Type  string `json:"type"`  // "uri", "message", "postback"
+	Type  string `json:"type"` // "uri", "message", "postback"
 	Label string `json:"label,omitempty"`
 	URI   string `json:"uri,omitempty"`
 	Text  string `json:"text,omitempty"`
