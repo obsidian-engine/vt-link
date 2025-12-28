@@ -1,3 +1,5 @@
+version: "2"
+
 # golangci-lint configuration - minimal setup
 run:
   timeout: 3m
@@ -9,17 +11,10 @@ run:
 linters:
   enable:
     - errcheck      # エラーチェック漏れ
-    - gosimple      # コード簡略化
     - govet         # go vetチェック
     - ineffassign   # 無駄な代入
     - staticcheck   # 静的解析
     - unused        # 未使用コード
-    - gofmt         # フォーマット
-    - goimports     # import整理
-
-linters-settings:
-  goimports:
-    local-prefixes: vt-link/backend
 
 issues:
   exclude-rules:
