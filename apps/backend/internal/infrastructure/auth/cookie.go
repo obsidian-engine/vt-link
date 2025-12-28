@@ -91,30 +91,10 @@ func GenerateCSRFToken() (string, error) {
 
 // GetAccessTokenFromCookie retrieves the access token from the cookie
 func GetAccessTokenFromCookie(c echo.Context) (string, error) {
-	// Debug: log for Server Component requests
-	if c.Request().Header.Get("User-Agent") == "node" {
-		fmt.Printf("[GetAccessToken] Attempting to get cookie: %s
-", accessTokenCookieName)
-	}
-	
 	cookie, err := c.Cookie(accessTokenCookieName)
 	if err != nil {
-		// Debug: log error for Server Component requests
-		if c.Request().Header.Get("User-Agent") == "node" {
-			fmt.Printf("[GetAccessToken] ERROR: %v
-", err)
-			fmt.Printf("[GetAccessToken] Raw Cookie header: %s
-", c.Request().Header.Get("Cookie"))
-		}
 		return "", fmt.Errorf("access token cookie not found: %w", err)
 	}
-	
-	// Debug: log success for Server Component requests
-	if c.Request().Header.Get("User-Agent") == "node" {
-		fmt.Printf("[GetAccessToken] SUCCESS: got token (length: %d)
-", len(cookie.Value))
-	}
-	
 	return cookie.Value, nil
 }
 

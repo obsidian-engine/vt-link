@@ -65,6 +65,7 @@ func newContainer() (*Container, error) {
 	fanRepo := pg.NewFanRepository(database)
 	messageHistoryRepo := pg.NewMessageHistoryRepository(database)
 	userSettingsRepo := pg.NewUserSettingsRepository(database)
+	userRepo := pg.NewUserRepository(database)
 
 	// 新規追加
 	dashboardRepo := pg.NewDashboardRepository(database)
@@ -96,7 +97,7 @@ func newContainer() (*Container, error) {
 
 	// Usecase
 	// Auth Usecase
-	authUsecase := authApp.NewInteractor(lineOAuthClient, jwtManager, stateStore)
+	authUsecase := authApp.NewInteractor(lineOAuthClient, jwtManager, stateStore, userRepo)
 	messageUsecase := message.NewInteractor(
 		messageRepo,
 		txManager,

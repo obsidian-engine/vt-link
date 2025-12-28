@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -12,13 +11,6 @@ import (
 func JWTMiddleware(jwtManager *auth.JWTManager) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			// Debug: log all cookies from Server Components
-			if c.Request().Header.Get("User-Agent") == "node" {
-				fmt.Printf("[JWT DEBUG] Server Component request\n")
-				fmt.Printf("[JWT DEBUG] Cookie header: %s\n", c.Request().Header.Get("Cookie"))
-				fmt.Printf("[JWT DEBUG] All headers: %v\n", c.Request().Header)
-			}
-
 			// 1. Get access token from cookie
 			tokenString, err := auth.GetAccessTokenFromCookie(c)
 			if err != nil {
