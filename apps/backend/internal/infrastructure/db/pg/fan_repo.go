@@ -183,3 +183,41 @@ func (r *FanRepository) Delete(ctx context.Context, id uuid.UUID) error {
 
 	return nil
 }
+
+func (r *FanRepository) CountActiveByUserID(ctx context.Context, userID uuid.UUID, days int) (int, error) {
+	query := `
+		SELECT COUNT(*)
+		FROM fans
+		WHERE user_id = $1
+		AND last_interaction_at > NOW() - INTERVAL '1 day' * $2
+	`
+
+	executor := db.GetExecutor(ctx, r.db)
+
+	var count int
+	err := sqlx.GetContext(ctx, executor, &count, query, userID, days)
+	if err != nil {
+		return 0, fmt.Errorf("failed to count active fans: %w", err)
+	}
+
+	return count, nil
+}
+
+func (r *FanRepository) CountNewByUserID(ctx context.Context, userID uuid.UUID, days int) (int, error) {
+	query := `
+		SELECT COUNT(*)
+		FROM fans
+		WHERE user_id = $1
+		AND followed_at > NOW() - INTERVAL '1 day' * $2
+	`
+
+	executor := db.GetExecutor(ctx, r.db)
+
+	var count int
+	err := sqlx.GetContext(ctx, executor, &count, query, userID, days)
+	if err != nil {
+		return 0, fmt.Errorf("failed to count new fans: %w", err)
+	}
+
+	return count, nil
+}

@@ -3,6 +3,7 @@ package http
 import (
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"vt-link/backend/internal/application/dashboard"
 )
@@ -21,7 +22,22 @@ func NewDashboardHandler(usecase dashboard.Usecase) *DashboardHandler {
 
 // GetStats handles GET /api/v1/dashboard/stats
 func (h *DashboardHandler) GetStats(c echo.Context) error {
-	stats, err := h.usecase.GetStats(c.Request().Context())
+	// Get user ID from context
+	userIDStr, ok := c.Get("userID").(string)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"error": "unauthorized",
+		})
+	}
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"error": "invalid user ID",
+		})
+	}
+
+	stats, err := h.usecase.GetStats(c.Request().Context(), userID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"error": err.Error(),
@@ -35,7 +51,22 @@ func (h *DashboardHandler) GetStats(c echo.Context) error {
 
 // GetCampaigns handles GET /api/v1/campaigns
 func (h *DashboardHandler) GetCampaigns(c echo.Context) error {
-	campaigns, err := h.usecase.GetCampaigns(c.Request().Context())
+	// Get user ID from context
+	userIDStr, ok := c.Get("userID").(string)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"error": "unauthorized",
+		})
+	}
+
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"error": "invalid user ID",
+		})
+	}
+
+	campaigns, err := h.usecase.GetCampaigns(c.Request().Context(), userID)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"error": err.Error(),

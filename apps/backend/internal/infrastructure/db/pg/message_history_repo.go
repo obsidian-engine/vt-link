@@ -142,3 +142,61 @@ func (r *MessageHistoryRepository) Delete(ctx context.Context, id uuid.UUID) err
 
 	return nil
 }
+
+// CountByUserID ユーザーの総配信数を取得
+func (r *MessageHistoryRepository) CountByUserID(ctx context.Context, userID uuid.UUID) (int, error) {
+	query := `
+		SELECT COUNT(*)
+		FROM message_history
+		WHERE user_id = $1
+	`
+
+	executor := db.GetExecutor(ctx, r.db)
+
+	var count int
+	err := sqlx.GetContext(ctx, executor, &count, query, userID)
+	if err != nil {
+		return 0, fmt.Errorf("failed to count message history: %w", err)
+	}
+
+	return count, nil
+}
+
+// SumRecipientsByUserID ユーザーの総リーチ数を取得
+func (r *MessageHistoryRepository) SumRecipientsByUserID(ctx context.Context, userID uuid.UUID) (int, error) {
+	query := `
+		SELECT COALESCE(SUM(recipient_count), 0)
+		FROM message_history
+		WHERE user_id = $1
+	`
+
+	executor := db.GetExecutor(ctx, r.db)
+
+	var sum int
+	err := sqlx.GetContext(ctx, executor, &sum, query, userID)
+	if err != nil {
+		return 0, fmt.Errorf("failed to sum recipients: %w", err)
+	}
+
+	return sum, nil
+}
+
+// GetLastSentDateByUserID ユーザーの最終配信日時を取得
+func (r *MessageHistoryRepository) GetLastSentDateByUserID(ctx context.Context, userID uuid.UUID) (string, error) {
+	query := `
+		SELECT COALESCE(TO_CHAR(MAX(sent_at), 'YYYY-MM-DD'), '')
+		FROM message_history
+		WHERE user_id = $1
+	`
+
+	executor := db.GetExecutor(ctx, r.db)
+
+	var lastSentDate string
+	err := sqlx.GetContext(ctx, executor, &lastSentDate, query, userID)
+	if err != nil {
+		return "", fmt.Errorf("failed to get last sent date: %w", err)
+	}
+
+	return lastSentDate, nil
+}
+

@@ -60,6 +60,11 @@ func newContainer() (*Container, error) {
 	fanRepo := pg.NewFanRepository(database)
 	messageHistoryRepo := pg.NewMessageHistoryRepository(database)
 	userSettingsRepo := pg.NewUserSettingsRepository(database)
+	
+	// 新規追加
+	dashboardRepo := pg.NewDashboardRepository(database)
+	campaignRepo := pg.NewCampaignRepository(database)
+	segmentRepo := pg.NewSegmentRepository(database)
 
 	// Transaction Manager
 	txManager := db.NewTxManager(database)
@@ -94,7 +99,7 @@ func newContainer() (*Container, error) {
 	)
 
 	// Audience Usecase
-	audienceUsecase := audience.NewInteractor(fanRepo)
+	audienceUsecase := audience.NewInteractor(fanRepo, segmentRepo)
 
 	// History Usecase
 	historyUsecase := history.NewInteractor(messageHistoryRepo)
@@ -103,7 +108,7 @@ func newContainer() (*Container, error) {
 	settingsUsecase := settings.NewInteractor(userSettingsRepo)
 
 	// Dashboard Usecase
-	dashboardUsecase := dashboard.NewDashboardInteractor()
+	dashboardUsecase := dashboard.NewDashboardInteractor(dashboardRepo, campaignRepo)
 
 	return &Container{
 		MessageUsecase:    messageUsecase,

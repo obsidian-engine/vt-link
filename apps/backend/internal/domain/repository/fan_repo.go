@@ -28,4 +28,10 @@ type FanRepository interface {
 
 	// Delete ファンを削除
 	Delete(ctx context.Context, id uuid.UUID) error
+
+	// CountActiveByUserID アクティブなファン数をカウント（指定日数以内に最終インタラクションがあるファン）
+	CountActiveByUserID(ctx context.Context, userID uuid.UUID, days int) (int, error)
+
+	// CountNewByUserID 新規ファン数をカウント（指定日数以内にフォローしたファン）
+	CountNewByUserID(ctx context.Context, userID uuid.UUID, days int) (int, error)
 }

@@ -11,12 +11,17 @@ import (
 )
 
 type Interactor struct {
-	fanRepo repository.FanRepository
+	fanRepo     repository.FanRepository
+	segmentRepo repository.SegmentRepository
 }
 
-func NewInteractor(fanRepo repository.FanRepository) Usecase {
+func NewInteractor(
+	fanRepo repository.FanRepository,
+	segmentRepo repository.SegmentRepository,
+) Usecase {
 	return &Interactor{
-		fanRepo: fanRepo,
+		fanRepo:     fanRepo,
+		segmentRepo: segmentRepo,
 	}
 }
 
@@ -133,36 +138,51 @@ func (i *Interactor) DeleteFan(ctx context.Context, id uuid.UUID) error {
 }
 
 func (i *Interactor) GetStats(ctx context.Context, userID uuid.UUID) (*model.AudienceStats, error) {
-	// TODO: 実際のDBから取得する実装に置き換え
+	// 総ファン数
+	totalFans, err := i.fanRepo.CountByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("Failed to count total fans: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	// アクティブファン数（30日以内）
+	activeFans, err := i.fanRepo.CountActiveByUserID(ctx, userID, 30)
+	if err != nil {
+		log.Printf("Failed to count active fans: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	// 新規ファン数（7日以内）
+	newFansThisWeek, err := i.fanRepo.CountNewByUserID(ctx, userID, 7)
+	if err != nil {
+		log.Printf("Failed to count new fans this week: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	// ブロック済みファン数（仮実装：0固定、後で拡張可能）
+	blockedFans := 0
+
+	// エンゲージメント率計算
+	engagementRate := 0.0
+	if totalFans > 0 {
+		engagementRate = float64(activeFans) / float64(totalFans) * 100
+	}
+
 	return &model.AudienceStats{
-		TotalFans:       12340,
-		ActiveFans:      9500,
-		NewFansThisWeek: 234,
-		BlockedFans:     120,
-		EngagementRate:  68.5,
+		TotalFans:       totalFans,
+		ActiveFans:      activeFans,
+		NewFansThisWeek: newFansThisWeek,
+		BlockedFans:     blockedFans,
+		EngagementRate:  engagementRate,
 	}, nil
 }
 
 func (i *Interactor) GetSegments(ctx context.Context, userID uuid.UUID) ([]*model.Segment, error) {
-	// TODO: 実際のDBから取得する実装に置き換え
-	return []*model.Segment{
-		{
-			ID:          "1",
-			Name:        "アクティブユーザー",
-			Description: "過去30日以内にアクションしたユーザー",
-			Count:       4500,
-		},
-		{
-			ID:          "2",
-			Name:        "新規ユーザー",
-			Description: "過去7日以内に友だち追加したユーザー",
-			Count:       234,
-		},
-		{
-			ID:          "3",
-			Name:        "購入済みユーザー",
-			Description: "過去に購入履歴があるユーザー",
-			Count:       1200,
-		},
-	}, nil
+	segments, err := i.segmentRepo.List(ctx, userID)
+	if err != nil {
+		log.Printf("Failed to get segments: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	return segments, nil
 }

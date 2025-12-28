@@ -53,12 +53,37 @@ func (i *Interactor) GetHistory(ctx context.Context, id uuid.UUID) (*model.Messa
 }
 
 func (i *Interactor) GetStats(ctx context.Context, userID uuid.UUID) (*model.HistoryStats, error) {
-	// TODO: 実際のDBから取得する実装に置き換え
+	// 総配信数を取得
+	totalMessages, err := i.historyRepo.CountByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("Failed to get total messages: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	// 総リーチ数を取得
+	totalRecipients, err := i.historyRepo.SumRecipientsByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("Failed to get total recipients: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	// 最終配信日時を取得
+	lastSentDate, err := i.historyRepo.GetLastSentDateByUserID(ctx, userID)
+	if err != nil {
+		log.Printf("Failed to get last sent date: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	// TODO: 開封率・クリック率はトラッキング機能実装後に実データに変更
+	averageOpenRate := 0.0
+	averageClickRate := 0.0
+
 	return &model.HistoryStats{
-		TotalMessages:    127,
-		TotalRecipients:  45890,
-		AverageOpenRate:  42.3,
-		AverageClickRate: 8.7,
-		LastSentDate:     "2024-03-15",
+		TotalMessages:    totalMessages,
+		TotalRecipients:  totalRecipients,
+		AverageOpenRate:  averageOpenRate,
+		AverageClickRate: averageClickRate,
+		LastSentDate:     lastSentDate,
 	}, nil
 }
+
