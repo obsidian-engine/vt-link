@@ -14,12 +14,9 @@ func JWTMiddleware(jwtManager *auth.JWTManager) echo.MiddlewareFunc {
 		return func(c echo.Context) error {
 			// Debug: log all cookies from Server Components
 			if c.Request().Header.Get("User-Agent") == "node" {
-				fmt.Printf("[JWT DEBUG] Server Component request
-")
-				fmt.Printf("[JWT DEBUG] Cookie header: %s
-", c.Request().Header.Get("Cookie"))
-				fmt.Printf("[JWT DEBUG] All headers: %v
-", c.Request().Header)
+				fmt.Printf("[JWT DEBUG] Server Component request\n")
+				fmt.Printf("[JWT DEBUG] Cookie header: %s\n", c.Request().Header.Get("Cookie"))
+				fmt.Printf("[JWT DEBUG] All headers: %v\n", c.Request().Header)
 			}
 
 			// 1. Get access token from cookie
