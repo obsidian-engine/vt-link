@@ -137,7 +137,7 @@ jobs:
           make deps
           go install go.uber.org/mock/mockgen@latest
           go install github.com/pressly/goose/v3/cmd/goose@latest
-          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@v2
 
       - name: Format check
         run: |
