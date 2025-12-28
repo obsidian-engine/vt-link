@@ -144,7 +144,11 @@ jobs:
           make generate
           make fmt
           if [ -n "$(git diff --name-only)" ]; then
-            echo "Code is not formatted. Run 'make fmt'"
+            echo "❌ Code is not formatted. Changed files:"
+            git diff --name-only
+            echo ""
+            echo "Diff details:"
+            git diff
             exit 1
           fi
 
