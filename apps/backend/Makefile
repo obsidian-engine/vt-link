@@ -48,7 +48,8 @@ deps-dev: deps ## Install development dependencies
 .PHONY: generate
 generate: ## Generate mocks and other generated code
 	@echo "Generating mocks..."
-	mockery
+	@which mockery > /dev/null || (echo "WARNING: mockery not found. Install it with: go install github.com/vektra/mockery/v2@latest" && echo "Skipping mock generation..." && exit 0)
+	@mockery
 
 .PHONY: build
 build: deps ## Build the application
