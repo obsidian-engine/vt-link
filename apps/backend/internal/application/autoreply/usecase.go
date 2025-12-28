@@ -27,6 +27,17 @@ type UpdateRuleInput struct {
 	Priority     *int             `json:"priority"`
 }
 
+// BulkUpdateRuleInput 一括更新用の入力
+type BulkUpdateRuleInput struct {
+	ID        uuid.UUID `json:"id"`
+	IsEnabled bool      `json:"isEnabled"`
+}
+
+// BulkUpdateInput 一括更新リクエスト
+type BulkUpdateInput struct {
+	Updates []BulkUpdateRuleInput `json:"updates"`
+}
+
 type WebhookInput struct {
 	Signature string `json:"-"`
 	Body      []byte `json:"-"`
@@ -41,6 +52,9 @@ type Usecase interface {
 
 	// UpdateRule ルールを更新
 	UpdateRule(ctx context.Context, input *UpdateRuleInput) (*model.AutoReplyRule, error)
+
+	// BulkUpdateRules 複数ルールの有効/無効を一括更新
+	BulkUpdateRules(ctx context.Context, input *BulkUpdateInput) error
 
 	// DeleteRule ルールを削除
 	DeleteRule(ctx context.Context, id uuid.UUID) error

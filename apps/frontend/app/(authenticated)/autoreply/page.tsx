@@ -7,7 +7,8 @@ import {
   useAutoReplyRules,
   createRule,
   updateRule,
-  deleteRule
+  deleteRule,
+  bulkUpdateRules
 } from '@/lib/hooks/use-auto-reply-rules'
 import type { AutoReplyRule, CreateAutoReplyRuleRequest } from '@/lib/api-client'
 
@@ -87,11 +88,13 @@ export default function AutoReplyPage() {
     const newGlobalEnabled = !globalEnabled
     setGlobalEnabled(newGlobalEnabled)
 
-    // 全ルールの有効/無効を一括更新
+    // 全ルールの有効/無効を一括更新（単一APIコール）
     try {
-      await Promise.all(
-        rules.map(rule => updateRule(rule.id, { isEnabled: newGlobalEnabled }))
-      )
+      const updates = rules.map(rule => ({
+        id: rule.id,
+        isEnabled: newGlobalEnabled
+      }))
+      await bulkUpdateRules(updates)
       await mutate()
     } catch (error) {
       console.error('Failed to toggle global settings:', error)
