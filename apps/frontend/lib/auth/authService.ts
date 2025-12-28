@@ -1,10 +1,10 @@
 /**
- * 認証サービス - localStorage操作の抽象化
+ * 認証サービス - Cookie操作の抽象化
  *
  * テスト可能な設計:
  * - StorageAdapter インターフェースでストレージを抽象化
  * - createAuthService でDI可能なファクトリ関数を提供
- * - デフォルトはlocalStorageを使用
+ * - デフォルトはCookieを使用（バックエンドと統一）
  */
 
 // ストレージ抽象化インターフェース
@@ -29,34 +29,37 @@ export interface AuthService {
   isAuthenticated(): boolean
 }
 
-// ストレージキー定数
+// Cookieキー定数（バックエンドと一致させる）
 const STORAGE_KEYS = {
-  ACCESS_TOKEN: 'accessToken',
-  REFRESH_TOKEN: 'refreshToken',
+  ACCESS_TOKEN: 'access_token',
+  REFRESH_TOKEN: 'refresh_token',
 } as const
 
-// デフォルトのlocalStorageアダプター
-const createLocalStorageAdapter = (): StorageAdapter => ({
+// Cookie操作ヘルパー
+const createCookieAdapter = (): StorageAdapter => ({
   getItem: (key: string) => {
-    if (typeof window === 'undefined') return null
-    return localStorage.getItem(key)
+    if (typeof document === 'undefined') return null
+    const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${key}=([^;]*)`))
+    return match ? decodeURIComponent(match[1]) : null
   },
   setItem: (key: string, value: string) => {
-    if (typeof window === 'undefined') return
-    localStorage.setItem(key, value)
+    if (typeof document === 'undefined') return
+    // HttpOnly Cookieはサーバー側で設定されるため、クライアントでは設定しない
+    // この関数は互換性のために残すが、実際の設定はバックエンドが行う
+    console.warn('Cookie設定はバックエンドで行われます')
   },
   removeItem: (key: string) => {
-    if (typeof window === 'undefined') return
-    localStorage.removeItem(key)
+    if (typeof document === 'undefined') return
+    document.cookie = `${key}=; Max-Age=0; path=/`
   },
 })
 
 /**
  * 認証サービスファクトリ
- * @param storage - ストレージアダプター（デフォルト: localStorage）
+ * @param storage - ストレージアダプター（デフォルト: Cookie）
  */
 export function createAuthService(
-  storage: StorageAdapter = createLocalStorageAdapter()
+  storage: StorageAdapter = createCookieAdapter()
 ): AuthService {
   return {
     getAccessToken(): string | null {
