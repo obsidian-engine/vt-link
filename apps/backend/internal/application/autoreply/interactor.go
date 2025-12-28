@@ -101,6 +101,28 @@ func (i *Interactor) DeleteRule(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
+func (i *Interactor) BulkUpdateRules(ctx context.Context, input *BulkUpdateInput) error {
+	if len(input.Updates) == 0 {
+		return nil
+	}
+
+	items := make([]repository.BulkUpdateItem, len(input.Updates))
+	for idx, u := range input.Updates {
+		items[idx] = repository.BulkUpdateItem{
+			ID:        u.ID,
+			IsEnabled: u.IsEnabled,
+		}
+	}
+
+	err := i.ruleRepo.BulkUpdateEnabled(ctx, items)
+	if err != nil {
+		log.Printf("Failed to bulk update auto reply rules: %v", err)
+		return errx.ErrInternalServer
+	}
+
+	return nil
+}
+
 func (i *Interactor) ProcessWebhook(ctx context.Context, input *WebhookInput) error {
 	// 署名検証
 	if !i.verifySignature(input.Body, input.Signature) {

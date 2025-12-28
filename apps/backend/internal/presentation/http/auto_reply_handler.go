@@ -32,6 +32,15 @@ type UpdateRuleRequest struct {
 	Priority     *int             `json:"priority"`
 }
 
+type BulkUpdateRuleItem struct {
+	ID        string `json:"id" validate:"required"`
+	IsEnabled bool   `json:"isEnabled"`
+}
+
+type BulkUpdateRulesRequest struct {
+	Updates []BulkUpdateRuleItem `json:"updates" validate:"required"`
+}
+
 func NewAutoReplyHandler(usecase autoreply.Usecase) *AutoReplyHandler {
 	return &AutoReplyHandler{
 		usecase: usecase,
@@ -164,6 +173,52 @@ func (h *AutoReplyHandler) DeleteRule(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusNoContent)
+}
+
+// BulkUpdateRules handles PATCH /api/v1/autoreply/rules/bulk
+func (h *AutoReplyHandler) BulkUpdateRules(c echo.Context) error {
+	var req BulkUpdateRulesRequest
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": "invalid request body",
+		})
+	}
+
+	if len(req.Updates) == 0 {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"error": "updates array is required",
+		})
+	}
+
+	updates := make([]autoreply.BulkUpdateRuleInput, len(req.Updates))
+	for i, item := range req.Updates {
+		id, err := uuid.Parse(item.ID)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{
+				"error": "invalid rule ID: " + item.ID,
+			})
+		}
+		updates[i] = autoreply.BulkUpdateRuleInput{
+			ID:        id,
+			IsEnabled: item.IsEnabled,
+		}
+	}
+
+	input := &autoreply.BulkUpdateInput{
+		Updates: updates,
+	}
+
+	err := h.usecase.BulkUpdateRules(c.Request().Context(), input)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"message": "rules updated successfully",
+		"count":   len(req.Updates),
+	})
 }
 
 // HandleWebhook handles POST /webhook

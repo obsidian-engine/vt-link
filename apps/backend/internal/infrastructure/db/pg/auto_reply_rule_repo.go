@@ -144,3 +144,23 @@ func (r *AutoReplyRuleRepository) Delete(ctx context.Context, id uuid.UUID) erro
 
 	return nil
 }
+
+func (r *AutoReplyRuleRepository) BulkUpdateEnabled(ctx context.Context, items []repository.BulkUpdateItem) error {
+	if len(items) == 0 {
+		return nil
+	}
+
+	// トランザクション内で一括更新
+	query := `UPDATE auto_reply_rules SET is_enabled = $2, updated_at = NOW() WHERE id = $1`
+
+	executor := db.GetExecutor(ctx, r.db)
+
+	for _, item := range items {
+		_, err := executor.ExecContext(ctx, query, item.ID, item.IsEnabled)
+		if err != nil {
+			return fmt.Errorf("failed to bulk update auto reply rule %s: %w", item.ID, err)
+		}
+	}
+
+	return nil
+}

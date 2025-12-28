@@ -81,6 +81,7 @@ func (r *Router) Setup() *echo.Echo {
 	// AutoReply routes
 	api.POST("/autoreply/rules", r.autoReplyHandler.CreateRule)
 	api.GET("/autoreply/rules", r.autoReplyHandler.ListRules)
+	api.PATCH("/autoreply/rules/bulk", r.autoReplyHandler.BulkUpdateRules)
 	api.PUT("/autoreply/rules/:id", r.autoReplyHandler.UpdateRule)
 	api.DELETE("/autoreply/rules/:id", r.autoReplyHandler.DeleteRule)
 
