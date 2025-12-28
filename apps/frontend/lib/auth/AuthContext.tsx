@@ -21,7 +21,7 @@ export interface AuthState {
 
 // Contextの値の型定義
 export interface AuthContextValue extends AuthState {
-  login: () => void
+  login: () => Promise<void>
   logout: () => void
   setTokens: (tokens: AuthTokens) => void
 }
@@ -72,8 +72,8 @@ export function AuthProvider({
 
   // ログイン処理（LINE OAuth）
   // React 19 Compiler が自動最適化するため useCallback 不要
-  const login = () => {
-    redirectToLineLogin()
+  const login = async () => {
+    await redirectToLineLogin()
   }
 
   // ログアウト処理

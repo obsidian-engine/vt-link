@@ -39,6 +39,21 @@ func NewAuthHandler(authUsecase authApp.Usecase) *AuthHandler {
 	}
 }
 
+// GenerateState handles GET /auth/state
+func (h *AuthHandler) GenerateState(c echo.Context) error {
+	output, err := h.authUsecase.GenerateState(c.Request().Context())
+	if err != nil {
+		c.Logger().Errorf("Failed to generate state: %v", err)
+		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"error": "failed to generate state",
+		})
+	}
+
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"state": output.State,
+	})
+}
+
 // Login handles POST /auth/login
 func (h *AuthHandler) Login(c echo.Context) error {
 	var req LoginRequest

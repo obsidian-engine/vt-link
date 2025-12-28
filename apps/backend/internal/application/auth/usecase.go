@@ -26,7 +26,14 @@ type RefreshOutput struct {
 	CSRFToken   string `json:"csrf_token"`
 }
 
+type GenerateStateOutput struct {
+	State string `json:"state"`
+}
+
 type Usecase interface {
+	// GenerateState OAuth state パラメータを生成
+	GenerateState(ctx context.Context) (*GenerateStateOutput, error)
+
 	// Login LINE OAuth認証を実行してJWTを発行
 	Login(ctx context.Context, input *LoginInput) (*LoginOutput, error)
 

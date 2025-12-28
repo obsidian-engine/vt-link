@@ -57,6 +57,7 @@ func (r *Router) Setup() *echo.Echo {
 
 	// Auth routes (public)
 	auth := r.echo.Group("/auth")
+	auth.GET("/state", r.authHandler.GenerateState)
 	auth.POST("/login", r.authHandler.Login)
 	auth.POST("/logout", r.authHandler.Logout)
 	auth.POST("/refresh", r.authHandler.Refresh)

@@ -27,6 +27,18 @@ func NewInteractor(
 	}
 }
 
+func (i *Interactor) GenerateState(ctx context.Context) (*GenerateStateOutput, error) {
+	state, err := i.stateStore.Generate()
+	if err != nil {
+		log.Printf("Failed to generate state: %v", err)
+		return nil, errx.ErrInternalServer
+	}
+
+	return &GenerateStateOutput{
+		State: state,
+	}, nil
+}
+
 func (i *Interactor) Login(ctx context.Context, input *LoginInput) (*LoginOutput, error) {
 	// Validate state parameter to prevent CSRF attacks
 	if err := i.stateStore.Validate(input.State); err != nil {
