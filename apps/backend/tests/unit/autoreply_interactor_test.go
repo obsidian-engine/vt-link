@@ -16,7 +16,6 @@ import (
 	"vt-link/backend/internal/application/autoreply"
 	"vt-link/backend/internal/domain/model"
 	repoMocks "vt-link/backend/internal/domain/repository/mocks"
-	serviceMocks "vt-link/backend/internal/domain/repository/mocks"
 	"vt-link/backend/internal/infrastructure/external"
 	"vt-link/backend/internal/shared/errx"
 )
@@ -307,7 +306,7 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Follow() {
 	defer ctrl.Finish()
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
-	mockReplier := serviceMocks.NewMockLineReplier(ctrl)
+	mockReplier := repoMocks.NewMockLineReplier(ctrl)
 	interactor := autoreply.NewInteractor(mockRepo, mockReplier)
 
 	// フォローイベント処理のテスト
@@ -363,7 +362,7 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Message_ExactMatch() {
 	defer ctrl.Finish()
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
-	mockReplier := serviceMocks.NewMockLineReplier(ctrl)
+	mockReplier := repoMocks.NewMockLineReplier(ctrl)
 	interactor := autoreply.NewInteractor(mockRepo, mockReplier)
 
 	// メッセージイベント（完全一致）処理のテスト
@@ -426,7 +425,7 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Message_PartialMatch()
 	defer ctrl.Finish()
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
-	mockReplier := serviceMocks.NewMockLineReplier(ctrl)
+	mockReplier := repoMocks.NewMockLineReplier(ctrl)
 	interactor := autoreply.NewInteractor(mockRepo, mockReplier)
 
 	// メッセージイベント（部分一致）処理のテスト
@@ -489,7 +488,7 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_InvalidSignature() {
 	defer ctrl.Finish()
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
-	mockReplier := serviceMocks.NewMockLineReplier(ctrl)
+	mockReplier := repoMocks.NewMockLineReplier(ctrl)
 	interactor := autoreply.NewInteractor(mockRepo, mockReplier)
 
 	// 署名検証失敗のテスト

@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
-	_ "github.com/lib/pq"
 
 	"vt-link/backend/internal/domain/model"
 	"vt-link/backend/internal/infrastructure/db"
@@ -52,7 +51,7 @@ func SetupTestDB(t *testing.T) *TestDB {
 // TeardownTestDB テスト用データベースのクリーンアップ
 func (tdb *TestDB) TeardownTestDB() {
 	if tdb.DB != nil {
-		tdb.DB.Close()
+		_ = tdb.DB.Close()
 	}
 }
 
@@ -73,10 +72,10 @@ func (tdb *TestDB) ClearAllTables(t *testing.T) {
 	}
 	defer func() {
 		if p := recover(); p != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			panic(p)
 		} else if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 		}
 	}()
 
@@ -228,10 +227,10 @@ func (tdb *TestDB) ClearAutoReplyRules(t *testing.T) {
 	}
 	defer func() {
 		if p := recover(); p != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			panic(p)
 		} else if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 		}
 	}()
 
@@ -290,10 +289,10 @@ func (tdb *TestDB) ClearRichMenus(t *testing.T) {
 	}
 	defer func() {
 		if p := recover(); p != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 			panic(p)
 		} else if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 		}
 	}()
 

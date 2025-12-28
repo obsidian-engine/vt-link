@@ -28,7 +28,7 @@ func WriteJSON(w http.ResponseWriter, statusCode int, data interface{}) {
 		Data:    data,
 	}
 
-	json.NewEncoder(w).Encode(response)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 // WriteError エラーレスポンスを書き込み
@@ -44,7 +44,7 @@ func WriteError(w http.ResponseWriter, err error) {
 				Message: appErr.Message,
 			},
 		}
-		json.NewEncoder(w).Encode(response)
+		_ = json.NewEncoder(w).Encode(response)
 		return
 	}
 
@@ -57,12 +57,12 @@ func WriteError(w http.ResponseWriter, err error) {
 			Message: "Internal server error",
 		},
 	}
-	json.NewEncoder(w).Encode(response)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
 // ParseJSON リクエストボディをJSONとしてパース
 func ParseJSON(r *http.Request, v interface{}) error {
-	defer r.Body.Close()
+	defer func() { _ = r.Body.Close() }()
 	return json.NewDecoder(r.Body).Decode(v)
 }
 

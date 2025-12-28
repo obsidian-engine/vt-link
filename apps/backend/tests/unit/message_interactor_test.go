@@ -15,7 +15,6 @@ import (
 	"vt-link/backend/internal/application/message"
 	"vt-link/backend/internal/domain/model"
 	repoMocks "vt-link/backend/internal/domain/repository/mocks"
-	serviceMocks "vt-link/backend/internal/domain/repository/mocks"
 	"vt-link/backend/internal/shared/errx"
 )
 
@@ -23,7 +22,7 @@ type MessageInteractorTestSuite struct {
 	suite.Suite
 	interactor message.Usecase
 	mockRepo   *repoMocks.MockMessageRepository
-	mockPusher *serviceMocks.MockPusher
+	mockPusher *repoMocks.MockPusher
 	mockTxMgr  *repoMocks.MockTxManager
 	ctx        context.Context
 }
@@ -31,7 +30,7 @@ type MessageInteractorTestSuite struct {
 func (s *MessageInteractorTestSuite) SetupTest() {
 	ctrl := gomock.NewController(s.T())
 	s.mockRepo = repoMocks.NewMockMessageRepository(ctrl)
-	s.mockPusher = serviceMocks.NewMockPusher(ctrl)
+	s.mockPusher = repoMocks.NewMockPusher(ctrl)
 	s.mockTxMgr = repoMocks.NewMockTxManager(ctrl)
 	s.ctx = context.Background()
 

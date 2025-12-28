@@ -96,7 +96,7 @@ func (p *LinePusher) sendMessageWithRetry(ctx context.Context, message LineMessa
 		if err != nil {
 			return fmt.Errorf("failed to send request: %w", err)
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
@@ -174,7 +174,7 @@ func (p *LinePusher) Broadcast(ctx context.Context, message string) error {
 	if err != nil {
 		return fmt.Errorf("failed to send broadcast request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -224,7 +224,7 @@ func (p *LinePusher) MulticastByAudience(ctx context.Context, audienceIDs []stri
 	if err != nil {
 		return fmt.Errorf("failed to send multicast request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)

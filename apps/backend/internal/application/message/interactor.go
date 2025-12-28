@@ -97,7 +97,9 @@ func (i *Interactor) SendMessage(ctx context.Context, input *SendMessageInput) e
 		if err != nil {
 			log.Printf("Failed to push message: %v", err)
 			message.MarkAsFailed()
-			i.messageRepo.Update(ctx, message)
+			if err := i.messageRepo.Update(ctx, message); err != nil {
+				log.Printf("Failed to update message status after push failure: %v", err)
+			}
 			return errx.NewAppError("PUSH_FAILED", "Failed to send message", 500)
 		}
 

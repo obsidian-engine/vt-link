@@ -59,7 +59,7 @@ func (c *LineOAuthClient) ExchangeCode(ctx context.Context, code string) (*Token
 	if err != nil {
 		return nil, fmt.Errorf("failed to exchange code: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -85,7 +85,7 @@ func (c *LineOAuthClient) GetProfile(ctx context.Context, accessToken string) (*
 	if err != nil {
 		return nil, fmt.Errorf("failed to get profile: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -117,7 +117,7 @@ func (c *LineOAuthClient) RefreshToken(ctx context.Context, refreshToken string)
 	if err != nil {
 		return nil, fmt.Errorf("failed to refresh token: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)

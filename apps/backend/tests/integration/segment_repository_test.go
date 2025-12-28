@@ -159,11 +159,12 @@ func (s *SegmentRepositoryIntegrationTestSuite) TestList_WithTagSegments() {
 	// タグセグメントの確認
 	tagSegments := make(map[string]int)
 	for _, seg := range segments {
-		if seg.ID == "tag_VIP" {
+		switch seg.ID {
+		case "tag_VIP":
 			tagSegments["VIP"] = seg.Count
-		} else if seg.ID == "tag_購入者" {
+		case "tag_購入者":
 			tagSegments["購入者"] = seg.Count
-		} else if seg.ID == "tag_イベント参加" {
+		case "tag_イベント参加":
 			tagSegments["イベント参加"] = seg.Count
 		}
 	}

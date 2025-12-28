@@ -1,3 +1,5 @@
+version: "2"
+
 # golangci-lint configuration - minimal setup
 run:
   timeout: 3m
