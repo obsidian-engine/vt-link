@@ -22,7 +22,7 @@ export interface AuthState {
 // Contextの値の型定義
 export interface AuthContextValue extends AuthState {
   login: () => Promise<void>
-  logout: () => void
+  logout: () => Promise<void>
   setTokens: (tokens: AuthTokens) => void
 }
 
@@ -77,9 +77,24 @@ export function AuthProvider({
   }
 
   // ログアウト処理
-  const logout = () => {
-    authService.clearTokens()
-    setIsAuthenticated(false)
+  const logout = async () => {
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_API_BASE || ''
+      await fetch(`${apiBase}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      })
+    } catch (error) {
+      console.error('ログアウトエラー:', error)
+    } finally {
+      // APIの成功・失敗に関わらず、状態をクリア
+      authService.clearTokens()
+      setIsAuthenticated(false)
+      // ログインページにリダイレクト
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login'
+      }
+    }
   }
 
   // トークン保存後の状態更新（実際のCookie設定はバックエンドが行う）
