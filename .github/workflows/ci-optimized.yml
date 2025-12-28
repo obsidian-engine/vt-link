@@ -137,6 +137,7 @@ jobs:
           make deps
           go install github.com/vektra/mockery/v2@latest
           go install github.com/pressly/goose/v3/cmd/goose@latest
+          go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
       - name: Format check
         run: |
@@ -146,6 +147,9 @@ jobs:
             echo "Code is not formatted. Run 'make fmt'"
             exit 1
           fi
+
+      - name: Lint
+        run: make lint
 
       - name: Test & Build
         env:

@@ -18,6 +18,11 @@ run: vendor ## サーバー起動
 build: deps ## ビルド
 	$(GOCMD) build $(LDFLAGS) -o $(BINARY_NAME) -v ./cmd/server
 
+.PHONY: lint
+lint: ## golangci-lintでコードチェック
+	@which golangci-lint > /dev/null || (echo "golangci-lint not found. Install it with: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest" && exit 1)
+	golangci-lint run ./...
+
 .PHONY: test
 test: ## テスト実行
 	$(GOCMD) test -v -race ./tests/unit/...
