@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { RuleCard } from '@/components/auto-reply/rule-card'
 import { RuleForm } from '@/components/auto-reply/rule-form'
 import {
@@ -19,7 +20,7 @@ export default function AutoReplyPage() {
   // ルール作成
   const handleCreate = async (data: CreateAutoReplyRuleRequest) => {
     if (rules.length >= 5) {
-      alert('ルールは最大5件までです')
+      toast.error('ルールは最大5件までです')
       return
     }
 
@@ -27,10 +28,10 @@ export default function AutoReplyPage() {
       await createRule(data)
       await mutate()
       setIsFormOpen(false)
-      alert('ルールを作成しました')
+      toast.success('ルールを作成しました')
     } catch (error) {
       console.error('Failed to create rule:', error)
-      alert('ルールの作成に失敗しました')
+      toast.error('ルールの作成に失敗しました')
     }
   }
 
@@ -49,10 +50,10 @@ export default function AutoReplyPage() {
       await mutate()
       setIsFormOpen(false)
       setEditingRule(null)
-      alert('ルールを更新しました')
+      toast.success('ルールを更新しました')
     } catch (error) {
       console.error('Failed to update rule:', error)
-      alert('ルールの更新に失敗しました')
+      toast.error('ルールの更新に失敗しました')
     }
   }
 
@@ -63,10 +64,10 @@ export default function AutoReplyPage() {
     try {
       await deleteRule(id)
       await mutate()
-      alert('ルールを削除しました')
+      toast.success('ルールを削除しました')
     } catch (error) {
       console.error('Failed to delete rule:', error)
-      alert('ルールの削除に失敗しました')
+      toast.error('ルールの削除に失敗しました')
     }
   }
 
@@ -77,7 +78,7 @@ export default function AutoReplyPage() {
       await mutate()
     } catch (error) {
       console.error('Failed to toggle rule:', error)
-      alert('ルールの切り替えに失敗しました')
+      toast.error('ルールの切り替えに失敗しました')
     }
   }
 
@@ -94,7 +95,7 @@ export default function AutoReplyPage() {
       await mutate()
     } catch (error) {
       console.error('Failed to toggle global settings:', error)
-      alert('全体設定の切り替えに失敗しました')
+      toast.error('全体設定の切り替えに失敗しました')
       setGlobalEnabled(!newGlobalEnabled) // ロールバック
     }
   }

@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { useRichMenu, createRichMenu, updateRichMenu, deleteRichMenu, publishRichMenu } from '@/lib/hooks/use-rich-menu'
 import { ImageUploader } from '@/components/richmenu/image-uploader'
 import { TemplateSelector } from '@/components/richmenu/template-selector'
@@ -75,8 +76,9 @@ export default function RichMenuPage() {
       setIsCreating(false)
       setFormData({ name: '', areas: [] })
       setCurrentStep('upload')
+      toast.success('リッチメニューを保存しました')
     } catch (error) {
-      alert(error instanceof Error ? error.message : '保存に失敗しました')
+      toast.error(error instanceof Error ? error.message : '保存に失敗しました')
     } finally {
       setIsSaving(false)
     }
@@ -88,9 +90,9 @@ export default function RichMenuPage() {
     try {
       await publishRichMenu(richMenu.id)
       await mutate()
-      alert('リッチメニューをLINEに反映しました')
+      toast.success('リッチメニューをLINEに反映しました')
     } catch (error) {
-      alert(error instanceof Error ? error.message : '反映に失敗しました')
+      toast.error(error instanceof Error ? error.message : '反映に失敗しました')
     }
   }
 
@@ -101,8 +103,9 @@ export default function RichMenuPage() {
     try {
       await deleteRichMenu(richMenu.id)
       await mutate()
+      toast.success('リッチメニューを削除しました')
     } catch (error) {
-      alert(error instanceof Error ? error.message : '削除に失敗しました')
+      toast.error(error instanceof Error ? error.message : '削除に失敗しました')
     }
   }
 
