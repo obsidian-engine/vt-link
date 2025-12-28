@@ -11,7 +11,7 @@ import (
 	"os"
 	"time"
 
-	"vt-link/backend/internal/domain/service"
+	"vt-link/backend/internal/domain/repository"
 	"vt-link/backend/internal/shared/retry"
 )
 
@@ -31,7 +31,7 @@ type LineText struct {
 	Text string `json:"text"`
 }
 
-func NewLinePusher() service.Pusher {
+func NewLinePusher() repository.Pusher {
 	return &LinePusher{
 		channelAccessToken: os.Getenv("LINE_MESSAGING_ACCESS_TOKEN"),
 		channelID:          os.Getenv("LINE_MESSAGING_CHANNEL_ID"),
@@ -239,7 +239,7 @@ func (p *LinePusher) MulticastByAudience(ctx context.Context, audienceIDs []stri
 // DummyPusher テスト・開発用のダミー実装
 type DummyPusher struct{}
 
-func NewDummyPusher() service.Pusher {
+func NewDummyPusher() repository.Pusher {
 	return &DummyPusher{}
 }
 

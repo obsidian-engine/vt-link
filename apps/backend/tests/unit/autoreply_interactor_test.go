@@ -16,7 +16,7 @@ import (
 	"vt-link/backend/internal/application/autoreply"
 	"vt-link/backend/internal/domain/model"
 	repoMocks "vt-link/backend/internal/domain/repository/mocks"
-	serviceMocks "vt-link/backend/internal/domain/service/mocks"
+	serviceMocks "vt-link/backend/internal/domain/repository/mocks"
 	"vt-link/backend/internal/infrastructure/external"
 	"vt-link/backend/internal/shared/errx"
 )
