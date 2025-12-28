@@ -1,9 +1,38 @@
-"use client"
-import { Calendar, Download, Filter } from "lucide-react"
-import { useHistory } from "./_hooks/use-history"
+import { Calendar, Download, Filter, Loader2 } from "lucide-react"
+import { serverApi, CACHE_STRATEGY } from "@/lib/server-api"
+import type { MessageHistory } from "@/lib/api-client"
 
-export default function HistoryPage() {
-  const { histories, isLoading, isError } = useHistory()
+export default async function HistoryPage() {
+  // Server Componentでデータフェッチ
+  const response = await serverApi.GET<{ data: MessageHistory[] }>('/api/v1/history', {
+    revalidate: CACHE_STRATEGY.NO_CACHE, // 常に最新データを取得
+  })
+
+  // エラーハンドリング
+  if (response.error) {
+    return (
+      <div className="space-y-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold">配信履歴</h1>
+            <p className="text-muted-foreground">
+              過去の配信・結果を一覧表示
+            </p>
+          </div>
+        </div>
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 p-4">
+            <p className="text-sm text-red-800 dark:text-red-400">
+              配信履歴の取得に失敗しました。{response.error.message || "時間をおいて再度お試しください。"}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // データを取得
+  const histories = response.data?.data || []
 
   // 日時フォーマット関数
   const formatDate = (dateString: string | null) => {
@@ -15,7 +44,7 @@ export default function HistoryPage() {
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit'
-    }).replace(/\//g, '/')
+    })
   }
 
   // ステータス表示関数
@@ -78,25 +107,8 @@ export default function HistoryPage() {
         <h2 className="text-base font-semibold mb-1">配信履歴詳細</h2>
         <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">配信されたメッセージとその結果</p>
         
-        {/* Loading State */}
-        {isLoading && (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-slate-600"></div>
-            <span className="ml-3 text-slate-600 dark:text-slate-400">読み込み中...</span>
-          </div>
-        )}
-
-        {/* Error State */}
-        {isError && (
-          <div className="rounded-lg border border-red-200 bg-red-50 dark:bg-red-900/20 dark:border-red-800 p-4">
-            <p className="text-sm text-red-800 dark:text-red-400">
-              配信履歴の取得に失敗しました。時間をおいて再度お試しください。
-            </p>
-          </div>
-        )}
-
         {/* Empty State */}
-        {!isLoading && !isError && histories.length === 0 && (
+        {histories.length === 0 && (
           <div className="text-center py-12">
             <Calendar className="h-12 w-12 mx-auto text-slate-400 mb-3" />
             <p className="text-slate-600 dark:text-slate-400">配信履歴がありません</p>
@@ -104,7 +116,7 @@ export default function HistoryPage() {
         )}
 
         {/* Data Table */}
-        {!isLoading && !isError && histories.length > 0 && (
+        {histories.length > 0 && (
           <div className="rounded-lg border border-white/30 overflow-hidden">
             <table className="min-w-full text-sm">
               <thead className="text-slate-600 dark:text-slate-400 bg-white/40 dark:bg-slate-800/30">

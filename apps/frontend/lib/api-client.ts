@@ -9,6 +9,45 @@ export interface Message {
   updatedAt: string
 }
 
+export interface Fan {
+  id: string
+  displayName: string | null
+  pictureUrl: string | null
+  tags: string[]
+  followedAt: string
+}
+
+export interface Pagination {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface MessageHistory {
+  id: string
+  messageId: string
+  recipientCount: number
+  status: string
+  sentAt: string | null
+  errorMessage: string | null
+  createdAt: string
+}
+
+export interface UserSettings {
+  timezone: string
+  language: string
+  defaultReplyDelay: number
+  notificationEnabled: boolean
+}
+
+export interface UpdateUserSettingsRequest {
+  timezone?: string
+  language?: string
+  defaultReplyDelay?: number
+  notificationEnabled?: boolean
+}
+
 export interface AutoReplyRule {
   id: string
   type: 'follow' | 'keyword'

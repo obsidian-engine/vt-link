@@ -1,7 +1,31 @@
-
-'use client'
 import Link from 'next/link'
-import { useDashboardStats, useCampaigns, Campaign } from './_shared/hooks/use-dashboard'
+import { serverApi, CACHE_STRATEGY } from '@/lib/server-api'
+
+interface DashboardStats {
+  friendCount: number
+  sendCount: number
+  sendLimit: number
+  averageCtr: number
+  monthlyRevenue: number
+}
+
+interface Campaign {
+  id: string
+  name: string
+  sentCount: number
+  ctr: number
+  cvr: number
+  status: 'active' | 'ended' | 'paused'
+  createdAt: string
+}
+
+interface DashboardStatsResponse {
+  data: DashboardStats
+}
+
+interface CampaignsResponse {
+  data: Campaign[]
+}
 
 /**
  * エラーからメッセージを安全に取得する型ガード関数
@@ -12,38 +36,26 @@ function getErrorMessage(error: unknown): string {
   return '不明なエラー'
 }
 
-export default function HomePage() {
-  const { stats, isLoading: statsLoading, isError: statsError } = useDashboardStats()
-  const { campaigns, isLoading: campaignsLoading, isError: campaignsError } = useCampaigns()
-
-  // ローディング状態
-  if (statsLoading || campaignsLoading) {
-    return (
-      <div className="space-y-12">
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="glass dark:glass-dark rounded-lg p-6 shadow-soft animate-pulse">
-              <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-16 mb-2"></div>
-              <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-24"></div>
-            </div>
-          ))}
-        </div>
-        <div className="glass dark:glass-dark rounded-lg shadow-soft p-6">
-          <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-32 mb-4"></div>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-12 bg-slate-200 dark:bg-slate-700 rounded animate-pulse"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    )
-  }
+export default async function HomePage() {
+  // 並列でデータ取得
+  const [statsResult, campaignsResult] = await Promise.all([
+    serverApi.GET<DashboardStatsResponse>('/api/v1/dashboard/stats', {
+      revalidate: CACHE_STRATEGY.SHORT, // 60秒間キャッシュ
+    }),
+    serverApi.GET<CampaignsResponse>('/api/v1/campaigns', {
+      revalidate: CACHE_STRATEGY.SHORT,
+    }),
+  ])
 
   // エラー状態
-  if (statsError || campaignsError) {
-    const errorMessage = getErrorMessage(statsError) || getErrorMessage(campaignsError) || '不明なエラー'
-    const isNetworkError = errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('fetch')
+  if (statsResult.error || campaignsResult.error) {
+    const errorMessage = 
+      getErrorMessage(statsResult.error) || 
+      getErrorMessage(campaignsResult.error) || 
+      '不明なエラー'
+    const isNetworkError = 
+      errorMessage.toLowerCase().includes('network') || 
+      errorMessage.toLowerCase().includes('fetch')
 
     return (
       <div className="space-y-8">
@@ -82,18 +94,18 @@ export default function HomePage() {
               </p>
             </details>
             <div className="flex gap-3 justify-center">
-              <button
-                onClick={() => window.location.reload()}
+              <Link
+                href="/"
                 className="min-h-[44px] px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 transition"
               >
                 再読み込み
-              </button>
-              <a
+              </Link>
+              <Link
                 href="/settings"
                 className="min-h-[44px] inline-flex items-center px-4 py-2 rounded-lg bg-muted text-foreground hover:bg-muted/80 active:bg-muted/70 focus:outline-none focus:ring-2 focus:ring-border focus:ring-offset-2 transition"
               >
                 設定を確認
-              </a>
+              </Link>
             </div>
             <p className="mt-6 text-xs text-gray-500 dark:text-gray-500">
               問題が解決しない場合は、
@@ -106,6 +118,21 @@ export default function HomePage() {
               ください。
             </p>
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  const stats = statsResult.data?.data
+  const campaigns = campaignsResult.data?.data ?? []
+
+  if (!stats) {
+    return (
+      <div className="space-y-8">
+        <div className="glass dark:glass-dark rounded-lg p-6 shadow-soft">
+          <p className="text-center text-muted-foreground">
+            データが見つかりませんでした
+          </p>
         </div>
       </div>
     )
@@ -127,23 +154,31 @@ export default function HomePage() {
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
           <div className="bg-white rounded-lg p-6 border border-border hover:border-primary/50 transition">
             <p className="text-sm text-muted-foreground mb-1">友だち数</p>
-            <p className="text-3xl font-bold">{stats?.friendCount.toLocaleString()}</p>
+            <p className="text-3xl font-bold">{stats.friendCount.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground mt-2">現在の友だち総数</p>
           </div>
           <div className="bg-white rounded-lg p-6 border border-border hover:border-primary/50 transition">
             <p className="text-sm text-muted-foreground mb-1">今月の送信</p>
-            <p className="text-3xl font-bold">{stats?.sendCount.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground mt-2">上限: {stats?.sendLimit.toLocaleString()}通</p>
+            <p className="text-3xl font-bold">{stats.sendCount.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              上限: {stats.sendLimit.toLocaleString()}通
+            </p>
           </div>
           <div className="bg-white rounded-lg p-6 border border-border hover:border-primary/50 transition">
             <p className="text-sm text-muted-foreground mb-1">平均CTR</p>
-            <p className="text-3xl font-bold">{stats?.averageCtr}%</p>
-            <p className="text-xs text-muted-foreground mt-2">クリック率（高いほど良好）</p>
+            <p className="text-3xl font-bold">{stats.averageCtr}%</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              クリック率（高いほど良好）
+            </p>
           </div>
           <div className="bg-white rounded-lg p-6 border border-border hover:border-primary/50 transition">
             <p className="text-sm text-muted-foreground mb-1">今月の売上</p>
-            <p className="text-3xl font-bold">¥{stats?.monthlyRevenue.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground mt-2">メッセージ経由の売上</p>
+            <p className="text-3xl font-bold">
+              ¥{stats.monthlyRevenue.toLocaleString()}
+            </p>
+            <p className="text-xs text-muted-foreground mt-2">
+              メッセージ経由の売上
+            </p>
           </div>
         </div>
       </div>
@@ -153,7 +188,9 @@ export default function HomePage() {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-lg font-semibold">最近のキャンペーン</h2>
-            <p className="text-sm text-muted-foreground">過去の配信結果を確認できます</p>
+            <p className="text-sm text-muted-foreground">
+              過去の配信結果を確認できます
+            </p>
           </div>
           <Link
             href="/messages"
@@ -163,37 +200,54 @@ export default function HomePage() {
           </Link>
         </div>
         <div className="bg-white rounded-lg border border-border overflow-hidden">
-          <table className="min-w-full text-sm">
-            <thead className="bg-muted text-muted-foreground">
-              <tr>
-                <th className="px-6 py-3 text-left font-medium">キャンペーン名</th>
-                <th className="px-6 py-3 text-right font-medium">送信</th>
-                <th className="px-6 py-3 text-right font-medium">CTR</th>
-                <th className="px-6 py-3 text-right font-medium">CVR</th>
-                <th className="px-6 py-3 text-left font-medium">状態</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {campaigns.map((campaign: Campaign) => (
-                <tr key={campaign.id} className="hover:bg-muted/50 transition">
-                  <td className="px-6 py-4">{campaign.name}</td>
-                  <td className="px-6 py-4 text-right">{campaign.sentCount.toLocaleString()}</td>
-                  <td className="px-6 py-4 text-right">{campaign.ctr}%</td>
-                  <td className="px-6 py-4 text-right">{campaign.cvr}%</td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
-                      campaign.status === 'active' ? 'bg-green-500/15 text-green-700 dark:text-green-400' :
-                      campaign.status === 'ended' ? 'bg-red-500/15 text-red-700 dark:text-red-400' :
-                      'bg-yellow-400/15 text-yellow-700 dark:text-yellow-300'
-                    }`}>
-                      {campaign.status === 'active' ? '配信中' : campaign.status === 'ended' ? '終了' : '一時停止'}
-                    </span>
-                  </td>
+          {campaigns.length > 0 ? (
+            <table className="min-w-full text-sm">
+              <thead className="bg-muted text-muted-foreground">
+                <tr>
+                  <th className="px-6 py-3 text-left font-medium">
+                    キャンペーン名
+                  </th>
+                  <th className="px-6 py-3 text-right font-medium">送信</th>
+                  <th className="px-6 py-3 text-right font-medium">CTR</th>
+                  <th className="px-6 py-3 text-right font-medium">CVR</th>
+                  <th className="px-6 py-3 text-left font-medium">状態</th>
                 </tr>
-              ))}
-
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {campaigns.map((campaign) => (
+                  <tr key={campaign.id} className="hover:bg-muted/50 transition">
+                    <td className="px-6 py-4">{campaign.name}</td>
+                    <td className="px-6 py-4 text-right">
+                      {campaign.sentCount.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 text-right">{campaign.ctr}%</td>
+                    <td className="px-6 py-4 text-right">{campaign.cvr}%</td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                          campaign.status === 'active'
+                            ? 'bg-green-500/15 text-green-700 dark:text-green-400'
+                            : campaign.status === 'ended'
+                            ? 'bg-red-500/15 text-red-700 dark:text-red-400'
+                            : 'bg-yellow-400/15 text-yellow-700 dark:text-yellow-300'
+                        }`}
+                      >
+                        {campaign.status === 'active'
+                          ? '配信中'
+                          : campaign.status === 'ended'
+                          ? '終了'
+                          : '一時停止'}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="p-12 text-center text-muted-foreground">
+              <p>まだキャンペーンがありません</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
