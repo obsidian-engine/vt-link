@@ -24,16 +24,8 @@ packages:
     interfaces:
       MessageRepository:
       TxManager:
-
-  vt-link/backend/internal/domain/service:
-    config:
-      all: false
-      dir: "{{.InterfaceDir}}/mocks"
-      filename: "{{.MockName}}.go"
-      mockname: "Mock{{.InterfaceName}}"
-      outpkg: mocks
-    interfaces:
       Pusher:
+
 
   vt-link/backend/internal/application/message:
     config:
