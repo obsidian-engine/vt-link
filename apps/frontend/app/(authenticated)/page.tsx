@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import { serverApi, CACHE_STRATEGY } from '@/lib/server-api'
 
+// Force dynamic rendering for cookie access
+export const dynamic = 'force-dynamic'
+
 interface DashboardStats {
   friendCount: number
   sendCount: number
