@@ -51,7 +51,7 @@ function AuthCallbackContent() {
         // Tokens stored in HttpOnly cookies
         // Use full page reload to ensure cookies are sent with next request
         if (typeof window !== 'undefined') {
-          window.location.href = '/';
+          window.location.href = '/?t=' + Date.now();
         }
       } catch (err) {
         if (process.env.NODE_ENV === 'development') {

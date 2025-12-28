@@ -3,6 +3,8 @@ import { serverApi, CACHE_STRATEGY } from '@/lib/server-api'
 
 // Force dynamic rendering for cookie access
 export const dynamic = 'force-dynamic'
+// Disable caching to always read fresh cookies
+export const revalidate = 0
 
 interface DashboardStats {
   friendCount: number
