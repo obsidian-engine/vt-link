@@ -13,7 +13,8 @@ interface RuleFormProps {
 export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleFormProps) {
   // keywordsはUI上カンマ区切り文字列で管理
   const [keywordsInput, setKeywordsInput] = useState(rule?.keywords?.join(', ') ?? '')
-  
+  const [keywordsError, setKeywordsError] = useState<string | null>(null)
+
   // React Hook Form初期化
   const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useAutoReplyForm({
     type: rule?.type ?? 'keyword',
@@ -32,22 +33,27 @@ export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleF
 
   // フォーム送信処理
   const onSubmitForm = async (data: AutoReplyFormValues) => {
+    // エラーリセット
+    setKeywordsError(null)
+
     // 最大5件チェック（zodスキーマ外のビジネスロジック）
     if (!rule && existingRulesCount >= 5) {
       return
     }
 
     // keywordsInputを配列に変換
-    const keywords = data.type === 'keyword' 
+    const keywords = data.type === 'keyword'
       ? keywordsInput.split(',').map(k => k.trim()).filter(Boolean)
       : undefined
 
     // keyword型の場合のkeywords検証
     if (data.type === 'keyword') {
       if (!keywords || keywords.length === 0) {
+        setKeywordsError('反応する言葉を入力してください')
         return
       }
       if (keywords.length > 10) {
+        setKeywordsError('反応する言葉は最大10個までです')
         return
       }
     }
@@ -135,6 +141,7 @@ export function RuleForm({ rule, onSubmit, onCancel, existingRulesCount }: RuleF
               placeholder="例: 料金, 値段, いくら"
               className="w-full px-3 py-2 rounded-lg bg-white/70 dark:bg-slate-800/50 border border-white/40 dark:border-slate-700/60 focus:outline-none focus:ring-2 focus:ring-primary"
             />
+            {keywordsError && <p className="mt-1 text-xs text-red-600 dark:text-red-400">{keywordsError}</p>}
             <p className="mt-1 text-xs text-muted-foreground">
               カンマ区切りで最大10個まで入力できます（例: 料金, 値段, いくら）
             </p>

@@ -71,6 +71,10 @@ describe('RuleForm', () => {
     const keywordTypeButton = screen.getByRole('button', { name: /反応する言葉/ })
     await user.click(keywordTypeButton)
 
+    // 必須フィールドを入力
+    await user.type(screen.getByLabelText(/ルール名/), 'テストルール')
+    await user.type(screen.getByLabelText(/返信メッセージ/), 'テストメッセージ')
+
     // 11個のキーワードを入力
     const keywordsInput = screen.getByPlaceholderText(/例: 料金, 値段, いくら/)
     const keywords = Array(11).fill('keyword').join(', ')
