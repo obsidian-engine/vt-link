@@ -5,6 +5,7 @@ package mocks
 import (
 	context "context"
 	model "vt-link/backend/internal/domain/model"
+	repository "vt-link/backend/internal/domain/repository"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -281,6 +282,24 @@ func (_c *MockAutoReplyRuleRepository_Delete_Call) Return(_a0 error) *MockAutoRe
 func (_c *MockAutoReplyRuleRepository_Delete_Call) RunAndReturn(run func(context.Context, uuid.UUID) error) *MockAutoReplyRuleRepository_Delete_Call {
 	_c.Call.Return(run)
 	return _c
+}
+
+// BulkUpdateEnabled provides a mock function with given fields: ctx, items
+func (_m *MockAutoReplyRuleRepository) BulkUpdateEnabled(ctx context.Context, items []repository.BulkUpdateItem) error {
+	ret := _m.Called(ctx, items)
+
+	if len(ret) == 0 {
+		panic("no return value specified for BulkUpdateEnabled")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, []repository.BulkUpdateItem) error); ok {
+		r0 = rf(ctx, items)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }
 
 // NewMockAutoReplyRuleRepository creates a new instance of MockAutoReplyRuleRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

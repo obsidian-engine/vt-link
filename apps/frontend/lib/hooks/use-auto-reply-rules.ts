@@ -65,13 +65,11 @@ export async function deleteRule(id: string): Promise<ApiResponse<void>> {
 // 一括更新（有効/無効の切り替え）
 export async function bulkUpdateRules(
   updates: { id: string; isEnabled: boolean }[]
-): Promise<ApiResponse<{ message: string; count: number }>> {
-  const res = await client.PATCH<{ message: string; count: number }>(
-    '/api/v1/autoreply/rules/bulk',
-    { body: { updates } }
-  )
+): Promise<void> {
+  const res = await client.PATCH('/api/v1/autoreply/rules/bulk', {
+    body: { updates }
+  })
   if (res.error) {
-    throw new Error(res.error.message)
+    throw new Error(res.error.message || 'Failed to bulk update rules')
   }
-  return res
 }

@@ -15,6 +15,8 @@ import {
   UpdateAutoReplyRuleRequest,
   AutoReplyRuleListResponse,
   AutoReplyRuleResponse,
+  BulkUpdateAutoReplyRulesRequest,
+  BulkUpdateAutoReplyRulesResponse,
   RichMenu,
   CreateRichMenuRequest,
   UpdateRichMenuRequest,
@@ -40,6 +42,8 @@ registry.register('CreateAutoReplyRuleRequest', CreateAutoReplyRuleRequest)
 registry.register('UpdateAutoReplyRuleRequest', UpdateAutoReplyRuleRequest)
 registry.register('AutoReplyRuleListResponse', AutoReplyRuleListResponse)
 registry.register('AutoReplyRuleResponse', AutoReplyRuleResponse)
+registry.register('BulkUpdateAutoReplyRulesRequest', BulkUpdateAutoReplyRulesRequest)
+registry.register('BulkUpdateAutoReplyRulesResponse', BulkUpdateAutoReplyRulesResponse)
 registry.register('RichMenu', RichMenu)
 registry.register('CreateRichMenuRequest', CreateRichMenuRequest)
 registry.register('UpdateRichMenuRequest', UpdateRichMenuRequest)
@@ -460,6 +464,40 @@ registry.registerPath({
     },
     404: {
       description: 'リッチメニューが見つかりません',
+      content: {
+        'application/json': {
+          schema: ApiError
+        }
+      }
+    }
+  }
+})
+
+// AutoReply Bulk Update Path
+registry.registerPath({
+  method: 'patch',
+  path: '/api/v1/autoreply/rules/bulk',
+  description: '自動返信ルールを一括更新',
+  summary: '自動返信ルール一括更新',
+  tags: ['auto-reply-rules'],
+  requestBody: {
+    content: {
+      'application/json': {
+        schema: BulkUpdateAutoReplyRulesRequest
+      }
+    }
+  },
+  responses: {
+    200: {
+      description: '一括更新成功',
+      content: {
+        'application/json': {
+          schema: BulkUpdateAutoReplyRulesResponse
+        }
+      }
+    },
+    400: {
+      description: 'バリデーションエラー',
       content: {
         'application/json': {
           schema: ApiError

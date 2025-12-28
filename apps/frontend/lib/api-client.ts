@@ -90,6 +90,7 @@ export interface ApiClient {
   POST<T = unknown>(path: string, options?: { body?: unknown }): Promise<ApiResponse<T>>
   PUT<T = unknown>(path: string, options?: { params?: { path?: Record<string, string> }; body?: unknown }): Promise<ApiResponse<T>>
   DELETE<T = unknown>(path: string, options?: { params?: { path?: Record<string, string> } }): Promise<ApiResponse<T>>
+  PATCH<T = unknown>(path: string, options?: { params?: { path?: Record<string, string> }; body?: unknown }): Promise<ApiResponse<T>>
 }
 
 export function makeClient(): ApiClient {
@@ -227,6 +228,19 @@ export function makeClient(): ApiClient {
         })
       }
       return requestWithAuth<T>('DELETE', finalPath)
+    },
+
+    async PATCH<T = unknown>(
+      path: string,
+      options?: { params?: { path?: Record<string, string> }; body?: unknown }
+    ): Promise<ApiResponse<T>> {
+      let finalPath = path
+      if (options?.params?.path) {
+        Object.entries(options.params.path).forEach(([key, value]) => {
+          finalPath = finalPath.replace(`:${key}`, value)
+        })
+      }
+      return requestWithAuth<T>('PATCH', finalPath, options?.body)
     },
   }
 }

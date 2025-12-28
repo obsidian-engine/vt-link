@@ -1108,6 +1108,64 @@
         ],
         "description": "自動返信ルールレスポンス"
       },
+      "BulkUpdateAutoReplyRulesRequest": {
+        "type": "object",
+        "properties": {
+          "updates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "isEnabled": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "isEnabled"
+              ]
+            },
+            "minItems": 1,
+            "maxItems": 5
+          }
+        },
+        "required": [
+          "updates"
+        ],
+        "description": "自動返信ルール一括更新リクエスト"
+      },
+      "BulkUpdateAutoReplyRulesResponse": {
+        "type": "object",
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "count": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "message",
+              "count"
+            ]
+          }
+        },
+        "required": [
+          "ok",
+          "data"
+        ],
+        "description": "自動返信ルール一括更新レスポンス"
+      },
       "RichMenu": {
         "type": "object",
         "properties": {
@@ -4589,6 +4647,127 @@
           },
           "404": {
             "description": "リッチメニューが見つかりません",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean",
+                      "enum": [
+                        false
+                      ]
+                    },
+                    "error": {
+                      "type": "object",
+                      "properties": {
+                        "code": {
+                          "type": "string"
+                        },
+                        "message": {
+                          "type": "string"
+                        },
+                        "details": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "nullable": true
+                          }
+                        }
+                      },
+                      "required": [
+                        "code",
+                        "message"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "error"
+                  ],
+                  "description": "APIエラーレスポンス"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/autoreply/rules/bulk": {
+      "patch": {
+        "description": "自動返信ルールを一括更新",
+        "summary": "自動返信ルール一括更新",
+        "tags": [
+          "auto-reply-rules"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "_def": {
+                  "unknownKeys": "strip",
+                  "catchall": {
+                    "_def": {
+                      "typeName": "ZodNever"
+                    },
+                    "~standard": {
+                      "version": 1,
+                      "vendor": "zod"
+                    }
+                  },
+                  "typeName": "ZodObject",
+                  "openapi": {
+                    "metadata": {
+                      "description": "自動返信ルール一括更新リクエスト"
+                    }
+                  }
+                },
+                "~standard": {
+                  "version": 1,
+                  "vendor": "zod"
+                },
+                "_cached": null
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "一括更新成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "message": {
+                          "type": "string"
+                        },
+                        "count": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "message",
+                        "count"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "data"
+                  ],
+                  "description": "自動返信ルール一括更新レスポンス"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "バリデーションエラー",
             "content": {
               "application/json": {
                 "schema": {

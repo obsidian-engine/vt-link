@@ -26,12 +26,12 @@ export function ConfirmDialog({
   const getConfirmButtonStyle = () => {
     switch (variant) {
       case 'danger':
-        return 'bg-destructive text-destructive-foreground hover:bg-destructive/90 focus:ring-destructive'
+        return 'bg-destructive text-destructive-foreground hover:bg-destructive/90 active:bg-destructive/80 focus:ring-destructive'
       case 'warning':
-        return 'bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-500'
+        return 'bg-amber-600 text-white hover:bg-amber-700 active:bg-amber-800 focus:ring-amber-500'
       case 'info':
       default:
-        return 'bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary'
+        return 'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80 focus:ring-primary'
     }
   }
 
@@ -47,14 +47,18 @@ export function ConfirmDialog({
         <Dialog.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-50" />
 
         {/* ダイアログコンテンツ */}
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
+        <Dialog.Content 
+          className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md z-50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]"
+          aria-labelledby="dialog-title"
+          aria-describedby="dialog-description"
+        >
           {/* タイトル */}
-          <Dialog.Title className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+          <Dialog.Title id="dialog-title" className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
             {title}
           </Dialog.Title>
 
           {/* 説明 */}
-          <Dialog.Description className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          <Dialog.Description id="dialog-description" className="text-sm text-gray-600 dark:text-gray-400 mb-6">
             {description}
           </Dialog.Description>
 
@@ -64,7 +68,7 @@ export function ConfirmDialog({
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="px-4 py-2 text-sm font-medium text-muted-foreground bg-muted rounded-md hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-border"
+                className="min-h-[44px] px-4 py-2 text-sm font-medium text-muted-foreground bg-muted rounded-md hover:bg-muted/80 active:bg-muted/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-border"
               >
                 {cancelLabel}
               </button>
@@ -74,7 +78,7 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={handleConfirm}
-              className={`px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${getConfirmButtonStyle()}`}
+              className={`min-h-[44px] px-4 py-2 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${getConfirmButtonStyle()}`}
             >
               {confirmLabel}
             </button>

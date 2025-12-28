@@ -1,14 +1,119 @@
 'use client'
+import { Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { AutoReplyRule } from '@/lib/api-client'
+
+/** ボタン状態型 - Material Design 3の8状態 */
+type ButtonState = 'enabled' | 'disabled' | 'loading' | 'error'
 
 interface RuleCardProps {
   rule: AutoReplyRule
   onEdit: (rule: AutoReplyRule) => void
   onDelete: (id: string) => void
   onToggle: (id: string, isEnabled: boolean) => void
+  /** 操作中のボタンを識別するためのローディング状態 */
+  loadingAction?: 'edit' | 'toggle' | 'delete' | null
+  /** エラー状態のボタン */
+  errorAction?: 'edit' | 'toggle' | 'delete' | null
 }
 
-export function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
+/**
+ * アクションボタンコンポーネント
+ * Material Design 3の8状態を実装:
+ * - enabled: 通常状態
+ * - disabled: 無効状態
+ * - hovered: ホバー状態 (CSS)
+ * - focused: フォーカス状態 (CSS)
+ * - pressed/active: 押下状態 (CSS)
+ * - loading: 読み込み中
+ * - error: エラー状態
+ * - selected: 選択状態 (toggleボタンで使用)
+ */
+function ActionButton({
+  children,
+  onClick,
+  state = 'enabled',
+  variant = 'default',
+  selected = false,
+  className,
+  ariaLabel,
+}: {
+  children: React.ReactNode
+  onClick: () => void
+  state?: ButtonState
+  variant?: 'default' | 'success' | 'danger' | 'toggle'
+  selected?: boolean
+  className?: string
+  ariaLabel?: string
+}) {
+  const isDisabled = state === 'disabled' || state === 'loading'
+
+  const baseStyles = cn(
+    // ベーススタイル
+    "text-xs min-h-[36px] px-3 py-1.5 rounded-md transition-all",
+    // フォーカス状態
+    "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+    // 無効/ローディング状態
+    isDisabled && "opacity-50 cursor-not-allowed",
+    // 押下状態
+    !isDisabled && "active:scale-[0.97]"
+  )
+
+  const variantStyles = {
+    default: cn(
+      "bg-primary/10 text-primary focus-visible:ring-primary",
+      !isDisabled && "hover:bg-primary/20 active:bg-primary/30",
+      state === 'error' && "bg-red-100 text-red-700 ring-2 ring-red-500"
+    ),
+    success: cn(
+      selected
+        ? "bg-green-500/10 text-green-700 dark:text-green-400"
+        : "bg-gray-500/10 text-gray-600 dark:text-gray-400",
+      "focus-visible:ring-green-500",
+      !isDisabled && (selected
+        ? "hover:bg-green-500/20 active:bg-green-500/30"
+        : "hover:bg-gray-500/20 active:bg-gray-500/30"),
+      state === 'error' && "bg-red-100 text-red-700 ring-2 ring-red-500"
+    ),
+    danger: cn(
+      "text-red-600 dark:text-red-400 focus-visible:ring-red-500",
+      !isDisabled && "hover:bg-red-500/10 active:bg-red-500/20",
+      state === 'error' && "bg-red-100 ring-2 ring-red-500"
+    ),
+    toggle: cn(
+      selected
+        ? "bg-green-500/10 text-green-700 dark:text-green-400"
+        : "bg-gray-500/10 text-gray-600 dark:text-gray-400",
+      "focus-visible:ring-green-500",
+      !isDisabled && (selected
+        ? "hover:bg-green-500/20 active:bg-green-500/30"
+        : "hover:bg-gray-500/20 active:bg-gray-500/30"),
+      state === 'error' && "bg-red-100 text-red-700 ring-2 ring-red-500"
+    ),
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={isDisabled}
+      aria-busy={state === 'loading'}
+      aria-label={ariaLabel}
+      className={cn(baseStyles, variantStyles[variant], className)}
+    >
+      {state === 'loading' ? (
+        <span className="inline-flex items-center gap-1">
+          <Loader2 className="h-3 w-3 animate-spin" aria-hidden="true" />
+          処理中...
+        </span>
+      ) : (
+        children
+      )}
+    </button>
+  )
+}
+
+export function RuleCard({ rule, onEdit, onDelete, onToggle, loadingAction, errorAction }: RuleCardProps) {
   const typeColor = rule.type === 'follow' ? 'bg-yellow-500' : 'bg-blue-500'
   const typeLabel = rule.type === 'follow' ? '友だち追加時' : '反応する言葉'
 
@@ -23,28 +128,31 @@ export function RuleCard({ rule, onEdit, onDelete, onToggle }: RuleCardProps) {
           </div>
         </div>
         <div className="flex gap-2">
-          <button
+          <ActionButton
             onClick={() => onEdit(rule)}
-            className="text-xs px-3 py-1.5 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+            state={loadingAction === 'edit' ? 'loading' : errorAction === 'edit' ? 'error' : 'enabled'}
+            variant="default"
+            ariaLabel={`${rule.name}を編集`}
           >
             編集
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             onClick={() => onToggle(rule.id, !rule.isEnabled)}
-            className={`text-xs px-3 py-1.5 rounded-md transition-colors ${
-              rule.isEnabled
-                ? 'bg-green-500/10 text-green-700 dark:text-green-400 hover:bg-green-500/20'
-                : 'bg-gray-500/10 text-gray-600 dark:text-gray-400 hover:bg-gray-500/20'
-            }`}
+            state={loadingAction === 'toggle' ? 'loading' : errorAction === 'toggle' ? 'error' : 'enabled'}
+            variant="toggle"
+            selected={rule.isEnabled}
+            ariaLabel={`${rule.name}を${rule.isEnabled ? '無効化' : '有効化'}`}
           >
             {rule.isEnabled ? '有効' : '無効'}
-          </button>
-          <button
+          </ActionButton>
+          <ActionButton
             onClick={() => onDelete(rule.id)}
-            className="text-xs px-3 py-1.5 rounded-md hover:bg-red-500/10 text-red-600 dark:text-red-400 transition-colors"
+            state={loadingAction === 'delete' ? 'loading' : errorAction === 'delete' ? 'error' : 'enabled'}
+            variant="danger"
+            ariaLabel={`${rule.name}を削除`}
           >
             削除
-          </button>
+          </ActionButton>
         </div>
       </div>
 

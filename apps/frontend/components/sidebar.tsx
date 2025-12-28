@@ -65,7 +65,7 @@ export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {
           <button
             type="button"
             aria-label="サイドバーを閉じる"
-            className="md:hidden inline-flex items-center justify-center w-9 h-9 rounded-lg hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-lg hover:bg-primary/10 active:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             onClick={() => setIsOpen(false)}
           >
             <X className="h-4 w-4" />

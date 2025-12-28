@@ -1610,6 +1610,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/autoreply/rules/bulk": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * 自動返信ルール一括更新
+         * @description 自動返信ルールを一括更新
+         */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            responses: {
+                /** @description 一括更新成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            ok: boolean;
+                            data: {
+                                message: string;
+                                count: number;
+                            };
+                        };
+                    };
+                };
+                /** @description バリデーションエラー */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @enum {boolean} */
+                            ok: false;
+                            error: {
+                                code: string;
+                                message: string;
+                                details?: {
+                                    [key: string]: unknown;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2262,6 +2330,22 @@ export interface components {
                  * @example 2025-01-10T09:00:00Z
                  */
                 updatedAt: string;
+            };
+        };
+        /** @description 自動返信ルール一括更新リクエスト */
+        BulkUpdateAutoReplyRulesRequest: {
+            updates: {
+                /** Format: uuid */
+                id: string;
+                isEnabled: boolean;
+            }[];
+        };
+        /** @description 自動返信ルール一括更新レスポンス */
+        BulkUpdateAutoReplyRulesResponse: {
+            ok: boolean;
+            data: {
+                message: string;
+                count: number;
             };
         };
         /**

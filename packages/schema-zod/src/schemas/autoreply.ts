@@ -107,6 +107,25 @@ export const AutoReplyRuleResponse = z.object({
   description: '自動返信ルールレスポンス'
 })
 
+export const BulkUpdateAutoReplyRulesRequest = z.object({
+  updates: z.array(z.object({
+    id: z.string().uuid(),
+    isEnabled: z.boolean()
+  })).min(1).max(5)
+}).openapi({
+  description: '自動返信ルール一括更新リクエスト'
+})
+
+export const BulkUpdateAutoReplyRulesResponse = z.object({
+  ok: z.boolean(),
+  data: z.object({
+    message: z.string(),
+    count: z.number().int()
+  })
+}).openapi({
+  description: '自動返信ルール一括更新レスポンス'
+})
+
 export type AutoReplyRule = z.infer<typeof AutoReplyRule>
 export type AutoReplyRuleType = z.infer<typeof AutoReplyRuleType>
 export type MatchType = z.infer<typeof MatchType>
@@ -114,3 +133,5 @@ export type CreateAutoReplyRuleRequest = z.infer<typeof CreateAutoReplyRuleReque
 export type UpdateAutoReplyRuleRequest = z.infer<typeof UpdateAutoReplyRuleRequest>
 export type AutoReplyRuleListResponse = z.infer<typeof AutoReplyRuleListResponse>
 export type AutoReplyRuleResponse = z.infer<typeof AutoReplyRuleResponse>
+export type BulkUpdateAutoReplyRulesRequest = z.infer<typeof BulkUpdateAutoReplyRulesRequest>
+export type BulkUpdateAutoReplyRulesResponse = z.infer<typeof BulkUpdateAutoReplyRulesResponse>
