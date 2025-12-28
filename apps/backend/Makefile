@@ -32,6 +32,7 @@ lint-fix: ## golangci-lintで自動修正
 generate: ## mockeryでモック生成
 	@which mockery > /dev/null || (echo "mockery not found. Install it with: go install github.com/vektra/mockery/v2@latest" && exit 1)
 	mockery
+	$(GOCMD) fmt ./...
 
 .PHONY: fmt
 fmt: ## コードフォーマット
