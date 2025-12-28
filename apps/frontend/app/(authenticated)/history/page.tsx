@@ -2,6 +2,9 @@ import { Calendar, Download, Filter, Loader2 } from "lucide-react"
 import { serverApi, CACHE_STRATEGY } from "@/lib/server-api"
 import type { MessageHistory } from "@/lib/api-client"
 
+// Force dynamic rendering for cookie access
+export const dynamic = 'force-dynamic'
+
 export default async function HistoryPage() {
   // Server Componentでデータフェッチ
   const response = await serverApi.GET<{ data: MessageHistory[] }>('/api/v1/history', {

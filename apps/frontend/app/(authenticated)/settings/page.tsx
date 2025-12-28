@@ -3,6 +3,9 @@ import { serverApi, CACHE_STRATEGY } from "@/lib/server-api"
 import { SettingsForm } from "./SettingsForm"
 import type { UserSettings } from "@/lib/api-client"
 
+// Force dynamic rendering for cookie access
+export const dynamic = 'force-dynamic'
+
 export default async function SettingsPage() {
   // Server Componentでデータフェッチ
   const response = await serverApi.GET<{ data: UserSettings }>('/api/v1/settings', {

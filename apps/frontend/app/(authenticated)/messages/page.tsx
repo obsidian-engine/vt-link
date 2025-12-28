@@ -3,6 +3,9 @@ import type { Message } from '@/lib/api-client'
 import Link from 'next/link'
 import { MessageList } from './_components/message-list'
 
+// Force dynamic rendering for cookie access
+export const dynamic = 'force-dynamic'
+
 interface MessagesResponse {
   data: Message[]
 }

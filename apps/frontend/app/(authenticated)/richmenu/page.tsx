@@ -2,6 +2,9 @@ import { serverApi, CACHE_STRATEGY } from '@/lib/server-api'
 import { RichMenuClient } from './_components/richmenu-client'
 import type { RichMenu } from '@/lib/api-client'
 
+// Force dynamic rendering for cookie access
+export const dynamic = 'force-dynamic'
+
 export default async function RichMenuPage() {
   const { data, error } = await serverApi.GET<RichMenu[]>('/richmenu', {
     revalidate: CACHE_STRATEGY.SHORT
