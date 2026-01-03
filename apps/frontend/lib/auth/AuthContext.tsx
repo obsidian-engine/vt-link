@@ -1,42 +1,37 @@
-'use client'
+"use client";
 
-import {
-  createContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react'
+import { createContext, useEffect, useState, type ReactNode } from "react";
 import {
   authService as defaultAuthService,
   redirectToLineLogin as defaultRedirectToLineLogin,
   type AuthService,
   type AuthTokens,
-} from './authService'
+} from "./authService";
 
 // 認証状態の型定義
 export interface AuthState {
-  isAuthenticated: boolean
-  isLoading: boolean
+  isAuthenticated: boolean;
+  isLoading: boolean;
 }
 
 // Contextの値の型定義
 export interface AuthContextValue extends AuthState {
-  login: () => Promise<void>
-  logout: () => Promise<void>
-  setTokens: (tokens: AuthTokens) => void
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
+  setTokens: (tokens: AuthTokens) => void;
 }
 
 // Context作成（undefinedで初期化してProvider外での使用を検出）
 export const AuthContext = createContext<AuthContextValue | undefined>(
-  undefined
-)
+  undefined,
+);
 
 // Provider Props
 interface AuthProviderProps {
-  children: ReactNode
+  children: ReactNode;
   // テスト用DI
-  authService?: AuthService
-  redirectToLineLogin?: () => void
+  authService?: AuthService;
+  redirectToLineLogin?: () => void;
 }
 
 /**
@@ -56,53 +51,53 @@ export function AuthProvider({
   authService = defaultAuthService,
   redirectToLineLogin = defaultRedirectToLineLogin,
 }: AuthProviderProps) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // 初期化: API経由で認証状態をチェック
   useEffect(() => {
     const checkAuth = async () => {
-      const authenticated = await authService.checkAuth()
-      setIsAuthenticated(authenticated)
-      setIsLoading(false)
-    }
+      const authenticated = await authService.checkAuth();
+      setIsAuthenticated(authenticated);
+      setIsLoading(false);
+    };
 
-    checkAuth()
-  }, [authService])
+    checkAuth();
+  }, [authService]);
 
   // ログイン処理（LINE OAuth）
   // React 19 Compiler が自動最適化するため useCallback 不要
   const login = async () => {
-    await redirectToLineLogin()
-  }
+    await redirectToLineLogin();
+  };
 
   // ログアウト処理
   const logout = async () => {
     try {
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE || ''
-      await fetch(`${apiBase}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      })
+      const { config } = await import("../config");
+      await fetch(`${config.apiBase}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
     } catch (error) {
-      console.error('ログアウトエラー:', error)
+      console.error("ログアウトエラー:", error);
     } finally {
       // APIの成功・失敗に関わらず、状態をクリア
-      authService.clearTokens()
-      setIsAuthenticated(false)
+      authService.clearTokens();
+      setIsAuthenticated(false);
       // ログインページにリダイレクト
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login'
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
       }
     }
-  }
+  };
 
   // トークン保存後の状態更新（実際のCookie設定はバックエンドが行う）
   const setTokens = (tokens: AuthTokens) => {
     // HttpOnly Cookieはバックエンドでのみ設定可能
     // ここでは認証状態を更新するのみ
-    setIsAuthenticated(true)
-  }
+    setIsAuthenticated(true);
+  };
 
   // Context値
   // React 19 Compiler が自動メモ化するため useMemo 不要
@@ -112,7 +107,7 @@ export function AuthProvider({
     login,
     logout,
     setTokens,
-  }
+  };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

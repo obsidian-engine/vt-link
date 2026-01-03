@@ -97,6 +97,10 @@ jobs:
 
       - name: Build
         run: pnpm -C apps/frontend build
+        env:
+          NEXT_PUBLIC_API_BASE: http://localhost:8080
+          NEXT_PUBLIC_LINE_CHANNEL_ID: dummy_channel_id
+          NEXT_PUBLIC_LINE_CALLBACK_URL: http://localhost:3000/auth/callback
 
   backend:
     name: Backend Check
