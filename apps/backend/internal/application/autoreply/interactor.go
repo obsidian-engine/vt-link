@@ -7,30 +7,33 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
-	"os"
 	"strings"
 
 	"github.com/google/uuid"
 	"vt-link/backend/internal/domain/model"
 	"vt-link/backend/internal/domain/repository"
 	"vt-link/backend/internal/shared/errx"
+	"vt-link/backend/internal/shared/logger"
 )
 
 type Interactor struct {
 	ruleRepo      repository.AutoReplyRuleRepository
+	userRepo      repository.UserRepository
 	replier       repository.LineReplier
 	channelSecret string
 }
 
 func NewInteractor(
 	ruleRepo repository.AutoReplyRuleRepository,
+	userRepo repository.UserRepository,
 	replier repository.LineReplier,
+	channelSecret string,
 ) Usecase {
 	return &Interactor{
 		ruleRepo:      ruleRepo,
+		userRepo:      userRepo,
 		replier:       replier,
-		channelSecret: os.Getenv("LINE_CHANNEL_SECRET"),
+		channelSecret: channelSecret,
 	}
 }
 
@@ -55,7 +58,11 @@ func (i *Interactor) CreateRule(ctx context.Context, input *CreateRuleInput) (*m
 
 	err := i.ruleRepo.Create(ctx, rule)
 	if err != nil {
-		log.Printf("Failed to create auto reply rule: %v", err)
+		logger.Log.Error("Failed to create auto reply rule",
+			"error", err,
+			"userID", input.UserID,
+			"ruleType", input.Type,
+		)
 		return nil, errx.ErrInternalServer
 	}
 
@@ -65,7 +72,10 @@ func (i *Interactor) CreateRule(ctx context.Context, input *CreateRuleInput) (*m
 func (i *Interactor) ListRules(ctx context.Context, userID uuid.UUID) ([]*model.AutoReplyRule, error) {
 	rules, err := i.ruleRepo.FindByUserID(ctx, userID)
 	if err != nil {
-		log.Printf("Failed to list auto reply rules: %v", err)
+		logger.Log.Error("Failed to list auto reply rules",
+			"error", err,
+			"userID", userID,
+		)
 		return nil, errx.ErrInternalServer
 	}
 
@@ -75,7 +85,10 @@ func (i *Interactor) ListRules(ctx context.Context, userID uuid.UUID) ([]*model.
 func (i *Interactor) UpdateRule(ctx context.Context, input *UpdateRuleInput) (*model.AutoReplyRule, error) {
 	rule, err := i.ruleRepo.FindByID(ctx, input.ID)
 	if err != nil {
-		log.Printf("Failed to find rule for update: %v", err)
+		logger.Log.Error("Failed to find rule for update",
+			"error", err,
+			"ruleID", input.ID,
+		)
 		return nil, errx.ErrNotFound
 	}
 
@@ -83,7 +96,10 @@ func (i *Interactor) UpdateRule(ctx context.Context, input *UpdateRuleInput) (*m
 
 	err = i.ruleRepo.Update(ctx, rule)
 	if err != nil {
-		log.Printf("Failed to update auto reply rule: %v", err)
+		logger.Log.Error("Failed to update auto reply rule",
+			"error", err,
+			"ruleID", input.ID,
+		)
 		return nil, errx.ErrInternalServer
 	}
 
@@ -93,7 +109,10 @@ func (i *Interactor) UpdateRule(ctx context.Context, input *UpdateRuleInput) (*m
 func (i *Interactor) DeleteRule(ctx context.Context, id uuid.UUID) error {
 	err := i.ruleRepo.Delete(ctx, id)
 	if err != nil {
-		log.Printf("Failed to delete auto reply rule: %v", err)
+		logger.Log.Error("Failed to delete auto reply rule",
+			"error", err,
+			"ruleID", id,
+		)
 		return errx.ErrNotFound
 	}
 
@@ -115,7 +134,10 @@ func (i *Interactor) BulkUpdateRules(ctx context.Context, input *BulkUpdateInput
 
 	err := i.ruleRepo.BulkUpdateEnabled(ctx, items)
 	if err != nil {
-		log.Printf("Failed to bulk update auto reply rules: %v", err)
+		logger.Log.Error("Failed to bulk update auto reply rules",
+			"error", err,
+			"count", len(items),
+		)
 		return errx.ErrInternalServer
 	}
 
@@ -125,21 +147,26 @@ func (i *Interactor) BulkUpdateRules(ctx context.Context, input *BulkUpdateInput
 func (i *Interactor) ProcessWebhook(ctx context.Context, input *WebhookInput) error {
 	// 署名検証
 	if !i.verifySignature(input.Body, input.Signature) {
-		log.Printf("Invalid webhook signature")
+		logger.Log.Warn("Invalid webhook signature")
 		return errx.NewAppError("INVALID_SIGNATURE", "Invalid webhook signature", 401)
 	}
 
 	// イベントパース
 	var webhookBody WebhookBody
 	if err := json.Unmarshal(input.Body, &webhookBody); err != nil {
-		log.Printf("Failed to parse webhook body: %v", err)
+		logger.Log.Error("Failed to parse webhook body",
+			"error", err,
+		)
 		return errx.ErrInvalidInput
 	}
 
 	// イベント処理
 	for _, event := range webhookBody.Events {
-		if err := i.handleEvent(ctx, &event); err != nil {
-			log.Printf("Failed to handle event: %v", err)
+		if err := i.handleEvent(ctx, webhookBody.Destination, &event); err != nil {
+			logger.Log.Error("Failed to handle event",
+				"error", err,
+				"eventType", event.Type,
+			)
 			// エラーでも処理継続（一部のイベント失敗で全体が止まらないように）
 		}
 	}
@@ -149,7 +176,7 @@ func (i *Interactor) ProcessWebhook(ctx context.Context, input *WebhookInput) er
 
 func (i *Interactor) verifySignature(body []byte, signature string) bool {
 	if i.channelSecret == "" {
-		log.Println("LINE_CHANNEL_SECRET not configured, skipping signature verification")
+		logger.Log.Warn("LINE_CHANNEL_SECRET not configured, skipping signature verification")
 		return true // 開発環境用
 	}
 
@@ -160,14 +187,23 @@ func (i *Interactor) verifySignature(body []byte, signature string) bool {
 	return hmac.Equal([]byte(signature), []byte(expected))
 }
 
-func (i *Interactor) handleEvent(ctx context.Context, event *WebhookEvent) error {
-	log.Printf("Handling event type: %s", event.Type)
+func (i *Interactor) handleEvent(ctx context.Context, destination string, event *WebhookEvent) error {
+	logger.Log.Info("Handling event",
+		"eventType", event.Type,
+		"destination", destination,
+	)
 
-	// TODO: userIDをLINE userIDから取得する処理が必要
-	// 暫定的にダミーのuserIDを使用
-	userID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	// destination（Bot User ID）からオーナーユーザーを特定
+	user, err := i.userRepo.FindByLineBotUserID(ctx, destination)
+	if err != nil {
+		logger.Log.Error("Failed to find user for bot user ID",
+			"error", err,
+			"botUserID", destination,
+		)
+		return fmt.Errorf("failed to find user for bot: %w", err)
+	}
 
-	rules, err := i.ruleRepo.FindByUserID(ctx, userID)
+	rules, err := i.ruleRepo.FindByUserID(ctx, user.ID)
 	if err != nil {
 		return fmt.Errorf("failed to find rules: %w", err)
 	}
@@ -178,7 +214,9 @@ func (i *Interactor) handleEvent(ctx context.Context, event *WebhookEvent) error
 	case "message":
 		return i.handleMessageEvent(ctx, event, rules)
 	default:
-		log.Printf("Unsupported event type: %s", event.Type)
+		logger.Log.Info("Unsupported event type",
+			"eventType", event.Type,
+		)
 		return nil
 	}
 }

@@ -38,7 +38,8 @@ func (s *AutoReplyInteractorTestSuite) TestCreateRule_Success() {
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	lineReplier := &external.LineReplier{}
-	interactor := autoreply.NewInteractor(mockRepo, lineReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, lineReplier, s.channelSecret)
 
 	// 正常なルール作成のテスト
 	userID := uuid.New()
@@ -75,7 +76,8 @@ func (s *AutoReplyInteractorTestSuite) TestCreateRule_EmptyName() {
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	lineReplier := &external.LineReplier{}
-	interactor := autoreply.NewInteractor(mockRepo, lineReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, lineReplier, s.channelSecret)
 
 	// 空の名前でのルール作成テスト
 	userID := uuid.New()
@@ -102,7 +104,8 @@ func (s *AutoReplyInteractorTestSuite) TestCreateRule_KeywordTypeWithoutKeywords
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	lineReplier := &external.LineReplier{}
-	interactor := autoreply.NewInteractor(mockRepo, lineReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, lineReplier, s.channelSecret)
 
 	// キーワードタイプでキーワードなしのテスト
 	userID := uuid.New()
@@ -132,7 +135,8 @@ func (s *AutoReplyInteractorTestSuite) TestListRules_Success() {
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	lineReplier := &external.LineReplier{}
-	interactor := autoreply.NewInteractor(mockRepo, lineReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, lineReplier, s.channelSecret)
 
 	// ルール一覧取得の正常テスト
 	userID := uuid.New()
@@ -181,7 +185,8 @@ func (s *AutoReplyInteractorTestSuite) TestUpdateRule_Success() {
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	lineReplier := &external.LineReplier{}
-	interactor := autoreply.NewInteractor(mockRepo, lineReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, lineReplier, s.channelSecret)
 
 	// ルール更新の正常テスト
 	ruleID := uuid.New()
@@ -238,7 +243,8 @@ func (s *AutoReplyInteractorTestSuite) TestUpdateRule_NotFound() {
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	lineReplier := &external.LineReplier{}
-	interactor := autoreply.NewInteractor(mockRepo, lineReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, lineReplier, s.channelSecret)
 
 	// 存在しないルールの更新テスト
 	ruleID := uuid.New()
@@ -264,7 +270,8 @@ func (s *AutoReplyInteractorTestSuite) TestDeleteRule_Success() {
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	lineReplier := &external.LineReplier{}
-	interactor := autoreply.NewInteractor(mockRepo, lineReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, lineReplier, s.channelSecret)
 
 	// ルール削除の正常テスト
 	ruleID := uuid.New()
@@ -285,7 +292,8 @@ func (s *AutoReplyInteractorTestSuite) TestDeleteRule_NotFound() {
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	lineReplier := &external.LineReplier{}
-	interactor := autoreply.NewInteractor(mockRepo, lineReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, lineReplier, s.channelSecret)
 
 	// 存在しないルールの削除テスト
 	ruleID := uuid.New()
@@ -307,10 +315,12 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Follow() {
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	mockReplier := repoMocks.NewMockLineReplier(ctrl)
-	interactor := autoreply.NewInteractor(mockRepo, mockReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, mockReplier, s.channelSecret)
 
 	// フォローイベント処理のテスト
-	userID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	userID := uuid.New()
+	botUserID := "U1234567890abcdef"
 
 	rules := []*model.AutoReplyRule{
 		{
@@ -325,7 +335,7 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Follow() {
 	}
 
 	webhookBody := map[string]interface{}{
-		"destination": "test",
+		"destination": botUserID,
 		"events": []map[string]interface{}{
 			{
 				"type":       "follow",
@@ -347,6 +357,7 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Follow() {
 	}
 
 	// Mockの期待値を設定
+	mockUserRepo.EXPECT().FindByLineBotUserID(s.ctx, botUserID).Return(&model.User{ID: userID}, nil)
 	mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(rules, nil)
 	mockReplier.EXPECT().Reply(s.ctx, "test-reply-token", "フォローありがとうございます").Return(nil)
 
@@ -363,10 +374,12 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Message_ExactMatch() {
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	mockReplier := repoMocks.NewMockLineReplier(ctrl)
-	interactor := autoreply.NewInteractor(mockRepo, mockReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, mockReplier, s.channelSecret)
 
 	// メッセージイベント（完全一致）処理のテスト
-	userID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	userID := uuid.New()
+	botUserID := "U1234567890abcdef"
 	matchType := model.MatchTypeExact
 
 	rules := []*model.AutoReplyRule{
@@ -384,7 +397,7 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Message_ExactMatch() {
 	}
 
 	webhookBody := map[string]interface{}{
-		"destination": "test",
+		"destination": botUserID,
 		"events": []map[string]interface{}{
 			{
 				"type":       "message",
@@ -410,6 +423,7 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Message_ExactMatch() {
 	}
 
 	// Mockの期待値を設定
+	mockUserRepo.EXPECT().FindByLineBotUserID(s.ctx, botUserID).Return(&model.User{ID: userID}, nil)
 	mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(rules, nil)
 	mockReplier.EXPECT().Reply(s.ctx, "test-reply-token", "料金についてはこちら").Return(nil)
 
@@ -426,10 +440,12 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Message_PartialMatch()
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	mockReplier := repoMocks.NewMockLineReplier(ctrl)
-	interactor := autoreply.NewInteractor(mockRepo, mockReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, mockReplier, s.channelSecret)
 
 	// メッセージイベント（部分一致）処理のテスト
-	userID := uuid.MustParse("00000000-0000-0000-0000-000000000000")
+	userID := uuid.New()
+	botUserID := "U1234567890abcdef"
 	matchType := model.MatchTypePartial
 
 	rules := []*model.AutoReplyRule{
@@ -447,7 +463,7 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Message_PartialMatch()
 	}
 
 	webhookBody := map[string]interface{}{
-		"destination": "test",
+		"destination": botUserID,
 		"events": []map[string]interface{}{
 			{
 				"type":       "message",
@@ -473,6 +489,7 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_Message_PartialMatch()
 	}
 
 	// Mockの期待値を設定
+	mockUserRepo.EXPECT().FindByLineBotUserID(s.ctx, botUserID).Return(&model.User{ID: userID}, nil)
 	mockRepo.EXPECT().FindByUserID(s.ctx, userID).Return(rules, nil)
 	mockReplier.EXPECT().Reply(s.ctx, "test-reply-token", "料金についてはこちら").Return(nil)
 
@@ -489,7 +506,8 @@ func (s *AutoReplyInteractorTestSuite) TestProcessWebhook_InvalidSignature() {
 
 	mockRepo := repoMocks.NewMockAutoReplyRuleRepository(ctrl)
 	mockReplier := repoMocks.NewMockLineReplier(ctrl)
-	interactor := autoreply.NewInteractor(mockRepo, mockReplier)
+	mockUserRepo := repoMocks.NewMockUserRepository(ctrl)
+	interactor := autoreply.NewInteractor(mockRepo, mockUserRepo, mockReplier, s.channelSecret)
 
 	// 署名検証失敗のテスト
 	webhookBody := map[string]interface{}{

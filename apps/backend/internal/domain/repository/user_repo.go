@@ -13,6 +13,9 @@ type UserRepository interface {
 	// FindByLineUserID LINE User IDからユーザーを検索
 	FindByLineUserID(ctx context.Context, lineUserID string) (*model.User, error)
 
+	// FindByLineBotUserID LINE Bot User IDからユーザーを検索
+	FindByLineBotUserID(ctx context.Context, lineBotUserID string) (*model.User, error)
+
 	// Create ユーザーを作成
 	Create(ctx context.Context, user *model.User) error
 

@@ -2,7 +2,6 @@ package di
 
 import (
 	"log"
-	"os"
 	"sync"
 	"time"
 
@@ -14,11 +13,13 @@ import (
 	"vt-link/backend/internal/application/message"
 	"vt-link/backend/internal/application/richmenu"
 	"vt-link/backend/internal/application/settings"
+	"vt-link/backend/internal/config"
 	"vt-link/backend/internal/infrastructure/auth"
 	"vt-link/backend/internal/infrastructure/db"
 	"vt-link/backend/internal/infrastructure/db/pg"
 	"vt-link/backend/internal/infrastructure/external"
 	"vt-link/backend/internal/shared/clock"
+	"vt-link/backend/internal/shared/logger"
 )
 
 type Container struct {
@@ -45,6 +46,9 @@ func GetContainer() *Container {
 		var err error
 		container, err = newContainer()
 		if err != nil {
+			logger.Log.Error("Failed to initialize container",
+				"error", err,
+			)
 			log.Fatalf("Failed to initialize container: %v", err)
 		}
 	})
@@ -52,6 +56,12 @@ func GetContainer() *Container {
 }
 
 func newContainer() (*Container, error) {
+	// Config読み込み
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		return nil, err
+	}
+
 	// DB接続
 	database, err := db.NewDB()
 	if err != nil {
@@ -80,16 +90,16 @@ func newContainer() (*Container, error) {
 	// 開発時はDummyPusherを使用する場合
 	// pusher := external.NewDummyPusher()
 
-	lineReplier := external.NewLineReplier(os.Getenv("LINE_ACCESS_TOKEN"))
-	lineRichMenuService := external.NewLineRichMenuService(os.Getenv("LINE_ACCESS_TOKEN"))
+	lineReplier := external.NewLineReplier(cfg.LineAccessToken)
+	lineRichMenuService := external.NewLineRichMenuService(cfg.LineAccessToken)
 
 	// Auth Services
 	lineOAuthClient := external.NewLineOAuthClient(
-		os.Getenv("LINE_LOGIN_CHANNEL_ID"),
-		os.Getenv("LINE_LOGIN_CHANNEL_SECRET"),
-		os.Getenv("LINE_LOGIN_CALLBACK_URL"),
+		cfg.LineLoginChannelID,
+		cfg.LineLoginChannelSecret,
+		cfg.LineLoginCallbackURL,
 	)
-	jwtManager := auth.NewJWTManager(os.Getenv("JWT_SECRET"))
+	jwtManager := auth.NewJWTManager(cfg.JWTSecret)
 	stateStore := auth.NewInMemoryStateStore(5 * time.Minute)
 
 	// Clock
@@ -107,7 +117,9 @@ func newContainer() (*Container, error) {
 
 	autoReplyUsecase := autoreply.NewInteractor(
 		autoReplyRuleRepo,
+		userRepo,
 		lineReplier,
+		cfg.LineChannelSecret,
 	)
 
 	richMenuUsecase := richmenu.NewInteractor(

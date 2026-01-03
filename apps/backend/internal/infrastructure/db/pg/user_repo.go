@@ -21,7 +21,7 @@ func NewUserRepository(db *db.DB) repository.UserRepository {
 
 func (r *UserRepository) FindByLineUserID(ctx context.Context, lineUserID string) (*model.User, error) {
 	query := `
-		SELECT id, line_user_id, display_name, picture_url, email, created_at, updated_at
+		SELECT id, line_user_id, line_bot_user_id, display_name, picture_url, email, created_at, updated_at
 		FROM users
 		WHERE line_user_id = $1
 	`
@@ -40,10 +40,31 @@ func (r *UserRepository) FindByLineUserID(ctx context.Context, lineUserID string
 	return &user, nil
 }
 
+func (r *UserRepository) FindByLineBotUserID(ctx context.Context, lineBotUserID string) (*model.User, error) {
+	query := `
+		SELECT id, line_user_id, line_bot_user_id, display_name, picture_url, email, created_at, updated_at
+		FROM users
+		WHERE line_bot_user_id = $1
+	`
+
+	executor := db.GetExecutor(ctx, r.db)
+
+	var user model.User
+	err := executor.QueryRowxContext(ctx, query, lineBotUserID).StructScan(&user)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, fmt.Errorf("user not found for bot user id: %w", err)
+		}
+		return nil, fmt.Errorf("failed to find user by bot user id: %w", err)
+	}
+
+	return &user, nil
+}
+
 func (r *UserRepository) Create(ctx context.Context, user *model.User) error {
 	query := `
-		INSERT INTO users (id, line_user_id, display_name, picture_url, email, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+		INSERT INTO users (id, line_user_id, line_bot_user_id, display_name, picture_url, email, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
 	`
 
 	executor := db.GetExecutor(ctx, r.db)
@@ -56,6 +77,7 @@ func (r *UserRepository) Create(ctx context.Context, user *model.User) error {
 	_, err := executor.ExecContext(ctx, query,
 		user.ID,
 		user.LineUserID,
+		user.LineBotUserID,
 		user.DisplayName,
 		user.PictureURL,
 		user.Email,
@@ -69,15 +91,16 @@ func (r *UserRepository) Create(ctx context.Context, user *model.User) error {
 
 func (r *UserRepository) Upsert(ctx context.Context, user *model.User) (*model.User, error) {
 	query := `
-		INSERT INTO users (id, line_user_id, display_name, picture_url, email, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
+		INSERT INTO users (id, line_user_id, line_bot_user_id, display_name, picture_url, email, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
 		ON CONFLICT (line_user_id)
 		DO UPDATE SET
+			line_bot_user_id = EXCLUDED.line_bot_user_id,
 			display_name = EXCLUDED.display_name,
 			picture_url = EXCLUDED.picture_url,
 			email = EXCLUDED.email,
 			updated_at = NOW()
-		RETURNING id, line_user_id, display_name, picture_url, email, created_at, updated_at
+		RETURNING id, line_user_id, line_bot_user_id, display_name, picture_url, email, created_at, updated_at
 	`
 
 	executor := db.GetExecutor(ctx, r.db)
@@ -91,6 +114,7 @@ func (r *UserRepository) Upsert(ctx context.Context, user *model.User) (*model.U
 	err := executor.QueryRowxContext(ctx, query,
 		user.ID,
 		user.LineUserID,
+		user.LineBotUserID,
 		user.DisplayName,
 		user.PictureURL,
 		user.Email,
